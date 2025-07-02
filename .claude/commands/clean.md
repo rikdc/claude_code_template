@@ -1,8 +1,6 @@
 ---
 title: Clean comments
 description: Removes useless comments from the code
-read_only: false
-type: 'command'
 ---
 
 - Look for comments that are obvious or redundant and remove them. Examples of comments that can be removed include:
