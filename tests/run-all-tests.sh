@@ -6,13 +6,13 @@
 set -euo pipefail
 
 # Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly SCRIPT_DIR
-LIB_DIR="$SCRIPT_DIR/lib"
-readonly LIB_DIR
+RUNNER_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly RUNNER_SCRIPT_DIR
+RUNNER_LIB_DIR="$RUNNER_SCRIPT_DIR/lib"
+readonly RUNNER_LIB_DIR
 
 # shellcheck source=lib/test-runner.sh
-source "$LIB_DIR/test-runner.sh"
+source "$RUNNER_LIB_DIR/test-runner.sh"
 
 # Test runner configuration
 # This variable is currently unused, but kept for future use
