@@ -1,0 +1,74 @@
+---
+#################################
+# Start of GitHub Super-Linter Workflow
+#################################
+name: Lint Code Base
+
+#
+# Documentation:
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+#
+
+#############################
+# Start the job on all push #
+#############################
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+###############
+# Set the Job #
+###############
+jobs:
+  build:
+    # Name the Job
+    name: Lint Code Base
+    # Set the agent to run on
+    runs-on: ubuntu-latest
+
+    ############
+    # Steps #
+    ############
+    steps:
+      ##########################
+      # Checkout the code base #
+      ##########################
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          # Full git history is needed to get a proper
+          # list of changed files within `super-linter`
+          fetch-depth: 0
+
+      ################################
+      # Run Linter against code base #
+      ################################
+      - name: Lint Code Base
+        uses: github/super-linter@v5
+        env:
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Enable specific linters
+          VALIDATE_BASH: true
+          VALIDATE_JSON: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_YAML: true
+          
+          # Filter files to validate
+          FILTER_REGEX_INCLUDE: '.*\.sh$|.*\.json$|.*\.md$|.*\.yml$|.*\.yaml$'
+          
+          # Use project-specific linter configuration
+          BASH_CONFIG_FILE: .github/linters/.shellcheckrc
+          MARKDOWN_CONFIG_FILE: .github/linters/.markdown-lint.yml
+          
+          # Linter configuration options
+          BASH_SEVERITY: warning
+          MARKDOWN_CONFIG_FILE: .github/linters/.markdown-lint.yml
+          
+          # Output configuration
+          LOG_LEVEL: NOTICE
+          DISABLE_ERRORS: false
