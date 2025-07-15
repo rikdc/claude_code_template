@@ -63,7 +63,7 @@ jobs:
           
           # Use project-specific linter configuration
           BASH_CONFIG_FILE: .github/linters/.shellcheckrc
-          MARKDOWN_CONFIG_FILE: .github/linters/.markdown-lint.yml
+          MARKDOWN_LINTER_RULES: .github/linters/.markdown-lint.yml
           
           # Linter configuration options
           BASH_SEVERITY: warning
