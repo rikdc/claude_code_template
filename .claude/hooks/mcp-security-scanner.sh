@@ -137,15 +137,34 @@ scan_with_patterns() {
     local content="$1"
     local violations=()
     
+    # For debugging - log content and config file
+    log "DEBUG: Content to scan: '$content'"
+    log "DEBUG: Using pattern file: $CONFIG_FILE"
+    
     # Load patterns from config
     while IFS='=' read -r pattern_name pattern_regex; do
         # Skip comments and empty lines
-        [[ "$pattern_name" =~ ^#.*$ ]] || [[ -z "$pattern_name" ]] && continue
-        [[ -z "$pattern_regex" ]] && continue
+        log "DEBUG: Processing pattern: '$pattern_name' = '$pattern_regex'"
+        [[ "$pattern_name" =~ ^#.*$ ]] && {
+            log "DEBUG: Skipping comment line"
+            continue
+        }
+        [[ -z "$pattern_name" ]] && {
+            log "DEBUG: Skipping empty pattern name"
+            continue
+        }
+        [[ -z "$pattern_regex" ]] && {
+            log "DEBUG: Skipping empty pattern regex"
+            continue
+        }
         
         # Use case-insensitive grep with basic patterns (macOS compatible)
+        log "DEBUG: Testing pattern '$pattern_name' against content"
         if echo "$content" | grep -qi "$pattern_regex" 2>/dev/null; then
+            log "DEBUG: Match found for pattern: $pattern_name"
             violations+=("$pattern_name")
+        else
+            log "DEBUG: No match for pattern: $pattern_name"
         fi
     done < "$CONFIG_FILE"
     
