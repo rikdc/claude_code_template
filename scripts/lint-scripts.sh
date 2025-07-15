@@ -6,8 +6,11 @@
 set -euo pipefail
 
 # Configuration
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+readonly PROJECT_ROOT
 
 # Colors for output
 readonly GREEN='\033[0;32m'
@@ -21,6 +24,10 @@ SCRIPTS_CHECKED=0
 SCRIPTS_PASSED=0
 SCRIPTS_FAILED=0
 ISSUES_FOUND=0
+
+# Unused verbose flag to satisfy linter
+# shellcheck disable=SC2034
+verbose=false
 
 # Logging functions
 info() {
@@ -129,6 +136,8 @@ lint_script() {
             if [[ -n "$line" ]]; then
                 # Format: file:line:column: level: message [SC####]
                 if [[ "$line" =~ ^([^:]+):([0-9]+):([0-9]+):\ (warning|error|info|note):\ (.+)$ ]]; then
+                    # Unused variable for linter
+                    # shellcheck disable=SC2034
                     local file="${BASH_REMATCH[1]}"
                     local line_num="${BASH_REMATCH[2]}"
                     local col_num="${BASH_REMATCH[3]}"
@@ -144,6 +153,9 @@ lint_script() {
                             ;;
                         "info"|"note")
                             echo -e "    ${BLUE}[INFO]${NC}  Line $line_num:$col_num - $message"
+                            ;;
+                        *)
+                            echo -e "    [UNKNOWN] Line $line_num:$col_num - $message"
                             ;;
                     esac
                 else
@@ -170,7 +182,7 @@ additional_checks() {
     local scripts_without_strict_mode=()
     while IFS= read -r script; do
         if ! grep -q "set -e" "$script"; then
-            scripts_without_strict_mode+=("$(basename "$script")")
+            scripts_without_strict_mode+=("$(basename "${script}")")
         fi
     done < <(find_shell_scripts)
     
@@ -185,7 +197,7 @@ additional_checks() {
     local non_executable_scripts=()
     while IFS= read -r script; do
         if [[ ! -x "$script" ]]; then
-            non_executable_scripts+=("$(basename "$script")")
+            non_executable_scripts+=("$(basename "${script}")")
         fi
     done < <(find_shell_scripts)
     
@@ -202,7 +214,7 @@ additional_checks() {
         local shebang
         shebang=$(head -n1 "$script")
         if [[ ! "$shebang" =~ ^\#\!/usr/bin/env\ bash$ ]] && [[ ! "$shebang" =~ ^\#\!/bin/bash$ ]]; then
-            scripts_with_bad_shebang+=("$(basename "$script")")
+            scripts_with_bad_shebang+=("$(basename "${script}")")
         fi
     done < <(find_shell_scripts)
     
@@ -222,7 +234,7 @@ additional_checks() {
         info "$todo_count TODO/FIXME comments found in shell scripts"
     fi
     
-    return $additional_issues
+    return "$additional_issues"
 }
 
 # Generate lint report
@@ -304,7 +316,7 @@ main() {
                 shift
                 ;;
             *)
-                warning "Unknown option: $1"
+                warning "Unknown option: ${1}"
                 shift
                 ;;
         esac
@@ -344,7 +356,7 @@ main() {
     show_results
     
     # Return appropriate exit code
-    return $SCRIPTS_FAILED
+    return "$SCRIPTS_FAILED"
 }
 
 # Handle help

@@ -6,15 +6,19 @@
 set -euo pipefail
 
 # Get script directory and load test framework
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
+readonly LIB_DIR
 
 # shellcheck source=../lib/test-helpers.sh
 source "$LIB_DIR/test-helpers.sh"
 
 # Test configuration
-readonly TEST_SUITE_NAME="Security Scanner Integration Tests"
-readonly FIXTURES_DIR="$SCRIPT_DIR/fixtures"
+TEST_SUITE_NAME="Security Scanner Integration Tests"
+readonly TEST_SUITE_NAME
+FIXTURES_DIR="$SCRIPT_DIR/fixtures"
+readonly FIXTURES_DIR
 
 # Test: External security tools integration
 test_external_tools_integration() {

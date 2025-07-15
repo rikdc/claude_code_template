@@ -48,6 +48,7 @@ log_debug() {
 test_suite_start() {
     local suite_name="$1"
     TEST_START_TIME=$(date +%s)
+    readonly TEST_START_TIME
     TESTS_RUN=0
     TESTS_PASSED=0
     TESTS_FAILED=0
@@ -58,6 +59,7 @@ test_suite_start() {
 
 test_suite_end() {
     local suite_name="$1"
+    local end_time
     local end_time
     end_time=$(date +%s)
     local duration=$((end_time - TEST_START_TIME))
@@ -207,6 +209,7 @@ cleanup_test_env() {
 create_temp_file() {
     local content="$1"
     local temp_file
+    local temp_file
     temp_file=$(mktemp)
     echo "$content" > "$temp_file"
     echo "$temp_file"
@@ -233,11 +236,13 @@ benchmark_test() {
     local description="$4"
     
     local start_time end_time duration_ms
+    local start_time
     start_time=$(date +%s%N)
     
     local test_result=0
     eval "$test_command" || test_result=$?
     
+    local end_time
     end_time=$(date +%s%N)
     duration_ms=$(( (end_time - start_time) / 1000000 ))
     
@@ -260,7 +265,7 @@ create_mcp_request() {
     local code="${3:-}"
     local query="${4:-}"
     
-    local json_content='{"hook_event_name": "PreToolUse", "tool_name": "'$tool_name'"'
+    local json_content='{"hook_event_name": "PreToolUse", "tool_name": "'"$tool_name"'"'
     
     if [[ -n "$prompt" || -n "$code" || -n "$query" ]]; then
         json_content+=', "tool_input": {'

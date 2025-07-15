@@ -7,11 +7,17 @@
 set -euo pipefail
 
 # Configuration
-readonly SCRIPT_NAME="$(basename "$0")"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_CLAUDE_DIR="$(dirname "$SCRIPT_DIR")"
-readonly LOG_FILE="${PROJECT_CLAUDE_DIR}/security-scan.log"
-readonly CONFIG_FILE="${PROJECT_CLAUDE_DIR}/security-patterns.conf"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+
+PROJECT_CLAUDE_DIR="$(dirname "$SCRIPT_DIR")"
+readonly PROJECT_CLAUDE_DIR
+
+LOG_FILE="${PROJECT_CLAUDE_DIR}/security-scan.log"
+readonly LOG_FILE
+
+CONFIG_FILE="${PROJECT_CLAUDE_DIR}/security-patterns.conf"
+readonly CONFIG_FILE
 
 # Logging function
 log() {
@@ -92,7 +98,8 @@ scan_with_tools() {
     echo "$content" > "$temp_file"
     
     local tools
-    tools=($(check_security_tools))
+    # Use mapfile to safely store command output in array
+    mapfile -t tools < <(check_security_tools)
     
     for tool in "${tools[@]}"; do
         case "$tool" in
@@ -113,6 +120,10 @@ scan_with_tools() {
                     rm -f "$temp_file"
                     return 1  # Found secrets
                 fi
+                ;;
+            *)
+                # Unknown tool - log but continue
+                log "Unknown security tool: $tool"
                 ;;
         esac
     done
@@ -162,6 +173,11 @@ scan_content() {
             if ! scan_with_tools "$content"; then
                 return 1
             fi
+            scan_with_patterns "$content"
+            ;;
+        *)
+            # Default to patterns only if unknown method
+            log "Unknown scan method: $scan_method. Using patterns only."
             scan_with_patterns "$content"
             ;;
     esac
@@ -227,7 +243,8 @@ main() {
     
     # Determine scan method based on available tools
     local available_tools scan_method
-    available_tools=($(check_security_tools))
+    # Use mapfile to safely store command output in array
+    mapfile -t available_tools < <(check_security_tools)
     
     if [[ ${#available_tools[@]} -gt 0 ]]; then
         scan_method="both"  # Use both tools and patterns

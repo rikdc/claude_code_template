@@ -6,8 +6,11 @@
 set -euo pipefail
 
 # Get script directory and load test framework
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+
+LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
+readonly LIB_DIR
 
 # shellcheck source=../lib/test-helpers.sh
 source "$LIB_DIR/test-helpers.sh"

@@ -6,14 +6,18 @@
 set -euo pipefail
 
 # Get script directory
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly LIB_DIR="$SCRIPT_DIR/lib"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+LIB_DIR="$SCRIPT_DIR/lib"
+readonly LIB_DIR
 
 # shellcheck source=lib/test-runner.sh
 source "$LIB_DIR/test-runner.sh"
 
 # Test runner configuration
-readonly MASTER_SUITE_NAME="MCP Security Scanner - Complete Test Suite"
+# This variable is currently unused, but kept for future use
+MASTER_SUITE_NAME="MCP Security Scanner - Complete Test Suite"
+readonly MASTER_SUITE_NAME
 
 # Display banner
 show_banner() {
@@ -87,13 +91,15 @@ run_test_category() {
     fi
     echo
     
-    return $result
+    return "$result"
 }
 
 # Main execution function
 main() {
     local test_type="${1:-all}"
+    # This variable is defined but not used in this function
     local pattern="${2:-*test*.sh}"
+    export TEST_OUTPUT_DIR="${TEST_OUTPUT_DIR:-$SCRIPT_DIR/output}"
     
     show_banner
     

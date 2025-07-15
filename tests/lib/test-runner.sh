@@ -6,9 +6,12 @@
 set -euo pipefail
 
 # Get script directory
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly TESTS_ROOT="$(dirname "$SCRIPT_DIR")"
-readonly PROJECT_ROOT="$(dirname "$TESTS_ROOT")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+TESTS_ROOT="$(dirname "$SCRIPT_DIR")"
+readonly TESTS_ROOT
+PROJECT_ROOT="$(dirname "$TESTS_ROOT")"
+readonly PROJECT_ROOT
 
 # Load test helpers
 # shellcheck source=test-helpers.sh
@@ -34,6 +37,7 @@ discover_tests() {
 
 run_test_file() {
     local test_file="$1"
+    local test_name
     local test_name
     test_name=$(basename "$test_file" .sh)
     
