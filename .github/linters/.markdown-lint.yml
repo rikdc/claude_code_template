@@ -1,0 +1,47 @@
+# Markdown Lint Rules
+# https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Default state for all rules
+default: true
+
+# MD013/line-length - Line length
+MD013:
+  # Number of characters
+  line_length: 100
+  # Allow long code blocks
+  code_blocks: false
+  # Allow long headings
+  headings: false
+  # Allow long tables
+  tables: false
+
+# MD033/no-inline-html - Inline HTML
+MD033:
+  # Allow specific HTML elements
+  allowed_elements: ["br", "img"]
+
+# MD041/first-line-heading/first-line-h1 - First line in a file should be a top-level heading
+MD041:
+  # Exclude files that don't need top-level heading
+  exclude: ["CHANGELOG.md"]
+
+# MD024/no-duplicate-heading/no-duplicate-header - Multiple headings with the same content
+MD024:
+  # Allow duplicate headings in different sections
+  allow_different_nesting: true
+
+# MD007/ul-indent - Unordered list indentation
+MD007:
+  # Spaces for indent
+  indent: 2
+
+# MD029/ol-prefix - Ordered list item prefix
+MD029: false
+
+# MD046/code-block-style - Code block style
+MD046:
+  # Block style
+  style: "fenced"
+
+# MD040/fenced-code-language - Fenced code blocks should have a language specified
+MD040: true

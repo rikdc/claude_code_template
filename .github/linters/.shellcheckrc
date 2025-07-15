@@ -1,0 +1,24 @@
+# ShellCheck configuration for Claude Code Template
+# https://github.com/koalaman/shellcheck/blob/master/shellcheck.1.md
+
+# Enable external source checking
+external-sources=true
+
+# Exclude specific checks that are not relevant or too strict for this project
+exclude=SC1091,SC2034,SC2155
+
+# SC1091: Not following sourced files (we use shellcheck source comments)
+# SC2034: Variable appears unused (sometimes variables are used in sourced files)  
+# SC2155: Declare and assign separately to avoid masking return values (sometimes acceptable)
+
+# Set shell dialect (bash)
+shell=bash
+
+# Enable all optional checks
+enable=add-default-case
+enable=check-extra-masked-returns
+enable=check-set-e-suppressed
+enable=check-unassigned-uppercase
+enable=deprecate-which
+enable=quote-safe-variables
+enable=require-double-brackets
