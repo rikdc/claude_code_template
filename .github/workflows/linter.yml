@@ -67,7 +67,6 @@ jobs:
           
           # Linter configuration options
           BASH_SEVERITY: warning
-          MARKDOWN_CONFIG_FILE: .github/linters/.markdown-lint.yml
           
           # Output configuration
           LOG_LEVEL: NOTICE
