@@ -1,0 +1,38 @@
+# Claude Code Template - Git Ignore Rules
+
+# Security scan logs (sensitive data may be logged)
+*.log
+security-scan.log
+.claude/security-scan.log
+
+# Test output and artifacts
+tests/output/
+tests/**/test-results.log
+lint-report.txt
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Auto-generated security patterns
+.claude/security-patterns.conf
+
+# Keep test library
+!tests/lib/

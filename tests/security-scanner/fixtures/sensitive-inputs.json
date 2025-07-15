@@ -1,0 +1,139 @@
+{
+  "test_cases": [
+    {
+      "name": "openai_api_key",
+      "description": "OpenAI API key should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__context7__get-library-docs",
+      "tool_input": {
+        "prompt": "Use this API key: sk-test123456789abcdefghijklmnopqrstuvwxyz1234567890"
+      }
+    },
+    {
+      "name": "aws_access_key",
+      "description": "AWS access key should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__sequential__sequentialthinking",
+      "tool_input": {
+        "prompt": "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE"
+      }
+    },
+    {
+      "name": "github_token",
+      "description": "GitHub token should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__magic__generate-component",
+      "tool_input": {
+        "code": "const token = 'ghp_abcdefghijklmnopqrstuvwxyz1234567890';"
+      }
+    },
+    {
+      "name": "database_connection_string",
+      "description": "Database URL should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__context7__resolve-library-id",
+      "tool_input": {
+        "prompt": "DATABASE_URL=postgresql://user:password@localhost:5432/mydb"
+      }
+    },
+    {
+      "name": "email_address",
+      "description": "Email addresses should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__playwright__navigate",
+      "tool_input": {
+        "prompt": "Contact support at admin@company.com for assistance"
+      }
+    },
+    {
+      "name": "credit_card_number",
+      "description": "Credit card numbers should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__sequential__sequentialthinking",
+      "tool_input": {
+        "prompt": "Test payment with card number 4111111111111111"
+      }
+    },
+    {
+      "name": "private_key",
+      "description": "Private keys should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__magic__generate-component",
+      "tool_input": {
+        "code": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA7..."
+      }
+    },
+    {
+      "name": "ssh_key",
+      "description": "SSH keys should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__context7__get-library-docs",
+      "tool_input": {
+        "code": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7..."
+      }
+    },
+    {
+      "name": "password_in_config",
+      "description": "Passwords in configuration should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__sequential__sequentialthinking",
+      "tool_input": {
+        "code": "const config = { password: 'supersecret123' };"
+      }
+    },
+    {
+      "name": "jwt_secret",
+      "description": "JWT secrets should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__context7__get-library-docs",
+      "tool_input": {
+        "prompt": "JWT_SECRET=myverysecretjwtkey12345"
+      }
+    },
+    {
+      "name": "slack_token",
+      "description": "Slack tokens should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__playwright__screenshot",
+      "tool_input": {
+        "code": "SLACK_TOKEN=xoxb-123456789012-123456789012-abcdefghijklmnopqrstuvwx"
+      }
+    },
+    {
+      "name": "azure_connection_string",
+      "description": "Azure connection strings should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__magic__generate-component",
+      "tool_input": {
+        "prompt": "AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=..."
+      }
+    },
+    {
+      "name": "multiple_secrets",
+      "description": "Multiple secrets in one request should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__sequential__sequentialthinking",
+      "tool_input": {
+        "prompt": "API_KEY=sk-test123456789 and DATABASE_URL=postgres://user:pass@host/db"
+      }
+    },
+    {
+      "name": "ssn_number",
+      "description": "Social Security Numbers should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__context7__get-library-docs",
+      "tool_input": {
+        "prompt": "Employee SSN: 123-45-6789"
+      }
+    },
+    {
+      "name": "mongodb_connection",
+      "description": "MongoDB connection strings should be blocked",
+      "hook_event_name": "PreToolUse",
+      "tool_name": "mcp__playwright__navigate",
+      "tool_input": {
+        "code": "const uri = 'mongodb://user:password@cluster.mongodb.net/database';"
+      }
+    }
+  ]
+}

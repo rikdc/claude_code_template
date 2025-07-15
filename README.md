@@ -1,20 +1,39 @@
-# AI Development Base Template
+# Claude Code Template
 
-A foundational template for AI development projects using Claude Code.
+A template for Claude Code projects with utilities, hooks, and commands.
 
-## Overview
+## Hooks
 
-This repository serves as a starting point for AI-powered development workflows, providing a structured foundation for building applications with Claude Code integration.
+| Hook | Description |
+|------|-------------|
+| [MCP Security Scanner](docs/mcp-security-scanner.md) | Prevents sensitive data from being sent to MCP services |
 
-## Getting Started
+## Commands
 
-More documentation and examples coming soon...
+```bash
+make install        # Install hooks to current project
+make test           # Run complete test suite
+make test-unit      # Run unit tests only
+make test-integration # Run integration tests only
+make lint           # Run ShellCheck on all scripts
+make clean          # Remove test artifacts
+make status         # Show current status
+make check-tools    # Check tool availability
+make help           # Show all commands
+```
 
-## Structure
+## Project Structure
 
-- `.claude/` - Claude Code configuration and commands
-- Additional project structure to be defined
-
----
-
-*This is a work in progress. Check back for updates as the template evolves.*
+```bash
+/
+├── .claude/                    # Claude Code configuration
+│   ├── hooks/                  # Claude Code hooks
+│   │   └── mcp-security-scanner.sh
+│   ├── settings.json           # Hook configuration
+│   └── security-patterns.conf.example
+├── docs/                       # Documentation
+│   └── mcp-security-scanner.md
+├── tests/                      # Test suite
+├── scripts/                    # Utility scripts
+└── Makefile                    # Command interface
+```
