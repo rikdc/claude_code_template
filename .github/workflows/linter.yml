@@ -51,23 +51,22 @@ jobs:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
           # Enable specific linters
           VALIDATE_BASH: true
           VALIDATE_JSON: true
           VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
-          
+
           # Filter files to validate
           FILTER_REGEX_INCLUDE: '.*\.sh$|.*\.json$|.*\.md$|.*\.yml$|.*\.yaml$'
-          
+
           # Use project-specific linter configuration
           BASH_CONFIG_FILE: .github/linters/.shellcheckrc
-          MARKDOWN_CONFIG_FILE: .github/linters/markdown-lint.yml
-          
+
           # Linter configuration options
           BASH_SEVERITY: warning
-          
+
           # Output configuration
           LOG_LEVEL: NOTICE
           DISABLE_ERRORS: false
