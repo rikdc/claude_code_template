@@ -1,6 +1,7 @@
 # MCP Security Scanner Hook
 
-This directory contains a security scanning hook for Claude Code that monitors and audits MCP requests for sensitive data before they are sent to external services.
+This directory contains a security scanning hook for Claude Code that monitors and audits MCP
+requests for sensitive data before they are sent to external services.
 
 ## Files
 
@@ -19,11 +20,14 @@ The security scanner runs automatically before any MCP tool call (tools starting
 3. **Logs security violations** when sensitive data is detected
 4. **Provides comprehensive audit trail** for all MCP requests
 
-**Important**: The scanner currently provides **monitoring and auditing** rather than blocking. All MCP requests are logged, and security violations are clearly flagged in the audit log for review and compliance purposes.
+**Important**: The scanner currently provides **monitoring and auditing** rather than blocking.
+All MCP requests are logged, and security violations are clearly flagged in the audit log for
+review and compliance purposes.
 
 ## Setup
 
-The hook is already configured in this repository. When you use Claude Code in this directory, it will automatically:
+The hook is already configured in this repository. When you use Claude Code in this directory,
+it will automatically:
 
 - Load the hook configuration from `.claude/settings.json`
 - Run the security scanner for all MCP requests
