@@ -5,7 +5,8 @@ description: Fix all code quality issues using parallel sub-tasks
 
 # Code Quality Check & Auto-Fix
 
-Comprehensive analysis and fixing of all code quality issues. This command **fixes problems, not just reports them**.
+Comprehensive analysis and fixing of all code quality issues. This command **fixes problems,
+not just reports them**.
 
 ## Workflow
 
@@ -33,6 +34,8 @@ When I find multiple issues, I'll spawn parallel sub-tasks:
 
 ## Execution Promise
 
-I will work systematically through all issues, spawning sub-tasks where beneficial, and continue until every check shows ✅ **PASSING**.
+I will work systematically through all issues, spawning sub-tasks where beneficial,
+and continue until every check shows ✅ **PASSING**.
 
-Example: "Found 20 issues across 8 files. Spawning 3 sub-tasks: formatting fixes, linting violations, and test failures. Coordinating results and verifying integration..."
+Example: "Found 20 issues across 8 files. Spawning 3 sub-tasks: formatting fixes,
+linting violations, and test failures. Coordinating results and verifying integration..."

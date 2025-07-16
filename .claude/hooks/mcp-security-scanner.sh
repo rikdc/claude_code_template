@@ -170,7 +170,7 @@ main() {
 
     # Only process PreToolUse events for MCP tools
     if [[ "$hook_event" != "PreToolUse" ]] || ! is_mcp_tool "$tool_name"; then
-        exit 0  # Allow non-MCP tools to proceed
+        exit 0
     fi
 
     if [[ -z "$tool_input" ]] || [[ "$tool_input" == "null" ]]; then
@@ -207,8 +207,6 @@ EOF
     exit 0  # Allow the request to proceed
 }
 
-# Handle script errors gracefully
 trap 'log "Script error on line $LINENO"' ERR
 
-# Run main function
 main "$@"

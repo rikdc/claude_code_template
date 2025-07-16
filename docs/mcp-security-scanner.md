@@ -193,7 +193,7 @@ tail -f .claude/security-scan.log
 - ✅ **Logs** detailed security violations with timestamps
 - ✅ **Audits** all MCP tool calls for compliance
 - ✅ **Alerts** when violations are detected
-- ⚠️  **Does not block** MCP requests (provides audit trail instead)
+- ✅ **Blocks** MCP requests containing secrets
 
 This approach ensures:
 

@@ -32,6 +32,7 @@ jobs:
           VALIDATE_YAML: true
 
           FILTER_REGEX_INCLUDE: '.*\.sh$|.*\.json$|.*\.md$|.*\.yml$|.*\.yaml$'
+          FILTER_REGEX_EXCLUDE: 'CLAUDE\.md'
 
           BASH_CONFIG_FILE: .github/linters/.shellcheckrc
 
