@@ -221,13 +221,9 @@ main() {
         exit 0  # Allow non-MCP tools to proceed
     fi
 
-    # Extract content to scan - use entire tool_input JSON as string
-    local content
-    content=$(echo "$input" | jq -r '.tool_input // empty')
-
-    if [[ -z "$content" ]] || [[ "$content" == "null" ]]; then
+    if [[ -z "$tool_input" ]] || [[ "$tool_input" == "null" ]]; then
         log "No content to scan for tool: $tool_name"
-        exit 0  # No content to scan
+        exit 0
     fi
 
     # Determine scan method based on available tools
@@ -247,7 +243,7 @@ main() {
     fi
 
     # Perform security scan
-    if ! scan_content "$content" "$scan_method"; then
+    if ! scan_content "$tool_input" "$scan_method"; then
         log "SECURITY VIOLATION: Sensitive data detected in MCP request to $tool_name"
 
         # Output structured JSON response to stderr
