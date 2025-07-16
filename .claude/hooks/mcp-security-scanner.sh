@@ -3,6 +3,9 @@
 # MCP Security Scanner Hook
 # Scans MCP requests for sensitive data before sending to external services
 # Compatible with Linux and macOS
+#
+# Exit Code 0 = All OK
+# Exit Code 2 = Block the request.
 
 set -euo pipefail
 
@@ -24,50 +27,6 @@ log() {
     local timestamp
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$timestamp] $*" >> "$LOG_FILE"
-}
-
-# Initialize configuration if it doesn't exist
-init_config() {
-    if [[ ! -f "$CONFIG_FILE" ]]; then
-        cat > "$CONFIG_FILE" << 'EOF'
-# Security patterns configuration
-# Format: PATTERN_NAME=regex_pattern
-
-# API Keys and Tokens
-API_KEY=(?i)(api[_-]?key|apikey|token|secret)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{16,}
-AWS_ACCESS_KEY=AKIA[0-9A-Z]{16}
-GITHUB_TOKEN=gh[pousr]_[A-Za-z0-9_]{36,255}
-SLACK_TOKEN=xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}
-DISCORD_TOKEN=[A-Za-z0-9_-]{23,28}\.[A-Za-z0-9_-]{6,7}\.[A-Za-z0-9_-]{27}
-
-# Database Connections
-DATABASE_URL=(?i)(database_url|db_url|connection_string)["\s]*[:=]["\s]*[^"\s]+
-POSTGRES_URL=postgres(ql)?://[^"\s]+
-MYSQL_URL=mysql://[^"\s]+
-MONGODB_URL=mongodb(\+srv)?://[^"\s]+
-
-# Passwords and Authentication
-PASSWORD=(?i)(password|passwd|pwd)["\s]*[:=]["\s]*[^"\s]{8,}
-JWT_SECRET=(?i)(jwt[_-]?secret|secret[_-]?key)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
-
-# Private Keys
-PRIVATE_KEY=-----BEGIN [A-Z]+ PRIVATE KEY-----
-SSH_KEY=ssh-(rsa|dsa|ed25519) [A-Za-z0-9+/=]+
-
-# Email and PII (common patterns)
-EMAIL=[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}
-CREDIT_CARD=\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b
-SSN=\b(?!000|666|9\d{2})\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b
-
-# Cloud Provider Keys
-AZURE_KEY=(?i)(azure|az)[_-]?(key|secret|token|password)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
-GCP_KEY=(?i)(gcp|google)[_-]?(key|secret|token|password)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
-
-# Custom patterns (user can add more)
-CUSTOM_PATTERN=
-EOF
-        log "Created default security patterns configuration at $CONFIG_FILE"
-    fi
 }
 
 # Check if external security tools are available
@@ -100,11 +59,7 @@ scan_with_tools() {
     echo "$content" > "$temp_file"
 
     local tools
-    # Use while loop for compatibility with older bash versions
-    local tool_list
-    tool_list=$(check_security_tools)
-    # Split the space-separated string into array
-    IFS=' ' read -ra tools <<< "$tool_list"
+    IFS=' ' read -ra tools <<< "$(check_security_tools)"
 
     for tool in "${tools[@]}"; do
         case "$tool" in
@@ -207,9 +162,6 @@ main() {
     local input
     input=$(cat)
 
-    # Initialize configuration
-    init_config
-
     # Parse JSON input
     local hook_event tool_name tool_input
     hook_event=$(echo "$input" | jq -r '.hook_event_name // empty')
@@ -228,11 +180,7 @@ main() {
 
     # Determine scan method based on available tools
     local available_tools scan_method
-    # Use while loop for compatibility with older bash versions
-    local tool_list
-    tool_list=$(check_security_tools)
-    # Split the space-separated string into array
-    IFS=' ' read -ra available_tools <<< "$tool_list"
+    IFS=' ' read -ra available_tools <<< "$(check_security_tools)"
 
     if [[ ${#available_tools[@]} -gt 0 ]]; then
         scan_method="both"  # Use both tools and patterns
@@ -246,7 +194,6 @@ main() {
     if ! scan_content "$tool_input" "$scan_method"; then
         log "SECURITY VIOLATION: Sensitive data detected in MCP request to $tool_name"
 
-        # Output structured JSON response to stderr
         cat >&2 << EOF
 {
   "decision": "block",
