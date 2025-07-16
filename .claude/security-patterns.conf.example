@@ -1,0 +1,67 @@
+# Security patterns configuration for MCP Security Scanner
+# Format: PATTERN_NAME=regex_pattern
+# Lines starting with # are comments and will be ignored
+
+# API Keys and Tokens
+API_KEY=(?i)(api[_-]?key|apikey|token|secret)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{16,}
+AWS_ACCESS_KEY=AKIA[0-9A-Z]{16}
+AWS_SECRET_KEY=(?i)(aws[_-]?secret[_-]?access[_-]?key)["\s]*[:=]["\s]*[A-Za-z0-9/+=]{40}
+GITHUB_TOKEN=gh[pousr]_[A-Za-z0-9_]{36,255}
+SLACK_TOKEN=xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}
+DISCORD_TOKEN=[A-Za-z0-9_-]{23,28}\.[A-Za-z0-9_-]{6,7}\.[A-Za-z0-9_-]{27}
+OPENAI_API_KEY=sk-[A-Za-z0-9]{48}
+ANTHROPIC_API_KEY=sk-ant-[A-Za-z0-9_-]{95,}
+
+# Database Connections
+DATABASE_URL=(?i)(database_url|db_url|connection_string)["\s]*[:=]["\s]*[^"\s]+
+POSTGRES_URL=postgres(ql)?://[^"\s]+
+MYSQL_URL=mysql://[^"\s]+
+MONGODB_URL=mongodb(\+srv)?://[^"\s]+
+REDIS_URL=redis://[^"\s]+
+
+# Passwords and Authentication
+PASSWORD=(?i)(password|passwd|pwd)["\s]*[:=]["\s]*[^"\s]{8,}
+JWT_SECRET=(?i)(jwt[_-]?secret|secret[_-]?key)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
+BASIC_AUTH=(?i)(authorization["\s]*:["\s]*basic["\s]+[A-Za-z0-9+/=]+)
+
+# Private Keys and Certificates
+PRIVATE_KEY=-----BEGIN [A-Z]+ PRIVATE KEY-----
+RSA_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----
+EC_PRIVATE_KEY=-----BEGIN EC PRIVATE KEY-----
+SSH_KEY=ssh-(rsa|dsa|ed25519) [A-Za-z0-9+/=]+
+PGP_PRIVATE_KEY=-----BEGIN PGP PRIVATE KEY-----
+
+# Email and PII (Personally Identifiable Information)
+EMAIL=[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}
+CREDIT_CARD=\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b
+SSN=\b(?!000|666|9\d{2})\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b
+PHONE_NUMBER=\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b
+
+# Cloud Provider Keys
+AZURE_KEY=(?i)(azure|az)[_-]?(key|secret|token|password)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
+GCP_KEY=(?i)(gcp|google)[_-]?(key|secret|token|password)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
+DIGITAL_OCEAN_TOKEN=dop_v1_[A-Za-z0-9]{64}
+HEROKU_API_KEY=(?i)(heroku[_-]?api[_-]?key)["\s]*[:=]["\s]*[A-Za-z0-9-]{36}
+
+# Financial and Payment
+STRIPE_KEY=(?i)(sk|pk)_(live|test)_[A-Za-z0-9]{24,}
+PAYPAL_CLIENT_ID=(?i)(paypal[_-]?client[_-]?id)["\s]*[:=]["\s]*[A-Za-z0-9_-]{80}
+
+# Development and CI/CD
+DOCKER_PASSWORD=(?i)(docker[_-]?password|dockerhub[_-]?token)["\s]*[:=]["\s]*[^"\s]+
+NPM_TOKEN=npm_[A-Za-z0-9]{36}
+TRAVIS_TOKEN=(?i)(travis[_-]?token)["\s]*[:=]["\s]*[A-Za-z0-9_-]{22}
+
+# Network and Infrastructure
+WEBHOOK_URL=https://hooks\.[a-zA-Z0-9.-]+/[A-Za-z0-9/]+
+FTP_PASSWORD=(?i)(ftp[_-]?password|ftp[_-]?pass)["\s]*[:=]["\s]*[^"\s]+
+
+# Custom patterns (users can add organization-specific patterns here)
+# Example: COMPANY_API_KEY=(?i)(mycompany[_-]?api[_-]?key)["\s]*[:=]["\s]*[a-zA-Z0-9_-]{32,}
+
+# Configuration Notes:
+# - Use (?i) prefix for case-insensitive matching
+# - Escape special regex characters with backslashes
+# - Test patterns at https://regex101.com/ before adding
+# - More specific patterns should come before general ones
+# - Consider false positive rates when adding new patterns
