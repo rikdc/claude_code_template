@@ -201,6 +201,7 @@ extract_mcp_content() {
     content+=$(echo "$tool_input" | jq -r '.prompt // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.query // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.content // empty' 2>/dev/null || echo "")
+    content+=$(echo "$tool_input" | jq -r '.thought // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.libraryName // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.context7CompatibleLibraryID // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.topic // empty' 2>/dev/null || echo "")
@@ -224,6 +225,9 @@ main() {
 
     # Initialize configuration
     init_config
+    
+    # Debug: Log that hook script is being executed
+    log "DEBUG: Hook script started - PID: $$"
 
     # Parse JSON input
     local hook_event tool_name tool_input
