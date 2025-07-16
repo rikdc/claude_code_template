@@ -50,7 +50,7 @@ test-integration: ## Run integration tests only
 .PHONY: lint
 lint: ## Run ShellCheck on all scripts
 	@echo -e "$(BLUE)🔍 Running ShellCheck on all scripts...$(NC)"
-	@find . -name "*.sh" -type f -executable | grep -v node_modules | xargs shellcheck -x
+	@find . -name "*.sh" -type f -perm +111 | grep -v node_modules | xargs shellcheck --rcfile=.github/linters/.shellcheckrc
 
 ##@ Installation and Setup
 
