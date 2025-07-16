@@ -11,9 +11,7 @@ This is a Claude Code Template project that provides security hooks and testing 
 All project operations are managed through the Makefile:
 
 ```bash
-make test           # Run complete test suite (unit + integration)
-make test-unit      # Run unit tests only  
-make test-integration # Run integration tests only
+make test           # Run complete test suite
 make lint           # Run ShellCheck on all shell scripts
 make install        # Install hooks (make scanner script executable)
 make clean          # Remove test artifacts and logs
@@ -50,6 +48,7 @@ The project uses a simple, focused testing approach:
 ### Security Pattern Detection
 
 The scanner detects multiple categories of sensitive data:
+
 - Authentication & API keys (AWS, GitHub, OpenAI, Slack, Discord, etc.)
 - Database connection strings (PostgreSQL, MySQL, MongoDB)
 - Personal information (emails, credit cards, SSNs, phone numbers)
@@ -58,7 +57,7 @@ The scanner detects multiple categories of sensitive data:
 ## Development Workflow
 
 1. **Testing**: Always run `make test` before committing changes
-2. **Linting**: Use `make lint` to ensure shell script quality  
+2. **Linting**: Use `make lint` to ensure shell script quality
 3. **Pattern Updates**: Modify `.claude/security-patterns.conf` to add custom security patterns
 4. **Hook Testing**: Test security patterns with sample MCP requests as shown in the documentation
 5. **Quality Checks**: Use `/check` command for comprehensive code quality analysis and auto-fixing
@@ -80,6 +79,7 @@ The security system operates through Claude Code's PreToolUse hook mechanism:
 **Required tools**: `jq`, `grep`, `awk`, `mktemp`
 
 **Optional security tools** (enhance detection capabilities):
+
 - `trufflehog`: Advanced secret scanning
 - `gitleaks`: Git secret detection  
 - `git-secrets`: Prevent secrets in commits
@@ -97,6 +97,7 @@ The security system operates through Claude Code's PreToolUse hook mechanism:
 ## Monitoring and Debugging
 
 **Security Scanning**: Check `.claude/security-scan.log` for:
+
 - Hook execution: `grep "DEBUG: Hook script started"`
 - Clean requests: `grep "Security scan passed"`  
 - Violations: `grep "SECURITY VIOLATION"`

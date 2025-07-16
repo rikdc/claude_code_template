@@ -13,8 +13,6 @@ A template for Claude Code projects with utilities, hooks, and commands.
 ```bash
 make install        # Install hooks to current project
 make test           # Run complete test suite
-make test-unit      # Run unit tests only
-make test-integration # Run integration tests only
 make lint           # Run ShellCheck on all scripts
 make clean          # Remove test artifacts
 make status         # Show current status
