@@ -71,22 +71,22 @@ EOF
 # Check if external security tools are available
 check_security_tools() {
     local tools=()
-    
+
     # Check for truffleHog
     if command -v trufflehog >/dev/null 2>&1; then
         tools+=("trufflehog")
     fi
-    
+
     # Check for gitleaks
     if command -v gitleaks >/dev/null 2>&1; then
         tools+=("gitleaks")
     fi
-    
+
     # Check for git-secrets
     if command -v git-secrets >/dev/null 2>&1; then
         tools+=("git-secrets")
     fi
-    
+
     echo "${tools[@]:-}"
 }
 
@@ -96,11 +96,14 @@ scan_with_tools() {
     local temp_file
     temp_file=$(mktemp)
     echo "$content" > "$temp_file"
-    
+
     local tools
-    # Use mapfile to safely store command output in array
-    mapfile -t tools < <(check_security_tools)
-    
+    # Use while loop for compatibility with older bash versions
+    local tool_list
+    tool_list=$(check_security_tools)
+    # Split the space-separated string into array
+    IFS=' ' read -ra tools <<< "$tool_list"
+
     for tool in "${tools[@]}"; do
         case "$tool" in
             "trufflehog")
@@ -127,7 +130,7 @@ scan_with_tools() {
                 ;;
         esac
     done
-    
+
     rm -f "$temp_file"
     return 0  # No secrets found
 }
@@ -136,43 +139,29 @@ scan_with_tools() {
 scan_with_patterns() {
     local content="$1"
     local violations=()
-    
-    # For debugging - log content and config file
-    log "DEBUG: Content to scan: '$content'"
-    log "DEBUG: Using pattern file: $CONFIG_FILE"
-    
+
+    # Log scanning operation
+    log "Scanning content with patterns from $CONFIG_FILE"
+
     # Load patterns from config
     while IFS='=' read -r pattern_name pattern_regex; do
         # Skip comments and empty lines
-        log "DEBUG: Processing pattern: '$pattern_name' = '$pattern_regex'"
-        [[ "$pattern_name" =~ ^#.*$ ]] && {
-            log "DEBUG: Skipping comment line"
-            continue
-        }
-        [[ -z "$pattern_name" ]] && {
-            log "DEBUG: Skipping empty pattern name"
-            continue
-        }
-        [[ -z "$pattern_regex" ]] && {
-            log "DEBUG: Skipping empty pattern regex"
-            continue
-        }
-        
+        [[ "$pattern_name" =~ ^#.*$ ]] && continue
+        [[ -z "$pattern_name" ]] && continue
+        [[ -z "$pattern_regex" ]] && continue
+
         # Use case-insensitive grep with basic patterns (macOS compatible)
-        log "DEBUG: Testing pattern '$pattern_name' against content"
         if echo "$content" | grep -qi "$pattern_regex" 2>/dev/null; then
-            log "DEBUG: Match found for pattern: $pattern_name"
+            log "Pattern match found: $pattern_name"
             violations+=("$pattern_name")
-        else
-            log "DEBUG: No match for pattern: $pattern_name"
         fi
     done < "$CONFIG_FILE"
-    
+
     if [[ ${#violations[@]} -gt 0 ]]; then
         log "Pattern violations found: ${violations[*]}"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -180,7 +169,7 @@ scan_with_patterns() {
 scan_content() {
     local content="$1"
     local scan_method="$2"
-    
+
     case "$scan_method" in
         "tools")
             scan_with_tools "$content"
@@ -206,7 +195,7 @@ scan_content() {
 extract_mcp_content() {
     local tool_input="$1"
     local content=""
-    
+
     # Extract various fields that might contain sensitive data
     content+=$(echo "$tool_input" | jq -r '.code // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.prompt // empty' 2>/dev/null || echo "")
@@ -215,7 +204,7 @@ extract_mcp_content() {
     content+=$(echo "$tool_input" | jq -r '.libraryName // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.context7CompatibleLibraryID // empty' 2>/dev/null || echo "")
     content+=$(echo "$tool_input" | jq -r '.topic // empty' 2>/dev/null || echo "")
-    
+
     echo "$content"
 }
 
@@ -232,39 +221,42 @@ is_mcp_tool() {
 main() {
     local input
     input=$(cat)
-    
+
     # Initialize configuration
     init_config
-    
+
     # Parse JSON input
     local hook_event tool_name tool_input
     hook_event=$(echo "$input" | jq -r '.hook_event_name // empty')
     tool_name=$(echo "$input" | jq -r '.tool_name // empty')
     tool_input=$(echo "$input" | jq -r '.tool_input // empty')
-    
+
     log "Hook event: $hook_event, Tool: $tool_name"
-    
-    # Only process PreToolUse events for MCP tools
+
+# Only process PreToolUse events for MCP tools
     if [[ "$hook_event" != "PreToolUse" ]] || ! is_mcp_tool "$tool_name"; then
         exit 0  # Allow non-MCP tools to proceed
     fi
-    
+
     # Extract content to scan
     local content
     content=$(extract_mcp_content "$tool_input")
-    
+
     if [[ -z "$content" ]]; then
         log "No content to scan for tool: $tool_name"
         exit 0  # No content to scan
     fi
-    
+
     log "Scanning content for tool: $tool_name (${#content} characters)"
-    
+
     # Determine scan method based on available tools
     local available_tools scan_method
-    # Use mapfile to safely store command output in array
-    mapfile -t available_tools < <(check_security_tools)
-    
+    # Use while loop for compatibility with older bash versions
+    local tool_list
+    tool_list=$(check_security_tools)
+    # Split the space-separated string into array
+    IFS=' ' read -ra available_tools <<< "$tool_list"
+
     if [[ ${#available_tools[@]} -gt 0 ]]; then
         scan_method="both"  # Use both tools and patterns
         log "Using security tools: ${available_tools[*]} + patterns"
@@ -272,7 +264,7 @@ main() {
         scan_method="patterns"  # Fall back to patterns only
         log "Using pattern-based scanning only"
     fi
-    
+
     # Perform security scan
     if ! scan_content "$content" "$scan_method"; then
         log "SECURITY VIOLATION: Sensitive data detected in MCP request to $tool_name"
@@ -291,7 +283,7 @@ main() {
         echo "View scan logs in: $LOG_FILE"
         exit 1  # Block the request
     fi
-    
+
     log "Security scan passed for tool: $tool_name"
     exit 0  # Allow the request to proceed
 }

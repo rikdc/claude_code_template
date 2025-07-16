@@ -15,7 +15,7 @@ HOOKS_DIR := $(CLAUDE_DIR)/hooks
 
 # Scripts
 SCANNER_SCRIPT := $(HOOKS_DIR)/mcp-security-scanner.sh
-TEST_RUNNER := $(TESTS_DIR)/run-all-tests.sh
+TEST_SCRIPT := $(TESTS_DIR)/test-scanner.sh
 INSTALL_SCRIPT := $(SCRIPTS_DIR)/install-hooks.sh
 
 # Colors for output
@@ -32,18 +32,18 @@ NC := \033[0m # No Color
 
 .PHONY: test
 test: ## Run complete test suite
-	@echo -e "$(BLUE)🧪 Running complete test suite...$(NC)"
-	@$(TEST_RUNNER) all
+	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
+	@$(TEST_SCRIPT)
 
 .PHONY: test-unit
 test-unit: ## Run unit tests only
-	@echo -e "$(BLUE)🧪 Running unit tests...$(NC)"
-	@$(TEST_RUNNER) unit
+	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
+	@$(TEST_SCRIPT)
 
 .PHONY: test-integration
 test-integration: ## Run integration tests only
-	@echo -e "$(BLUE)🔗 Running integration tests...$(NC)"
-	@$(TEST_RUNNER) integration
+	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
+	@$(TEST_SCRIPT)
 
 ##@ Quality Assurance
 
