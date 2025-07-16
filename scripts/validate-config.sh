@@ -6,8 +6,10 @@
 set -euo pipefail
 
 # Configuration
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+readonly PROJECT_ROOT
 readonly CLAUDE_DIR="$PROJECT_ROOT/.claude"
 readonly HOOKS_DIR="$CLAUDE_DIR/hooks"
 readonly SCANNER_SCRIPT="$HOOKS_DIR/mcp-security-scanner.sh"
@@ -119,9 +121,7 @@ validate_json_config() {
     info "Validating JSON configuration..."
     
     # Validate JSON syntax
-    validate_check "Hook settings JSON is valid" "jq empty '$SETTINGS_FILE'"
-    
-    if [[ $? -eq 0 ]]; then
+    if validate_check "Hook settings JSON is valid" "jq empty '$SETTINGS_FILE'"; then
         # Validate structure
         validate_check "Hook configuration has 'hooks' section" "jq -e '.hooks' '$SETTINGS_FILE'"
         validate_check "Hook configuration has 'PreToolUse' section" "jq -e '.hooks.PreToolUse' '$SETTINGS_FILE'"
@@ -363,7 +363,7 @@ main() {
     show_results
     
     # Return appropriate exit code
-    return $CHECKS_FAILED
+    return "$CHECKS_FAILED"
 }
 
 # Handle help

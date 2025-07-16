@@ -302,7 +302,6 @@ show_results() {
 # Main linting function
 main() {
     local generate_report_flag=false
-    local verbose=false
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -312,7 +311,7 @@ main() {
                 shift
                 ;;
             --verbose|-v)
-                verbose=true
+                # Verbose mode (not yet implemented)
                 shift
                 ;;
             *)

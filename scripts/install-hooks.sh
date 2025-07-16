@@ -6,8 +6,10 @@
 set -euo pipefail
 
 # Configuration
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+readonly PROJECT_ROOT
 readonly CLAUDE_DIR="$PROJECT_ROOT/.claude"
 readonly HOOKS_DIR="$CLAUDE_DIR/hooks"
 readonly SCANNER_SCRIPT="$HOOKS_DIR/mcp-security-scanner.sh"
