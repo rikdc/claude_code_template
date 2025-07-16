@@ -37,7 +37,7 @@ test_basic() {
     
     rm -rf "$temp_path"
     
-    if [ $result -eq $expected ]; then
+    if [[ "$result" -eq "$expected" ]]; then
         echo "PASS"
         PASSED=$((PASSED + 1))
     else
@@ -73,7 +73,7 @@ echo
 total=$((PASSED + FAILED))
 echo "📊 Tests: $total, Passed: $PASSED, Failed: $FAILED"
 
-if [ $FAILED -eq 0 ]; then
+if [[ "$FAILED" -eq 0 ]]; then
     echo "✅ All tests passed!"
     exit 0
 else
