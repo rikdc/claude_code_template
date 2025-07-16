@@ -111,19 +111,19 @@ scan_with_tools() {
             "trufflehog")
                 if trufflehog filesystem --no-update --fail "$temp_file" 2>/dev/null; then
                     rm -f "$temp_file"
-                    return 1  # Found secrets
+                    return 2  # Found secrets
                 fi
                 ;;
             "gitleaks")
                 if ! gitleaks detect --source "$temp_file" --no-git 2>/dev/null; then
                     rm -f "$temp_file"
-                    return 1  # Found secrets
+                    return 2  # Found secrets
                 fi
                 ;;
             "git-secrets")
                 if ! git-secrets --scan "$temp_file" 2>/dev/null; then
                     rm -f "$temp_file"
-                    return 1  # Found secrets
+                    return 2  # Found secrets
                 fi
                 ;;
             *)
@@ -193,24 +193,6 @@ scan_content() {
     esac
 }
 
-# Extract content from MCP tool input
-extract_mcp_content() {
-    local tool_input="$1"
-    local content=""
-
-    # Extract various fields that might contain sensitive data
-    content+=$(echo "$tool_input" | jq -r '.code // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.prompt // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.query // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.content // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.thought // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.libraryName // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.context7CompatibleLibraryID // empty' 2>/dev/null || echo "")
-    content+=$(echo "$tool_input" | jq -r '.topic // empty' 2>/dev/null || echo "")
-
-    echo "$content"
-}
-
 # Check if tool is MCP-related
 is_mcp_tool() {
     local tool_name="$1"
@@ -227,9 +209,6 @@ main() {
 
     # Initialize configuration
     init_config
-    
-    # Debug: Log that hook script is being executed
-    log "DEBUG: Hook script started - PID: $$"
 
     # Parse JSON input
     local hook_event tool_name tool_input
@@ -237,23 +216,19 @@ main() {
     tool_name=$(echo "$input" | jq -r '.tool_name // empty')
     tool_input=$(echo "$input" | jq -r '.tool_input // empty')
 
-    log "Hook event: $hook_event, Tool: $tool_name"
-
-# Only process PreToolUse events for MCP tools
+    # Only process PreToolUse events for MCP tools
     if [[ "$hook_event" != "PreToolUse" ]] || ! is_mcp_tool "$tool_name"; then
         exit 0  # Allow non-MCP tools to proceed
     fi
 
-    # Extract content to scan
+    # Extract content to scan - use entire tool_input JSON as string
     local content
-    content=$(extract_mcp_content "$tool_input")
+    content=$(echo "$input" | jq -r '.tool_input // empty')
 
-    if [[ -z "$content" ]]; then
+    if [[ -z "$content" ]] || [[ "$content" == "null" ]]; then
         log "No content to scan for tool: $tool_name"
         exit 0  # No content to scan
     fi
-
-    log "Scanning content for tool: $tool_name (${#content} characters)"
 
     # Determine scan method based on available tools
     local available_tools scan_method
@@ -274,20 +249,15 @@ main() {
     # Perform security scan
     if ! scan_content "$content" "$scan_method"; then
         log "SECURITY VIOLATION: Sensitive data detected in MCP request to $tool_name"
-        echo "🚨 Security Alert: Sensitive data detected in MCP request"
-        echo "Tool: $tool_name"
-        echo ""
-        echo "The request contains potentially sensitive information that should not"
-        echo "be sent to external services. Please review the content and remove any:"
-        echo "• API keys, tokens, or secrets"
-        echo "• Database connection strings"
-        echo "• Passwords or authentication credentials"
-        echo "• Private keys or certificates"
-        echo "• Personal identifiable information (PII)"
-        echo ""
-        echo "Configure patterns in: $CONFIG_FILE"
-        echo "View scan logs in: $LOG_FILE"
-        exit 1  # Block the request
+
+        # Output structured JSON response to stderr
+        cat >&2 << EOF
+{
+  "decision": "block",
+  "reason": "Sensitive data detected in MCP request to $tool_name. The request contains potentially sensitive information that should not be sent to external services. Please review the content and remove any: API keys, tokens, secrets, database connection strings, passwords, authentication credentials, private keys, certificates, or personal identifiable information (PII). Configure patterns in: $CONFIG_FILE. View scan logs in: $LOG_FILE"
+}
+EOF
+        exit 2  # Block the request
     fi
 
     log "Security scan passed for tool: $tool_name"

@@ -35,16 +35,6 @@ test: ## Run complete test suite
 	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
 	@$(TEST_SCRIPT)
 
-.PHONY: test-unit
-test-unit: ## Run unit tests only
-	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
-	@$(TEST_SCRIPT)
-
-.PHONY: test-integration
-test-integration: ## Run integration tests only
-	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
-	@$(TEST_SCRIPT)
-
 ##@ Quality Assurance
 
 .PHONY: lint
