@@ -56,7 +56,7 @@ Sub-task 1: Validation
 Ensure all sections are included:
 
 ```markdown
-## Summary
+# Summary
 
 ## pr_agent:summary
 
