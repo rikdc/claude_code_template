@@ -20,7 +20,7 @@ To create a commit, just type:
 
 This command spawns parallel sub-tasks for efficiency:
 
-1. **Pre-commit checks** (unless `--no-verify`): Runs `pnpm lint`, `pnpm build`, `pnpm generate:docs`
+1. **Pre-commit checks** (unless `--no-verify`): Runs `make checks` if available.
 2. **Git analysis**: Checks staged files, runs `git diff`, analyzes change patterns
 3. **Commit preparation**: Generates conventional commit messages with appropriate emoji
 
