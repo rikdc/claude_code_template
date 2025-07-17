@@ -1,3 +1,8 @@
+---
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git log:*)
+description: Creates well-formatted commits with conventional commit messages and emoji
+---
+
 # Claude Command: Commit
 
 Creates well-formatted commits with conventional commit messages and emoji.

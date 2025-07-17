@@ -8,6 +8,17 @@ A template for Claude Code projects with utilities, hooks, and commands.
 |------|-------------|
 | [MCP Security Scanner](docs/mcp-security-scanner.md) | Prevents sensitive data from being sent to MCP services |
 
+## Slash Commands
+
+| Command | Description |
+|---------|-------------|
+| `/changelog` | Maintains a CHANGELOG.md document in this repository |
+| `/check` | Fix all code quality issues using parallel sub-tasks |
+| `/clean` | Removes useless comments from the code |
+| `/gh:commit` | Creates well-formatted commits with conventional commit messages and emoji |
+| `/gh:pr` | Creates a PR on GitHub |
+| `/review-code` | Performs comprehensive code review on the latest commit |
+
 ## Commands
 
 ```bash
