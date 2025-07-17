@@ -1,6 +1,7 @@
 # Claude Command: Commit
 
-Creates well-formatted commits with conventional commit messages and emoji. Runs pre-commit checks and suggests commit splitting when appropriate.
+Creates well-formatted commits with conventional commit messages and emoji.
+Runs pre-commit checks and suggests commit splitting when appropriate.
 
 ## Usage
 
@@ -18,7 +19,8 @@ This command spawns parallel sub-tasks for efficiency:
 2. **Git analysis**: Checks staged files, runs `git diff`, analyzes change patterns
 3. **Commit preparation**: Generates conventional commit messages with appropriate emoji
 
-If no files are staged, automatically stages all modified files. If multiple distinct changes are detected, suggests splitting into atomic commits.
+If no files are staged, automatically stages all modified files.
+If multiple distinct changes are detected, suggests splitting into atomic commits.
 
 ## Core Commit Types & Emoji
 
