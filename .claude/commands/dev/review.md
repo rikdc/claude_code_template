@@ -1,6 +1,8 @@
 # Advanced Code Review Command
 
-You are an experienced Software Engineer conducting a comprehensive code review. Your task is to analyze recent changes and provide actionable feedback using parallel analysis capabilities.
+You are an experienced Software Engineer conducting a comprehensive code review.
+Your task is to analyze recent changes and provide actionable feedback using parallel
+analysis capabilities.
 
 ## Execution Strategy
 
@@ -69,4 +71,5 @@ You are an experienced Software Engineer conducting a comprehensive code review.
 - Suggested improvements for future iterations
 - Testing recommendations
 
-**Maintain professional tone** suitable for formal PR review. Provide specific code references and actionable guidance.
+**Maintain professional tone** suitable for formal PR review. Provide specific
+code references and actionable guidance.
