@@ -4,15 +4,6 @@
 # Default state for all rules
 default: true
 
-# MD013/line-length - Line length
-MD013:
-  # Allow long code blocks
-  code_blocks: false
-  # Allow long headings
-  headings: false
-  # Allow long tables
-  tables: false
-
 # MD033/no-inline-html - Inline HTML
 MD033:
   # Allow specific HTML elements
