@@ -18,7 +18,7 @@ Guidelines for managing task lists in markdown files to track progress on comple
     - References the task number and PRD context
     - **Formats the message as a single-line command using `-m` flags**, e.g.:
 
-        ```
+        ```bash
         git commit -m "feat: add payment validation logic" -m "- Validates card type and expiry" -m "- Adds unit tests for edge cases" -m "Related to T123 in PRD"
         ```
 
