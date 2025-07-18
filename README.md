@@ -55,7 +55,9 @@ make help           # Show all commands
 This project includes work from the following sources:
 
 ### Product Management Commands
+
 The PM command suite (`/pm:create-prd`, `/pm:generate-tasks`, `/pm:process-tasks`) is based on patterns and workflows from:
+
 - **Source**: [AI Dev Tasks](https://github.com/snarktank/ai-dev-tasks/tree/main)
 - **License**: MIT License
 - **Usage**: Adapted and extended for Claude Code project management workflows
