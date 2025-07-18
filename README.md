@@ -17,6 +17,9 @@ A template for Claude Code projects with utilities, hooks, and commands.
 | `/clean` | Removes useless comments from the code |
 | `/gh:commit` | Creates well-formatted commits with conventional commit messages and emoji |
 | `/gh:pr` | Creates a PR on GitHub |
+| `/pm:create-prd` | Interactive PRD creation workflow with clarifying questions |
+| `/pm:generate-tasks` | Automatic task list generation from PRDs with phased approach |
+| `/pm:process-tasks` | Task management protocols and completion workflows |
 | `/review-code` | Performs comprehensive code review on the latest commit |
 
 ## Commands
@@ -46,3 +49,17 @@ make help           # Show all commands
 ├── scripts/                    # Utility scripts
 └── Makefile                    # Command interface
 ```
+
+## Attribution
+
+This project includes work from the following sources:
+
+### Product Management Commands
+
+The PM command suite (`/pm:create-prd`, `/pm:generate-tasks`, `/pm:process-tasks`) is based on patterns and workflows from:
+
+- **Source**: [AI Dev Tasks](https://github.com/snarktank/ai-dev-tasks/tree/main)
+- **License**: MIT License
+- **Usage**: Adapted and extended for Claude Code project management workflows
+
+Special thanks to the AI Dev Tasks project for providing the foundational patterns for structured AI-assisted development workflows.
