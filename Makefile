@@ -38,9 +38,24 @@ test: ## Run complete test suite
 ##@ Quality Assurance
 
 .PHONY: lint
-lint: ## Run ShellCheck on all scripts
-	@echo -e "$(BLUE)🔍 Running ShellCheck on all scripts...$(NC)"
-	@find . -name "*.sh" -type f -perm +111 | grep -v node_modules | xargs shellcheck --rcfile=.github/linters/.shellcheckrc
+lint: ## Run ShellCheck on shell scripts and markdownlint on Markdown files
+	@echo -e "$(BLUE)🔍 Running linting checks...$(NC)"
+	@echo
+	@echo "Shell scripts:"
+	@if command -v shellcheck >/dev/null 2>&1; then \
+		find . -name "*.sh" -type f -perm +111 | grep -v node_modules | xargs shellcheck --rcfile=.github/linters/.shellcheckrc && \
+		echo -e "  $(GREEN)✅ ShellCheck passed$(NC)"; \
+	else \
+		echo -e "  $(YELLOW)⚠️  ShellCheck not installed - skipping shell script linting$(NC)"; \
+	fi
+	@echo
+	@echo "Markdown files:"
+	@if command -v markdownlint >/dev/null 2>&1; then \
+		markdownlint --config .github/linters/.markdown-lint.yml **/*.md && \
+		echo -e "  $(GREEN)✅ markdownlint passed$(NC)"; \
+	else \
+		echo -e "  $(YELLOW)⚠️  markdownlint not installed - skipping Markdown linting$(NC)"; \
+	fi
 
 ##@ Installation and Setup
 
@@ -66,21 +81,30 @@ check-tools: ## Check for required and optional tools
 	@echo -e "$(BLUE)🔧 Checking tool availability...$(NC)"
 	@echo
 	@echo "Required tools:"
-	@for tool in jq grep awk mktemp; do
-		if command -v $$tool >/dev/null 2>&1; then
-			echo -e "  ✅ $$tool"
-		else
-			echo -e "  ❌ $$tool (required)"
-		fi
+	@for tool in jq grep awk mktemp; do \
+		if command -v $$tool >/dev/null 2>&1; then \
+			echo -e "  ✅ $$tool"; \
+		else \
+			echo -e "  ❌ $$tool (required)"; \
+		fi; \
+	done
+	@echo
+	@echo "Development tools:"
+	@for tool in shellcheck markdownlint; do \
+		if command -v $$tool >/dev/null 2>&1; then \
+			echo -e "  ✅ $$tool"; \
+		else \
+			echo -e "  ⚪ $$tool (recommended for linting)"; \
+		fi; \
 	done
 	@echo
 	@echo "Optional security tools:"
-	@for tool in gitleaks trufflehog git-secrets; do
-		if command -v $$tool >/dev/null 2>&1; then
-			echo -e "  ✅ $$tool"
-		else
-			echo -e "  ⚪ $$tool (optional)"
-		fi
+	@for tool in gitleaks trufflehog git-secrets; do \
+		if command -v $$tool >/dev/null 2>&1; then \
+			echo -e "  ✅ $$tool"; \
+		else \
+			echo -e "  ⚪ $$tool (optional)"; \
+		fi; \
 	done
 
 ##@ Information
