@@ -9,11 +9,11 @@ excluded_tools = []
 hook_types = []  # Empty means monitor all hook types
 
 [storage]
-database_path = ".claude/activity_metrics.db" 
+database_path = ".claude/activity_metrics.db"
 backup_enabled = false
 cleanup_days = 30
 
-[analytics]  
+[analytics]
 enable_insights = true
 daily_summaries = true
 performance_tracking = true
@@ -25,7 +25,7 @@ condition = "content_size > 50000"
 description = "Track operations with large content"
 
 [[filters]]
-name = "slow_commands" 
+name = "slow_commands"
 condition = "execution_time > 5000"
 description = "Track slow executing commands"
 
@@ -36,7 +36,7 @@ description = "Track file editing activities"
 
 [[filters]]
 name = "bash_activities"
-condition = "tool_identifier == 'Bash'" 
+condition = "tool_identifier == 'Bash'"
 description = "Track bash command usage"
 
 [[filters]]
