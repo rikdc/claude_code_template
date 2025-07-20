@@ -10,6 +10,26 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${WORKSPACE}/.claude/hooks/activity-monitor.py"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${WORKSPACE}/.claude/hooks/activity-monitor.py"
+          }
+        ]
+      }
     ]
   }
 }
