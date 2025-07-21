@@ -13,9 +13,16 @@ echo '{
     "prompt": "What is the weather today?",
     "cwd": "/safe/directory",
     "transcript_path": "/safe/transcript.json"
-}' | python3 .claude/hooks/activity-monitor.py
+}'
 
-if [ $? -eq 0 ]; then
+if echo '{
+    "hook_event_name": "UserPromptSubmit",
+    "tool_name": "",
+    "session_id": "test-session-123",
+    "prompt": "What is the weather today?",
+    "cwd": "/safe/directory",
+    "transcript_path": "/safe/transcript.json"
+}' | python3 .claude/hooks/activity-monitor.py; then
     echo "✓ UserPromptSubmit test passed"
 else 
     echo "✗ UserPromptSubmit test failed"
@@ -30,9 +37,16 @@ echo '{
     "tool_input": {
         "command": "export API_KEY=sk-1234567890abcdef && curl -H Authorization: Bearer token123"
     }
-}' | python3 .claude/hooks/activity-monitor.py
+}'
 
-if [ $? -eq 0 ]; then
+if echo '{
+    "hook_event_name": "PreToolUse", 
+    "tool_name": "Bash",
+    "session_id": "test-session-456",
+    "tool_input": {
+        "command": "export API_KEY=sk-1234567890abcdef && curl -H Authorization: Bearer token123"
+    }
+}' | python3 .claude/hooks/activity-monitor.py; then
     echo "✓ PreToolUse with sensitive data test passed"
 else
     echo "✗ PreToolUse with sensitive data test failed" 
@@ -51,7 +65,17 @@ cat << 'EOF' | python3 .claude/hooks/activity-monitor.py
 }
 EOF
 
-if [ $? -eq 0 ]; then
+if cat << 'EOF' | python3 .claude/hooks/activity-monitor.py
+{
+    "hook_event_name": "'; DROP TABLE activity_log; --",
+    "tool_name": "../../../etc/passwd", 
+    "session_id": "<script>alert('xss')</script>",
+    "tool_input": {
+        "command": "rm -rf /"
+    }
+}
+EOF
+then
     echo "✓ Malicious input test passed (safely handled)"
 else
     echo "✗ Malicious input test failed"
@@ -64,9 +88,13 @@ python3 -c "
 import json
 large_data = {'hook_event_name': 'Test', 'large_field': 'x' * 1048577}
 print(json.dumps(large_data))
-" | python3 .claude/hooks/activity-monitor.py
+"
 
-if [ $? -eq 0 ]; then
+if python3 -c "
+import json
+large_data = {'hook_event_name': 'Test', 'large_field': 'x' * 1048577}
+print(json.dumps(large_data))
+" | python3 .claude/hooks/activity-monitor.py; then
     echo "✓ Oversized input test passed (handled gracefully)"
 else
     echo "✗ Oversized input test failed"
@@ -91,7 +119,7 @@ if [ -f ".claude/activity_metrics.db" ]; then
             CASE WHEN length(event_data) > 100 THEN substr(event_data, 1, 100) || '...' ELSE event_data END as data
         FROM activity_log 
         ORDER BY id DESC 
-        LIMIT 3;" 2>/dev/null | while read line; do
+        LIMIT 3;" 2>/dev/null | while read -r line; do
         echo "  $line"
     done
 else
