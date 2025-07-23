@@ -8,11 +8,12 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/claude-code-template/prompt-manager/internal/api"
+	"github.com/claude-code-template/prompt-manager/internal/api/handlers"
 	"github.com/claude-code-template/prompt-manager/internal/database"
 )
 
 const (
-	DefaultPort = "8080"
+	DefaultPort = "8082"
 )
 
 func main() {
@@ -37,28 +38,35 @@ func main() {
 	// Initialize API server
 	server := api.NewServer(db)
 
+	// Initialize message handlers
+	promptHandler := handlers.NewPromptHandler(db)
+	responseHandler := handlers.NewResponseHandler(db)
+	sessionHandler := handlers.NewSessionHandler(db)
+
 	// Setup routes
 	router := mux.NewRouter()
 	
 	// Health check endpoint
 	router.HandleFunc("/health", server.HealthHandler).Methods("GET")
 	
-	// API routes
-	api := router.PathPrefix("/api/v1").Subrouter()
+	// Message endpoints for hook processing
+	router.HandleFunc("/messages/prompt", promptHandler.HandlePromptSubmit).Methods("POST")
+	router.HandleFunc("/messages/response", responseHandler.HandleResponseSubmit).Methods("POST")
+	router.HandleFunc("/messages/session", sessionHandler.HandleSessionEvent).Methods("POST")
 	
-	// Conversation endpoints
-	api.HandleFunc("/conversations", server.ListConversationsHandler).Methods("GET")
-	api.HandleFunc("/conversations", server.CreateConversationHandler).Methods("POST")
-	api.HandleFunc("/conversations/{id}", server.GetConversationHandler).Methods("GET")
-	api.HandleFunc("/conversations/{id}", server.UpdateConversationHandler).Methods("PUT")
-	api.HandleFunc("/conversations/{id}", server.DeleteConversationHandler).Methods("DELETE")
+	// Conversation endpoints (at root level for activity monitor compatibility)
+	router.HandleFunc("/conversations", server.ListConversationsHandler).Methods("GET")
+	router.HandleFunc("/conversations", server.CreateConversationHandler).Methods("POST")
+	router.HandleFunc("/conversations/{id}", server.GetConversationHandler).Methods("GET")
+	router.HandleFunc("/conversations/{id}", server.UpdateConversationHandler).Methods("PUT")
+	router.HandleFunc("/conversations/{id}", server.DeleteConversationHandler).Methods("DELETE")
 	
 	// Rating endpoints
-	api.HandleFunc("/conversations/{id}/ratings", server.CreateConversationRatingHandler).Methods("POST")
-	api.HandleFunc("/conversations/{id}/ratings", server.GetConversationRatingsHandler).Methods("GET")
-	api.HandleFunc("/ratings/{id}", server.UpdateRatingHandler).Methods("PUT")
-	api.HandleFunc("/ratings/{id}", server.DeleteRatingHandler).Methods("DELETE")
-	api.HandleFunc("/ratings/stats", server.GetRatingStatsHandler).Methods("GET")
+	router.HandleFunc("/conversations/{id}/ratings", server.CreateConversationRatingHandler).Methods("POST")
+	router.HandleFunc("/conversations/{id}/ratings", server.GetConversationRatingsHandler).Methods("GET")
+	router.HandleFunc("/ratings/{id}", server.UpdateRatingHandler).Methods("PUT")
+	router.HandleFunc("/ratings/{id}", server.DeleteRatingHandler).Methods("DELETE")
+	router.HandleFunc("/ratings/stats", server.GetRatingStatsHandler).Methods("GET")
 	
 	fmt.Printf("Starting Prompt Manager server on port %s\n", port)
 	fmt.Printf("Database: %s\n", config.DatabasePath)

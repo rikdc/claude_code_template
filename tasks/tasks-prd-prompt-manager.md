@@ -40,7 +40,7 @@
 
 ## Tasks
 
-- [ ] 1.0 Set up Claude Code Hook Integration for Prompt Capture
+- [x] 1.0 Set up Claude Code Hook Integration for Prompt Capture
   - [x] 1.1 Create directory structure for prompt manager in `apps/prompt_manager/`
   - [x] 1.2 Create queue directory structure in `.claude/apps/prompt_manager/queue/` with subdirectories (incoming, processing, failed, archive)
   - [x] 1.3 Create hook script `capture-prompt.sh` for UserPromptSubmit events with ultra-fast file writing
@@ -50,24 +50,24 @@
   - [x] 1.7 Implement atomic file operations with timestamp-session-event naming convention
 
 - [ ] 2.0 Implement Backend Go Web Service with Database Layer
-  - [ ] 2.1 Initialize Go module and set up project structure in `apps/prompt_manager/`
-  - [ ] 2.2 Create SQLite database schema with conversations and ratings tables
-  - [ ] 2.3 Implement database connection and CRUD operations in `internal/database/`
-  - [ ] 2.4 Create data models for conversations, sessions, ratings, and tags in `internal/models/`
-  - [ ] 2.5 Design and implement REST API endpoints for conversations and ratings
-  - [ ] 2.6 Add health check endpoint for monitoring queue status and system health
-  - [ ] 2.7 Implement database migrations system for schema versioning
-  - [ ] 2.8 Write comprehensive unit tests for database operations and API handlers
+  - [x] 2.1 Initialize Go module and set up project structure in `apps/prompt_manager/`
+  - [x] 2.2 Create SQLite database schema with conversations and ratings tables
+  - [x] 2.3 Implement database connection and CRUD operations in `internal/database/`
+  - [x] 2.4 Create data models for conversations, sessions, ratings, and tags in `internal/models/`
+  - [x] 2.5 Design and implement REST API endpoints for conversations and ratings
+  - [x] 2.6 Add health check endpoint for monitoring queue status and system health
+  - [x] 2.7 Implement database migrations system for schema versioning
+  - [x] 2.8 Write comprehensive unit tests for database operations and API handlers
 
 - [ ] 3.0 Create Background Queue Processor for Data Ingestion
-  - [ ] 3.1 Implement file system watcher using fsnotify for queue monitoring
-  - [ ] 3.2 Create processing pipeline to move files between queue directories
-  - [ ] 3.3 Implement JSON parsing and validation for hook data
-  - [ ] 3.4 Build conversation correlation logic to link prompts with responses
-  - [ ] 3.5 Add error handling with retry logic and dead letter queue
-  - [ ] 3.6 Implement transcript file parsing for complete conversation context
-  - [ ] 3.7 Create daemon service management (systemd/launchd) configuration
-  - [ ] 3.8 Add comprehensive logging and monitoring for background processing
+  - [x] 3.1 Implement file system watcher using fsnotify for queue monitoring
+  - [x] 3.2 Create processing pipeline to move files between queue directories
+  - [x] 3.3 Implement JSON parsing and validation for hook data
+  - [x] 3.4 Build conversation correlation logic to link prompts with responses
+  - [x] 3.5 Add error handling with retry logic and dead letter queue
+  - [x] 3.6 Implement transcript file parsing for complete conversation context
+  - [x] 3.7 Create daemon service management (systemd/launchd) configuration
+  - [x] 3.8 Add comprehensive logging and monitoring for background processing
 
 - [ ] 4.0 Create Vue.js Frontend Application with Core Components
   - [ ] 4.1 Initialize Vue.js project in `apps/prompt_manager/web/` directory
