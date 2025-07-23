@@ -25,11 +25,17 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from contextlib import contextmanager
 import sqlite3
+import urllib.request
+import urllib.parse
+import urllib.error
 
 try:
     import toml
 except ImportError:
     toml = None
+
+# Prompt Manager API Configuration
+PROMPT_MANAGER_API_URL = "http://localhost:8082"
 
 # Security and Configuration Constants
 MAX_JSON_SIZE = 1024 * 1024  # 1MB limit for JSON input
@@ -194,6 +200,128 @@ def database_connection():
     finally:
         if conn:
             conn.close()
+
+
+# Prompt Manager API functions
+def make_api_request(method: str, endpoint: str, data: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """Make HTTP request to prompt manager API."""
+    try:
+        url = f"{PROMPT_MANAGER_API_URL}{endpoint}"
+        
+        if method == "GET":
+            request = urllib.request.Request(url)
+        else:
+            json_data = json.dumps(data) if data else "{}"
+            request = urllib.request.Request(
+                url, 
+                data=json_data.encode('utf-8'),
+                headers={'Content-Type': 'application/json'}
+            )
+            request.get_method = lambda: method
+        
+        with urllib.request.urlopen(request, timeout=5) as response:
+            if 200 <= response.getcode() < 300:
+                response_data = response.read().decode('utf-8')
+                return json.loads(response_data) if response_data else {}
+            else:
+                log_monitor_event("WARNING", f"API request failed with status {response.getcode()}")
+                return None
+                
+    except urllib.error.URLError as e:
+        log_monitor_event("DEBUG", f"API request failed (service may be down): {e}")
+        return None
+    except Exception as e:
+        log_monitor_event("WARNING", f"API request error: {e}")
+        return None
+
+def record_prompt_manager_event(hook_data: Dict[str, Any], hook_category: str, session_id: str) -> None:
+    """Record event to prompt manager database via API using new direct endpoints."""
+    try:
+        # Prepare base payload with common fields
+        base_payload = {
+            "event": hook_category,
+            "timestamp": datetime.now().isoformat(),
+            "session_id": session_id,
+            "filename": "activity-monitor",
+            "data": {}
+        }
+        
+        # Handle different hook types
+        if hook_category == "UserPromptSubmit":
+            # Extract prompt data and send to prompt endpoint
+            prompt = hook_data.get("prompt", "")
+            if prompt:
+                base_payload["data"]["prompt"] = str(prompt)
+                
+                # Add optional context data
+                if "cwd" in hook_data:
+                    base_payload["data"]["cwd"] = hook_data["cwd"]
+                if "transcript_path" in hook_data:
+                    base_payload["data"]["transcript_path"] = hook_data["transcript_path"]
+                
+                response = make_api_request("POST", "/messages/prompt", base_payload)
+                if response and response.get("success"):
+                    log_monitor_event("DEBUG", f"Recorded prompt for session {session_id}")
+                
+        elif hook_category == "PostToolUse":
+            # Extract tool usage and send to response endpoint (treating tool use as assistant activity)
+            tool_name = hook_data.get("tool_name", "")
+            tool_input = hook_data.get("tool_input", {})
+            tool_result = hook_data.get("tool_result", "")
+            
+            if tool_name:
+                # Create response content describing tool usage
+                response_content = f"Used tool: {tool_name}"
+                if tool_result:
+                    response_content += f"\nResult: {str(tool_result)[:200]}..."
+                
+                base_payload["data"]["response"] = response_content
+                
+                # Add tool calls data
+                if tool_input:
+                    base_payload["data"]["tool_calls"] = [{
+                        "name": tool_name,
+                        "arguments": tool_input if isinstance(tool_input, dict) else {}
+                    }]
+                
+                # Add execution time if available
+                if "execution_time" in hook_data:
+                    base_payload["data"]["execution_time"] = hook_data["execution_time"]
+                
+                response = make_api_request("POST", "/messages/response", base_payload)
+                if response and response.get("success"):
+                    log_monitor_event("DEBUG", f"Recorded tool usage for session {session_id}")
+        
+        elif hook_category in ["Stop", "SessionEnd"]:
+            # Send session end event
+            base_payload["event"] = "SessionEnd" 
+            response = make_api_request("POST", "/messages/session", base_payload)
+            if response and response.get("success"):
+                log_monitor_event("DEBUG", f"Recorded session end for session {session_id}")
+        
+        elif hook_category in ["SessionStart", "Start"]:
+            # Send session start event
+            base_payload["event"] = "SessionStart"
+            # Add context data if available
+            if "cwd" in hook_data:
+                base_payload["data"]["cwd"] = hook_data["cwd"]
+            if "transcript_path" in hook_data:
+                base_payload["data"]["transcript_path"] = hook_data["transcript_path"]
+                
+            response = make_api_request("POST", "/messages/session", base_payload)
+            if response and response.get("success"):
+                log_monitor_event("DEBUG", f"Recorded session start for session {session_id}")
+        
+        else:
+            # For any other hook types, try to send to session endpoint with generic handling
+            log_monitor_event("DEBUG", f"Recording unknown hook category {hook_category} as session event")
+            base_payload["event"] = hook_category
+            response = make_api_request("POST", "/messages/session", base_payload)
+            if response and response.get("success"):
+                log_monitor_event("DEBUG", f"Recorded {hook_category} for session {session_id}")
+                
+    except Exception as e:
+        log_monitor_event("WARNING", f"Failed to record prompt manager event: {e}")
 
 # Configuration management
 def load_monitor_config(config_file: str = ".claude/activity-monitor.toml") -> Dict[str, Any]:
@@ -465,6 +593,12 @@ def record_activity_event(hook_data: Dict[str, Any]) -> bool:
         # Log success
         log_monitor_event("INFO", f"Recorded {hook_category} activity for {tool_identifier or 'system'}")
         
+        # Record to prompt manager if enabled
+        try:
+            record_prompt_manager_event(hook_data, hook_category, session_id)
+        except Exception as e:
+            log_monitor_event("DEBUG", f"Prompt manager recording failed: {e}")
+        
         # Check custom filters
         evaluate_activity_filters(metadata, config)
         
@@ -718,19 +852,28 @@ def main():
         hook_category, tool_identifier, session_id = parse_hook_event(hook_data)
         
         # Handle different hook categories
-        if hook_category in ["PreToolUse", "PostToolUse", "UserPromptSubmit"]:
+        if hook_category in ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"]:
             success = record_activity_event(hook_data)
             
             if not success:
                 log_monitor_event("WARNING", f"Failed to record {hook_category} event")
                 
-        elif hook_category == "Stop":
+        # Additional handling for Stop events
+        if hook_category == "Stop":
             # Generate session summary and cleanup
             summary = generate_activity_summary(session_id)
             log_monitor_event("INFO", f"Session ended: {summary.get('total_events', 0)} events recorded")
             
             # Periodic cleanup
             cleanup_old_data()
+        
+        # Catch-all: try to record any unhandled event types to prompt manager
+        elif hook_category not in ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"]:
+            log_monitor_event("DEBUG", f"Recording unhandled hook category: {hook_category}")
+            try:
+                record_prompt_manager_event(hook_data, hook_category, session_id)
+            except Exception as e:
+                log_monitor_event("DEBUG", f"Failed to record {hook_category} event to prompt manager: {e}")
         
         # Always return success (non-blocking)
         sys.exit(0)
