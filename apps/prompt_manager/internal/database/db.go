@@ -25,7 +25,7 @@ type Config struct {
 // DefaultConfig returns default database configuration
 func DefaultConfig() *Config {
 	return &Config{
-		DatabasePath:  ".claude/apps/prompt_manager/database/prompts.db",
+		DatabasePath:  "data/prompt_manager.db",
 		MigrationsDir: "database/migrations",
 	}
 }
