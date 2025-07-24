@@ -482,7 +482,3 @@ func TestGetRatingStats(t *testing.T) {
 	}
 }
 
-// Helper function for string pointers
-func stringPtr(s string) *string {
-	return &s
-}
