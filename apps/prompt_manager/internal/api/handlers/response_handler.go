@@ -23,18 +23,18 @@ func (rh *ResponseHandler) HandleResponseSubmit(w http.ResponseWriter, r *http.R
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
-		rh.errorResponse(w, "Method not allowed", http.StatusMethodNotAllowed)
+		ErrorResponse(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var hookData HookData
 	if err := json.NewDecoder(r.Body).Decode(&hookData); err != nil {
-		rh.errorResponse(w, "Invalid JSON request body", http.StatusBadRequest)
+		ErrorResponse(w, "Invalid JSON request body", http.StatusBadRequest)
 		return
 	}
 
 	if hookData.SessionID == "" {
-		rh.errorResponse(w, "session_id is required", http.StatusBadRequest)
+		ErrorResponse(w, "session_id is required", http.StatusBadRequest)
 		return
 	}
 
@@ -55,7 +55,7 @@ func (rh *ResponseHandler) HandleResponseSubmit(w http.ResponseWriter, r *http.R
 	}
 
 	if responseContent == "" {
-		rh.errorResponse(w, "no response content in request", http.StatusBadRequest)
+		ErrorResponse(w, "no response content in request", http.StatusBadRequest)
 		return
 	}
 
@@ -76,16 +76,16 @@ func (rh *ResponseHandler) HandleResponseSubmit(w http.ResponseWriter, r *http.R
 	}
 
 	// Get or create conversation
-	conversationID, err := rh.getOrCreateConversation(hookData.SessionID, hookData.Data)
+	conversationID, err := GetOrCreateConversation(rh.db, hookData.SessionID, hookData.Data)
 	if err != nil {
-		rh.errorResponse(w, fmt.Sprintf("Failed to get or create conversation: %v", err), http.StatusInternalServerError)
+		ErrorResponse(w, fmt.Sprintf("Failed to get or create conversation: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Create message record
 	message, err := rh.db.CreateMessage(conversationID, "response", responseContent, toolCallsJSON, executionTime)
 	if err != nil {
-		rh.errorResponse(w, fmt.Sprintf("Failed to create message: %v", err), http.StatusInternalServerError)
+		ErrorResponse(w, fmt.Sprintf("Failed to create message: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -103,42 +103,5 @@ func (rh *ResponseHandler) HandleResponseSubmit(w http.ResponseWriter, r *http.R
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
-}
-
-// getOrCreateConversation gets existing conversation or creates a new one
-func (rh *ResponseHandler) getOrCreateConversation(sessionID string, data map[string]interface{}) (int, error) {
-	// Try to find existing conversation for this session
-	conversations, err := rh.db.ListConversations(10, 0)
-	if err != nil {
-		return 0, fmt.Errorf("failed to list conversations: %w", err)
-	}
-
-	// Check if any conversation matches this session
-	for _, conv := range conversations {
-		if conv.SessionID == sessionID {
-			return conv.ID, nil
-		}
-	}
-
-	// Create new conversation
-	workingDir := extractStringFromData(data, "cwd")
-	transcriptPath := extractStringFromData(data, "transcript_path")
-
-	conv, err := rh.db.CreateConversation(sessionID, nil, workingDir, transcriptPath)
-	if err != nil {
-		return 0, fmt.Errorf("failed to create conversation: %w", err)
-	}
-
-	return conv.ID, nil
-}
-
-// errorResponse sends an error response
-func (rh *ResponseHandler) errorResponse(w http.ResponseWriter, message string, statusCode int) {
-	w.WriteHeader(statusCode)
-	response := APIResponse{
-		Success: false,
-		Error:   &message,
-	}
 	json.NewEncoder(w).Encode(response)
 }

@@ -22,11 +22,13 @@ Based on analysis of Claude Code's hook system:
 **Architecture**: Hook makes HTTP POST to Go backend API endpoint
 
 **Pros**:
+
 - Simple, straightforward implementation
 - Real-time data availability in web interface
 - Standard REST patterns
 
 **Cons**:
+
 - Network latency can cause hook timeouts
 - HTTP failures could block Claude Code operations
 - Dependency on web server availability during hooks
@@ -39,11 +41,13 @@ Based on analysis of Claude Code's hook system:
 **Architecture**: Hook writes directly to SQLite database
 
 **Pros**:
+
 - Fast local writes
 - No network dependencies
 - Immediate data availability
 
 **Cons**:
+
 - Database locking issues with concurrent access
 - Risk of database corruption from failed writes
 - Difficult to handle processing errors gracefully
@@ -56,6 +60,7 @@ Based on analysis of Claude Code's hook system:
 **Architecture**: Hook writes to file queue, background daemon processes files
 
 **Pros**:
+
 - Ultra-fast hook execution (<1ms file writes)
 - No network dependencies during hooks
 - Graceful failure handling
@@ -64,6 +69,7 @@ Based on analysis of Claude Code's hook system:
 - Scalable to high-volume conversations
 
 **Cons**:
+
 - Slightly more complex architecture
 - Small delay between capture and web interface availability
 - Requires background daemon management
@@ -97,6 +103,7 @@ apps/prompt_manager/
 ### File Format
 
 Queue files use JSON format with consistent naming:
+
 - **Filename**: `{timestamp}-{session-id}-{hook-type}.json`
 - **Content**: Complete hook data as received from Claude Code
 
@@ -119,10 +126,12 @@ exit 0
 ### Background Processor Features
 
 **File System Watcher**:
+
 - Uses inotify (Linux) or fsevents (macOS) for instant processing
 - Processes files as they arrive in queue directory
 
 **Processing Pipeline**:
+
 1. Move file from `incoming/` to `processing/`
 2. Parse and validate JSON data
 3. Update SQLite database with conversation data
@@ -130,11 +139,13 @@ exit 0
 5. Handle errors by moving to `failed/` directory
 
 **Error Handling**:
+
 - Retry logic for transient failures
 - Dead letter queue for permanently failed files
 - Comprehensive logging for debugging
 
 **Data Processing**:
+
 - Extract conversation context from transcript files
 - Correlate multiple hook events for complete conversations
 - Handle session splitting and organization logic
@@ -144,6 +155,7 @@ exit 0
 ### Hook Configuration
 
 Update `.claude/settings.json`:
+
 ```json
 {
   "hooks": {
@@ -194,12 +206,14 @@ CREATE TABLE ratings (
 ### Background Daemon
 
 **Go Implementation**:
+
 - Lightweight daemon using `fsnotify` library
 - Configurable processing intervals and batch sizes
 - Health check endpoints for monitoring
 - Graceful shutdown handling
 
 **Service Management**:
+
 - systemd service file for Linux
 - launchd plist for macOS  
 - Process monitoring and auto-restart
@@ -207,6 +221,7 @@ CREATE TABLE ratings (
 ### REST API Design
 
 **Endpoints**:
+
 - `GET /api/conversations` - List conversations with filtering
 - `GET /api/conversations/{id}` - Get conversation details
 - `POST /api/conversations/{id}/rating` - Add/update rating
@@ -216,23 +231,27 @@ CREATE TABLE ratings (
 ## Benefits of This Approach
 
 ### Performance
+
 - **Hook Execution**: Sub-millisecond file writes
 - **No Blocking**: Zero impact on Claude Code responsiveness
 - **Scalable**: Handles high-volume conversations efficiently
 
 ### Reliability
+
 - **No Network Dependencies**: File operations during hooks
 - **Atomic Operations**: Prevents data corruption
 - **Failure Isolation**: Processing failures don't affect hooks
 - **Retry Mechanisms**: Built-in error recovery
 
 ### Maintainability
+
 - **Clear Separation**: Distinct responsibilities for each component
 - **Easy Debugging**: Queue files provide audit trail
 - **Monitoring**: File system metrics and processing logs
 - **Testing**: Easy to simulate different scenarios
 
 ### Future Scalability
+
 - **Multi-User Ready**: Can support centralized database migration
 - **Horizontal Scaling**: Background processors can be distributed
 - **Data Export**: Queue files provide portable data format
@@ -240,17 +259,20 @@ CREATE TABLE ratings (
 ## Monitoring and Operations
 
 ### Health Checks
+
 - Queue directory file counts
 - Background processor status
 - Database connection health
 - Processing latency metrics
 
 ### Logging Strategy
+
 - Hook execution logs (minimal, performance-focused)
 - Background processing logs (detailed, error-focused)  
 - API access logs (standard web server logs)
 
 ### Error Scenarios
+
 - Disk space exhaustion: Alert and cleanup policies
 - Database corruption: Backup and recovery procedures
 - Processor crashes: Auto-restart and notification
