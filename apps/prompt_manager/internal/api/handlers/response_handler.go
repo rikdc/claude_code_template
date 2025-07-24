@@ -105,4 +105,3 @@ func (rh *ResponseHandler) HandleResponseSubmit(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
-

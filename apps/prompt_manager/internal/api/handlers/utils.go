@@ -55,7 +55,7 @@ func ExtractStringFromData(data map[string]interface{}, key string) *string {
 func ErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	
+
 	response := APIResponse{
 		Success: false,
 		Error:   &message,

@@ -102,4 +102,3 @@ func (sh *SessionHandler) handleSessionEnd(w http.ResponseWriter, hookData *Hook
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
-

@@ -18,7 +18,6 @@ func NewPromptHandler(db *database.DB) *PromptHandler {
 	return &PromptHandler{db: db}
 }
 
-
 // HandlePromptSubmit processes user prompt submissions
 func (ph *PromptHandler) HandlePromptSubmit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -80,4 +79,3 @@ func (ph *PromptHandler) HandlePromptSubmit(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
-
