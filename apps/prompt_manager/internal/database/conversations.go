@@ -94,6 +94,28 @@ func (db *DB) GetConversation(id int) (*Conversation, error) {
 	return &conv, nil
 }
 
+// GetConversationBySessionID retrieves a conversation by session ID
+func (db *DB) GetConversationBySessionID(sessionID string) (*Conversation, error) {
+	query := `
+	SELECT id, session_id, title, created_at, updated_at, prompt_count, total_characters, working_directory, transcript_path
+	FROM conversations WHERE session_id = ?`
+
+	var conv Conversation
+	err := db.conn.QueryRow(query, sessionID).Scan(
+		&conv.ID, &conv.SessionID, &conv.Title, &conv.CreatedAt, &conv.UpdatedAt,
+		&conv.PromptCount, &conv.TotalCharacters, &conv.WorkingDirectory, &conv.TranscriptPath,
+	)
+	
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("conversation not found")
+		}
+		return nil, fmt.Errorf("failed to get conversation by session ID: %w", err)
+	}
+
+	return &conv, nil
+}
+
 // GetConversationWithMessages retrieves a conversation with its messages
 func (db *DB) GetConversationWithMessages(id int) (*ConversationWithMessages, error) {
 	// Get conversation

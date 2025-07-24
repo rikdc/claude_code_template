@@ -75,20 +75,16 @@ func (sh *SessionHandler) handleSessionStart(w http.ResponseWriter, hookData *Ho
 
 // handleSessionEnd processes session end/stop events
 func (sh *SessionHandler) handleSessionEnd(w http.ResponseWriter, hookData *HookData) {
-	// Try to find existing conversation for this session
-	conversations, err := sh.db.ListConversations(10, 0)
-	if err != nil {
-		ErrorResponse(w, fmt.Sprintf("Failed to list conversations: %v", err), http.StatusInternalServerError)
+	// Try to find existing conversation for this session using efficient lookup
+	var conversationID *int
+	if conv, err := sh.db.GetConversationBySessionID(hookData.SessionID); err == nil {
+		conversationID = &conv.ID
+	} else if err.Error() != "conversation not found" {
+		// Only return error for actual database errors, not "not found"
+		ErrorResponse(w, fmt.Sprintf("Failed to lookup conversation: %v", err), http.StatusInternalServerError)
 		return
 	}
-
-	var conversationID *int
-	for _, conv := range conversations {
-		if conv.SessionID == hookData.SessionID {
-			conversationID = &conv.ID
-			break
-		}
-	}
+	// If conversation not found, conversationID remains nil which is fine for session end
 
 	response := APIResponse{
 		Success: true,

@@ -129,6 +129,98 @@ func TestConversationCRUD(t *testing.T) {
 	}
 }
 
+func TestGetConversationBySessionID(t *testing.T) {
+	tests := []struct {
+		name          string
+		setupData     []struct {
+			sessionID string
+			title     *string
+		}
+		querySessionID string
+		expectFound    bool
+		expectedError  string
+	}{
+		{
+			name:           "conversation not found",
+			setupData:      []struct{sessionID string; title *string}{},
+			querySessionID: "non-existent-session",
+			expectFound:    false,
+			expectedError:  "conversation not found",
+		},
+		{
+			name: "conversation found",
+			setupData: []struct{sessionID string; title *string}{
+				{sessionID: "test-session-123", title: stringPtr("Test Conversation")},
+			},
+			querySessionID: "test-session-123",
+			expectFound:    true,
+		},
+		{
+			name: "case sensitive lookup",
+			setupData: []struct{sessionID string; title *string}{
+				{sessionID: "test-session-456", title: stringPtr("Case Test")},
+			},
+			querySessionID: "TEST-SESSION-456",
+			expectFound:    false,
+			expectedError:  "conversation not found",
+		},
+		{
+			name: "multiple conversations - find correct one",
+			setupData: []struct{sessionID string; title *string}{
+				{sessionID: "session-1", title: stringPtr("First")},
+				{sessionID: "session-2", title: stringPtr("Second")},
+				{sessionID: "session-3", title: stringPtr("Third")},
+			},
+			querySessionID: "session-2",
+			expectFound:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := setupTestDB(t)
+
+			// Setup test data
+			var expectedConv *Conversation
+			for _, setup := range tt.setupData {
+				conv, err := db.CreateConversation(setup.sessionID, setup.title, nil, nil)
+				if err != nil {
+					t.Fatalf("Failed to create setup conversation: %v", err)
+				}
+				if setup.sessionID == tt.querySessionID {
+					expectedConv = conv
+				}
+			}
+
+			// Test the query
+			result, err := db.GetConversationBySessionID(tt.querySessionID)
+
+			if tt.expectFound {
+				if err != nil {
+					t.Fatalf("Expected to find conversation, got error: %v", err)
+				}
+				if result.SessionID != tt.querySessionID {
+					t.Errorf("Expected session ID %s, got %s", tt.querySessionID, result.SessionID)
+				}
+				if expectedConv != nil && result.ID != expectedConv.ID {
+					t.Errorf("Expected conversation ID %d, got %d", expectedConv.ID, result.ID)
+				}
+			} else {
+				if err == nil {
+					t.Error("Expected error, but got result")
+				}
+				if tt.expectedError != "" && err.Error() != tt.expectedError {
+					t.Errorf("Expected error %q, got %q", tt.expectedError, err.Error())
+				}
+			}
+		})
+	}
+}
+
+func stringPtr(s string) *string {
+	return &s
+}
+
 func TestMessageCRUD(t *testing.T) {
 	db := setupTestDB(t)
 
