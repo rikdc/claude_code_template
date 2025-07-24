@@ -26,8 +26,8 @@ func ConvertConversationWithMessages(dbConv *database.ConversationWithMessages) 
 	
 	// Convert messages
 	apiMessages := make([]models.Message, len(dbConv.Messages))
-	for i, msg := range dbConv.Messages {
-		apiMessages[i] = ConvertMessage(&msg)
+	for i := range dbConv.Messages {
+		apiMessages[i] = ConvertMessage(&dbConv.Messages[i])
 	}
 	apiConv.Messages = apiMessages
 	
@@ -66,9 +66,9 @@ func ConvertRating(dbRating *database.Rating) models.Rating {
 // ConvertConversationsToSummaries converts multiple database conversations to API conversation summaries
 func ConvertConversationsToSummaries(dbConversations []database.Conversation) []models.ConversationSummary {
 	summaries := make([]models.ConversationSummary, len(dbConversations))
-	for i, conv := range dbConversations {
+	for i := range dbConversations {
 		// Convert to API model first to use the ToSummary method
-		apiConv := ConvertConversation(&conv)
+		apiConv := ConvertConversation(&dbConversations[i])
 		summaries[i] = apiConv.ToSummary()
 	}
 	return summaries
@@ -77,8 +77,8 @@ func ConvertConversationsToSummaries(dbConversations []database.Conversation) []
 // ConvertRatings converts multiple database ratings to API rating models
 func ConvertRatings(dbRatings []database.Rating) []models.Rating {
 	apiRatings := make([]models.Rating, len(dbRatings))
-	for i, rating := range dbRatings {
-		apiRatings[i] = ConvertRating(&rating)
+	for i := range dbRatings {
+		apiRatings[i] = ConvertRating(&dbRatings[i])
 	}
 	return apiRatings
 }
