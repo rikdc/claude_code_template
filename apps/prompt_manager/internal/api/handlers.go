@@ -9,7 +9,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/claude-code-template/prompt-manager/internal/database"
-	"github.com/claude-code-template/prompt-manager/internal/models"
 )
 
 // Server holds the database connection and provides HTTP handlers
@@ -118,22 +117,7 @@ func (s *Server) ListConversationsHandler(w http.ResponseWriter, r *http.Request
 	}
 	
 	// Convert to summaries for list view
-	summaries := make([]models.ConversationSummary, len(conversations))
-	for i, conv := range conversations {
-		// Create a model conversation to use ToSummary method
-		modelConv := models.Conversation{
-			ID:               conv.ID,
-			SessionID:        conv.SessionID,
-			Title:            conv.Title,
-			CreatedAt:        conv.CreatedAt,
-			UpdatedAt:        conv.UpdatedAt,
-			PromptCount:      conv.PromptCount,
-			TotalCharacters:  conv.TotalCharacters,
-			WorkingDirectory: conv.WorkingDirectory,
-			TranscriptPath:   conv.TranscriptPath,
-		}
-		summaries[i] = modelConv.ToSummary()
-	}
+	summaries := ConvertConversationsToSummaries(conversations)
 	
 	meta := &Meta{
 		Page:    page,
@@ -169,35 +153,7 @@ func (s *Server) GetConversationHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	
 	// Convert database models to API models
-	apiConv := models.Conversation{
-		ID:               conv.ID,
-		SessionID:        conv.SessionID,
-		Title:            conv.Title,
-		CreatedAt:        conv.CreatedAt,
-		UpdatedAt:        conv.UpdatedAt,
-		PromptCount:      conv.PromptCount,
-		TotalCharacters:  conv.TotalCharacters,
-		WorkingDirectory: conv.WorkingDirectory,
-		TranscriptPath:   conv.TranscriptPath,
-	}
-	
-	// Convert messages
-	apiMessages := make([]models.Message, len(conv.Messages))
-	for i, msg := range conv.Messages {
-		toolCalls, _ := models.UnmarshalToolCalls(msg.ToolCalls)
-		
-		apiMessages[i] = models.Message{
-			ID:             msg.ID,
-			ConversationID: msg.ConversationID,
-			MessageType:    models.MessageType(msg.MessageType),
-			Content:        msg.Content,
-			CharacterCount: msg.CharacterCount,
-			Timestamp:      msg.Timestamp,
-			ToolCalls:      toolCalls,
-			ExecutionTime:  msg.ExecutionTime,
-		}
-	}
-	apiConv.Messages = apiMessages
+	apiConv := ConvertConversationWithMessages(conv)
 	
 	successResponse(w, apiConv, nil)
 }
@@ -227,17 +183,7 @@ func (s *Server) CreateConversationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	
-	apiConv := models.Conversation{
-		ID:               conv.ID,
-		SessionID:        conv.SessionID,
-		Title:            conv.Title,
-		CreatedAt:        conv.CreatedAt,
-		UpdatedAt:        conv.UpdatedAt,
-		PromptCount:      conv.PromptCount,
-		TotalCharacters:  conv.TotalCharacters,
-		WorkingDirectory: conv.WorkingDirectory,
-		TranscriptPath:   conv.TranscriptPath,
-	}
+	apiConv := ConvertConversation(conv)
 	
 	w.WriteHeader(http.StatusCreated)
 	successResponse(w, apiConv, nil)
@@ -288,17 +234,7 @@ func (s *Server) UpdateConversationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	
-	apiConv := models.Conversation{
-		ID:               conv.ID,
-		SessionID:        conv.SessionID,
-		Title:            conv.Title,
-		CreatedAt:        conv.CreatedAt,
-		UpdatedAt:        conv.UpdatedAt,
-		PromptCount:      conv.PromptCount,
-		TotalCharacters:  conv.TotalCharacters,
-		WorkingDirectory: conv.WorkingDirectory,
-		TranscriptPath:   conv.TranscriptPath,
-	}
+	apiConv := ConvertConversation(conv)
 	
 	successResponse(w, apiConv, nil)
 }
@@ -368,15 +304,7 @@ func (s *Server) CreateConversationRatingHandler(w http.ResponseWriter, r *http.
 		return
 	}
 	
-	apiRating := models.Rating{
-		ID:             rating.ID,
-		ConversationID: rating.ConversationID,
-		MessageID:      rating.MessageID,
-		Rating:         rating.Rating,
-		Comment:        rating.Comment,
-		CreatedAt:      rating.CreatedAt,
-		UpdatedAt:      rating.UpdatedAt,
-	}
+	apiRating := ConvertRating(rating)
 	
 	w.WriteHeader(http.StatusCreated)
 	successResponse(w, apiRating, nil)
@@ -403,18 +331,7 @@ func (s *Server) GetConversationRatingsHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	
-	apiRatings := make([]models.Rating, len(ratings))
-	for i, rating := range ratings {
-		apiRatings[i] = models.Rating{
-			ID:             rating.ID,
-			ConversationID: rating.ConversationID,
-			MessageID:      rating.MessageID,
-			Rating:         rating.Rating,
-			Comment:        rating.Comment,
-			CreatedAt:      rating.CreatedAt,
-			UpdatedAt:      rating.UpdatedAt,
-		}
-	}
+	apiRatings := ConvertRatings(ratings)
 	
 	successResponse(w, apiRatings, nil)
 }
@@ -465,15 +382,7 @@ func (s *Server) UpdateRatingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	apiRating := models.Rating{
-		ID:             rating.ID,
-		ConversationID: rating.ConversationID,
-		MessageID:      rating.MessageID,
-		Rating:         rating.Rating,
-		Comment:        rating.Comment,
-		CreatedAt:      rating.CreatedAt,
-		UpdatedAt:      rating.UpdatedAt,
-	}
+	apiRating := ConvertRating(rating)
 	
 	successResponse(w, apiRating, nil)
 }
