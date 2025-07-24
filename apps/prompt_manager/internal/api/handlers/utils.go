@@ -9,32 +9,32 @@ import (
 )
 
 // GetOrCreateConversation finds an existing conversation by session ID or creates a new one.
-// It searches through recent conversations to find a match for the given session ID.
+// It uses a direct database query to efficiently find conversations by session ID.
 // If no match is found, it creates a new conversation with optional context data.
 func GetOrCreateConversation(db *database.DB, sessionID string, data map[string]interface{}) (int, error) {
-	// Try to find existing conversation for this session
-	conversations, err := db.ListConversations(10, 0)
-	if err != nil {
-		return 0, fmt.Errorf("failed to list conversations: %w", err)
+	// Try to find existing conversation for this session using efficient lookup
+	conv, err := db.GetConversationBySessionID(sessionID)
+	if err == nil {
+		// Found existing conversation
+		return conv.ID, nil
 	}
 
-	// Check if any conversation matches this session
-	for _, conv := range conversations {
-		if conv.SessionID == sessionID {
-			return conv.ID, nil
-		}
+	// Check if error is "not found" - if so, create new conversation
+	// For other errors, return them
+	if err.Error() != "conversation not found" {
+		return 0, fmt.Errorf("failed to lookup conversation by session ID: %w", err)
 	}
 
 	// Create new conversation
 	workingDir := ExtractStringFromData(data, "cwd")
 	transcriptPath := ExtractStringFromData(data, "transcript_path")
 
-	conv, err := db.CreateConversation(sessionID, nil, workingDir, transcriptPath)
+	newConv, err := db.CreateConversation(sessionID, nil, workingDir, transcriptPath)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create conversation: %w", err)
 	}
 
-	return conv.ID, nil
+	return newConv.ID, nil
 }
 
 // ExtractStringFromData safely extracts a string value from map data.
