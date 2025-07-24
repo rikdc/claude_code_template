@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/claude-code-template/prompt-manager/internal/database"
+	"github.com/claude-code-template/prompt-manager/internal/models"
 )
 
 func TestConvertConversation(t *testing.T) {
@@ -58,52 +59,144 @@ func TestConvertConversation(t *testing.T) {
 }
 
 func TestConvertMessage(t *testing.T) {
-	now := time.Now()
-	toolCallsJSON := `[{"name": "test_tool", "arguments": {"key": "value"}}]`
-	executionTime := 150
-
-	dbMsg := &database.Message{
-		ID:             1,
-		ConversationID: 1,
-		MessageType:    "prompt",
-		Content:        "Test message content",
-		CharacterCount: 20,
-		Timestamp:      now,
-		ToolCalls:      &toolCallsJSON,
-		ExecutionTime:  &executionTime,
+	tests := []struct {
+		name          string
+		dbMsg         *database.Message
+		expectError   bool
+		expectedError string
+		validateMsg   func(t *testing.T, msg models.Message)
+	}{
+		{
+			name: "successful conversion with tool calls",
+			dbMsg: &database.Message{
+				ID:             1,
+				ConversationID: 1,
+				MessageType:    "prompt",
+				Content:        "Test message content",
+				CharacterCount: 20,
+				Timestamp:      time.Now(),
+				ToolCalls:      stringPtr(`[{"name": "test_tool", "arguments": {"key": "value"}}]`),
+				ExecutionTime:  intPtr(150),
+			},
+			expectError: false,
+			validateMsg: func(t *testing.T, msg models.Message) {
+				if msg.ID != 1 {
+					t.Errorf("Expected ID 1, got %d", msg.ID)
+				}
+				if len(msg.ToolCalls) != 1 {
+					t.Errorf("Expected 1 tool call, got %d", len(msg.ToolCalls))
+				}
+				if len(msg.ToolCalls) > 0 && msg.ToolCalls[0].Name != "test_tool" {
+					t.Errorf("Expected tool call name 'test_tool', got %s", msg.ToolCalls[0].Name)
+				}
+			},
+		},
+		{
+			name: "successful conversion with nil tool calls",
+			dbMsg: &database.Message{
+				ID:             2,
+				ConversationID: 1,
+				MessageType:    "response",
+				Content:        "Response content",
+				CharacterCount: 16,
+				Timestamp:      time.Now(),
+				ToolCalls:      nil,
+				ExecutionTime:  nil,
+			},
+			expectError: false,
+			validateMsg: func(t *testing.T, msg models.Message) {
+				if msg.ID != 2 {
+					t.Errorf("Expected ID 2, got %d", msg.ID)
+				}
+				if len(msg.ToolCalls) != 0 {
+					t.Errorf("Expected 0 tool calls, got %d", len(msg.ToolCalls))
+				}
+			},
+		},
+		{
+			name: "error on malformed tool calls JSON",
+			dbMsg: &database.Message{
+				ID:             3,
+				ConversationID: 1,
+				MessageType:    "prompt",
+				Content:        "Test content",
+				CharacterCount: 12,
+				Timestamp:      time.Now(),
+				ToolCalls:      stringPtr(`{"invalid": "json"}`), // Invalid: not an array
+				ExecutionTime:  nil,
+			},
+			expectError:   true,
+			expectedError: "failed to unmarshal tool calls for message 3",
+		},
+		{
+			name: "error on completely invalid JSON",
+			dbMsg: &database.Message{
+				ID:             4,
+				ConversationID: 1,
+				MessageType:    "prompt",
+				Content:        "Test content",
+				CharacterCount: 12,
+				Timestamp:      time.Now(),
+				ToolCalls:      stringPtr(`{invalid json`),
+				ExecutionTime:  nil,
+			},
+			expectError:   true,
+			expectedError: "failed to unmarshal tool calls for message 4",
+		},
 	}
 
-	apiMsg := ConvertMessage(dbMsg)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			apiMsg, err := ConvertMessage(tt.dbMsg)
 
-	// Verify all fields are converted correctly
-	if apiMsg.ID != dbMsg.ID {
-		t.Errorf("Expected ID %d, got %d", dbMsg.ID, apiMsg.ID)
+			if tt.expectError {
+				if err == nil {
+					t.Error("Expected error, but got none")
+				} else if tt.expectedError != "" && !containsString(err.Error(), tt.expectedError) {
+					t.Errorf("Expected error containing %q, got %q", tt.expectedError, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Expected no error, got %v", err)
+				} else if tt.validateMsg != nil {
+					tt.validateMsg(t, apiMsg)
+				}
+
+				// Verify basic fields for successful conversions
+				if apiMsg.ConversationID != tt.dbMsg.ConversationID {
+					t.Errorf("Expected ConversationID %d, got %d", tt.dbMsg.ConversationID, apiMsg.ConversationID)
+				}
+				if string(apiMsg.MessageType) != tt.dbMsg.MessageType {
+					t.Errorf("Expected MessageType %s, got %s", tt.dbMsg.MessageType, string(apiMsg.MessageType))
+				}
+				if apiMsg.Content != tt.dbMsg.Content {
+					t.Errorf("Expected Content %s, got %s", tt.dbMsg.Content, apiMsg.Content)
+				}
+			}
+		})
 	}
-	if apiMsg.ConversationID != dbMsg.ConversationID {
-		t.Errorf("Expected ConversationID %d, got %d", dbMsg.ConversationID, apiMsg.ConversationID)
+}
+
+// Helper functions for tests
+func stringPtr(s string) *string {
+	return &s
+}
+
+func intPtr(i int) *int {
+	return &i
+}
+
+func containsString(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || (len(substr) > 0 && stringContains(s, substr)))
+}
+
+func stringContains(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
 	}
-	if string(apiMsg.MessageType) != dbMsg.MessageType {
-		t.Errorf("Expected MessageType %s, got %s", dbMsg.MessageType, string(apiMsg.MessageType))
-	}
-	if apiMsg.Content != dbMsg.Content {
-		t.Errorf("Expected Content %s, got %s", dbMsg.Content, apiMsg.Content)
-	}
-	if apiMsg.CharacterCount != dbMsg.CharacterCount {
-		t.Errorf("Expected CharacterCount %d, got %d", dbMsg.CharacterCount, apiMsg.CharacterCount)
-	}
-	if !apiMsg.Timestamp.Equal(dbMsg.Timestamp) {
-		t.Errorf("Expected Timestamp %v, got %v", dbMsg.Timestamp, apiMsg.Timestamp)
-	}
-	if apiMsg.ExecutionTime == nil || *apiMsg.ExecutionTime != *dbMsg.ExecutionTime {
-		t.Errorf("Expected ExecutionTime %v, got %v", dbMsg.ExecutionTime, apiMsg.ExecutionTime)
-	}
-	// Tool calls should be unmarshaled
-	if len(apiMsg.ToolCalls) != 1 {
-		t.Errorf("Expected 1 tool call, got %d", len(apiMsg.ToolCalls))
-	}
-	if len(apiMsg.ToolCalls) > 0 && apiMsg.ToolCalls[0].Name != "test_tool" {
-		t.Errorf("Expected tool call name 'test_tool', got %s", apiMsg.ToolCalls[0].Name)
-	}
+	return false
 }
 
 func TestConvertRating(t *testing.T) {
@@ -148,71 +241,116 @@ func TestConvertRating(t *testing.T) {
 }
 
 func TestConvertConversationWithMessages(t *testing.T) {
-	now := time.Now()
-	title := "Test Conversation"
-
-	dbConv := &database.ConversationWithMessages{
-		Conversation: database.Conversation{
-			ID:               1,
-			SessionID:        "session-123",
-			Title:            &title,
-			CreatedAt:        now,
-			UpdatedAt:        now,
-			PromptCount:      1,
-			TotalCharacters:  20,
-			WorkingDirectory: nil,
-			TranscriptPath:   nil,
-		},
-		Messages: []database.Message{
-			{
-				ID:             1,
-				ConversationID: 1,
-				MessageType:    "prompt",
-				Content:        "Test prompt",
-				CharacterCount: 11,
-				Timestamp:      now,
-				ToolCalls:      nil,
-				ExecutionTime:  nil,
+	tests := []struct {
+		name         string
+		dbConv       *database.ConversationWithMessages
+		expectError  bool
+		validateConv func(t *testing.T, conv models.Conversation)
+	}{
+		{
+			name: "successful conversion with valid messages",
+			dbConv: &database.ConversationWithMessages{
+				Conversation: database.Conversation{
+					ID:               1,
+					SessionID:        "session-123",
+					Title:            stringPtr("Test Conversation"),
+					CreatedAt:        time.Now(),
+					UpdatedAt:        time.Now(),
+					PromptCount:      1,
+					TotalCharacters:  20,
+					WorkingDirectory: nil,
+					TranscriptPath:   nil,
+				},
+				Messages: []database.Message{
+					{
+						ID:             1,
+						ConversationID: 1,
+						MessageType:    "prompt",
+						Content:        "Test prompt",
+						CharacterCount: 11,
+						Timestamp:      time.Now(),
+						ToolCalls:      nil,
+						ExecutionTime:  nil,
+					},
+					{
+						ID:             2,
+						ConversationID: 1,
+						MessageType:    "response",
+						Content:        "Test response",
+						CharacterCount: 13,
+						Timestamp:      time.Now().Add(time.Second),
+						ToolCalls:      nil,
+						ExecutionTime:  nil,
+					},
+				},
 			},
-			{
-				ID:             2,
-				ConversationID: 1,
-				MessageType:    "response",
-				Content:        "Test response",
-				CharacterCount: 13,
-				Timestamp:      now.Add(time.Second),
-				ToolCalls:      nil,
-				ExecutionTime:  nil,
+			expectError: false,
+			validateConv: func(t *testing.T, conv models.Conversation) {
+				if conv.ID != 1 {
+					t.Errorf("Expected ID 1, got %d", conv.ID)
+				}
+				if len(conv.Messages) != 2 {
+					t.Errorf("Expected 2 messages, got %d", len(conv.Messages))
+				}
 			},
+		},
+		{
+			name: "error when message has malformed tool calls",
+			dbConv: &database.ConversationWithMessages{
+				Conversation: database.Conversation{
+					ID:               2,
+					SessionID:        "session-456",
+					Title:            stringPtr("Error Test"),
+					CreatedAt:        time.Now(),
+					UpdatedAt:        time.Now(),
+					PromptCount:      1,
+					TotalCharacters:  10,
+					WorkingDirectory: nil,
+					TranscriptPath:   nil,
+				},
+				Messages: []database.Message{
+					{
+						ID:             3,
+						ConversationID: 2,
+						MessageType:    "prompt",
+						Content:        "Test prompt",
+						CharacterCount: 11,
+						Timestamp:      time.Now(),
+						ToolCalls:      stringPtr(`{invalid json`), // Malformed JSON
+						ExecutionTime:  nil,
+					},
+				},
+			},
+			expectError: true,
 		},
 	}
 
-	apiConv := ConvertConversationWithMessages(dbConv)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			apiConv, err := ConvertConversationWithMessages(tt.dbConv)
 
-	// Verify conversation fields
-	if apiConv.ID != dbConv.ID {
-		t.Errorf("Expected ID %d, got %d", dbConv.ID, apiConv.ID)
-	}
-	if apiConv.SessionID != dbConv.SessionID {
-		t.Errorf("Expected SessionID %s, got %s", dbConv.SessionID, apiConv.SessionID)
-	}
+			if tt.expectError {
+				if err == nil {
+					t.Error("Expected error, but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Expected no error, got %v", err)
+				} else {
+					// Verify basic fields
+					if apiConv.ID != tt.dbConv.ID {
+						t.Errorf("Expected ID %d, got %d", tt.dbConv.ID, apiConv.ID)
+					}
+					if apiConv.SessionID != tt.dbConv.SessionID {
+						t.Errorf("Expected SessionID %s, got %s", tt.dbConv.SessionID, apiConv.SessionID)
+					}
 
-	// Verify messages are converted
-	if len(apiConv.Messages) != len(dbConv.Messages) {
-		t.Errorf("Expected %d messages, got %d", len(dbConv.Messages), len(apiConv.Messages))
-	}
-
-	for i, msg := range apiConv.Messages {
-		expectedMsg := dbConv.Messages[i]
-		if msg.ID != expectedMsg.ID {
-			t.Errorf("Message %d: Expected ID %d, got %d", i, expectedMsg.ID, msg.ID)
-		}
-		if msg.Content != expectedMsg.Content {
-			t.Errorf("Message %d: Expected Content %s, got %s", i, expectedMsg.Content, msg.Content)
-		}
-		if string(msg.MessageType) != expectedMsg.MessageType {
-			t.Errorf("Message %d: Expected MessageType %s, got %s", i, expectedMsg.MessageType, string(msg.MessageType))
-		}
+					if tt.validateConv != nil {
+						tt.validateConv(t, apiConv)
+					}
+				}
+			}
+		})
 	}
 }
 
@@ -311,14 +449,14 @@ func TestConvertRatings(t *testing.T) {
 		if rating.Rating != expected.Rating {
 			t.Errorf("Rating %d: Expected Rating %d, got %d", i, expected.Rating, rating.Rating)
 		}
-		
+
 		// Check conversation ID
 		if (rating.ConversationID == nil) != (expected.ConversationID == nil) {
 			t.Errorf("Rating %d: ConversationID null mismatch", i)
 		} else if rating.ConversationID != nil && *rating.ConversationID != *expected.ConversationID {
 			t.Errorf("Rating %d: Expected ConversationID %d, got %d", i, *expected.ConversationID, *rating.ConversationID)
 		}
-		
+
 		// Check message ID
 		if (rating.MessageID == nil) != (expected.MessageID == nil) {
 			t.Errorf("Rating %d: MessageID null mismatch", i)
@@ -327,3 +465,4 @@ func TestConvertRatings(t *testing.T) {
 		}
 	}
 }
+

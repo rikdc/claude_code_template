@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/claude-code-template/prompt-manager/internal/database"
 	"github.com/claude-code-template/prompt-manager/internal/models"
 )
@@ -21,23 +23,30 @@ func ConvertConversation(dbConv *database.Conversation) models.Conversation {
 }
 
 // ConvertConversationWithMessages converts a database conversation with messages to an API model
-func ConvertConversationWithMessages(dbConv *database.ConversationWithMessages) models.Conversation {
+func ConvertConversationWithMessages(dbConv *database.ConversationWithMessages) (models.Conversation, error) {
 	apiConv := ConvertConversation(&dbConv.Conversation)
-	
+
 	// Convert messages
 	apiMessages := make([]models.Message, len(dbConv.Messages))
 	for i := range dbConv.Messages {
-		apiMessages[i] = ConvertMessage(&dbConv.Messages[i])
+		msg, err := ConvertMessage(&dbConv.Messages[i])
+		if err != nil {
+			return models.Conversation{}, fmt.Errorf("failed to convert message in conversation %d: %w", dbConv.ID, err)
+		}
+		apiMessages[i] = msg
 	}
 	apiConv.Messages = apiMessages
-	
-	return apiConv
+
+	return apiConv, nil
 }
 
 // ConvertMessage converts a database message to an API message model
-func ConvertMessage(dbMsg *database.Message) models.Message {
-	toolCalls, _ := models.UnmarshalToolCalls(dbMsg.ToolCalls)
-	
+func ConvertMessage(dbMsg *database.Message) (models.Message, error) {
+	toolCalls, err := models.UnmarshalToolCalls(dbMsg.ToolCalls)
+	if err != nil {
+		return models.Message{}, fmt.Errorf("failed to unmarshal tool calls for message %d: %w", dbMsg.ID, err)
+	}
+
 	return models.Message{
 		ID:             dbMsg.ID,
 		ConversationID: dbMsg.ConversationID,
@@ -47,7 +56,7 @@ func ConvertMessage(dbMsg *database.Message) models.Message {
 		Timestamp:      dbMsg.Timestamp,
 		ToolCalls:      toolCalls,
 		ExecutionTime:  dbMsg.ExecutionTime,
-	}
+	}, nil
 }
 
 // ConvertRating converts a database rating to an API rating model
@@ -82,3 +91,4 @@ func ConvertRatings(dbRatings []database.Rating) []models.Rating {
 	}
 	return apiRatings
 }
+
