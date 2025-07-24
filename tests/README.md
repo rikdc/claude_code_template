@@ -5,14 +5,18 @@ This directory contains comprehensive tests for the activity monitor security im
 ## Test Files
 
 ### `test-activity-monitor.py`
+
 Comprehensive Python test suite that validates:
+
 - **Security Validation Functions**: Path traversal protection, data sanitization, input validation
 - **Database Context Manager**: Proper connection handling and cleanup
 - **Input Limits**: JSON size limits and execution duration caps
 - **Integration**: End-to-end testing with mock hook data
 
 ### `test-hook-input.sh`
+
 Shell script that tests the hook with realistic JSON input:
+
 - Normal hook events (UserPromptSubmit, PreToolUse)
 - Sensitive data sanitization
 - Malicious input handling
@@ -21,11 +25,13 @@ Shell script that tests the hook with realistic JSON input:
 ## Running Tests
 
 ### Security Test Suite
+
 ```bash
 python3 tests/test-activity-monitor.py
 ```
 
 ### Hook Input Tests
+
 ```bash
 ./tests/test-hook-input.sh
 ```
@@ -51,6 +57,7 @@ echo '{"hook_event_name": "UserPromptSubmit", "prompt": "test"}' | \
 ## Expected Results
 
 All tests should pass with output showing:
+
 - Path traversal attempts are blocked
 - Sensitive data (API keys, passwords, emails) is sanitized
 - Malicious inputs are handled safely

@@ -29,18 +29,21 @@ The Prompt Manager is a web-based application that provides users with a compreh
 ## Functional Requirements
 
 ### Core Data Capture
+
 1. The system must intercept user prompts via Claude Code UserPromptSubmit hooks
 2. The system must capture complete conversation data including Claude responses, tool calls, and execution results
 3. The system must store session metadata including timestamps, session IDs, and working directory context
 4. The system must access and parse Claude Code transcript files for complete conversation history
 
 ### Web Interface
+
 5. The system must provide a web interface displaying a list of intercepted prompts with preview text
 6. The system must allow users to click on any prompt to view the complete conversation thread
 7. The system must display conversation data in a readable format with clear distinction between user prompts, Claude responses, and tool executions
 8. The system must provide a responsive design that works on desktop and tablet devices
 
 ### Rating and Tagging System
+
 9. The system must allow users to rate prompts using a 1-5 star rating system
 10. The system must enable users to add custom text tags to any prompt
 11. The system must store and display ratings and tags persistently
@@ -48,18 +51,21 @@ The Prompt Manager is a web-based application that provides users with a compreh
 13. The system must optionally connect to Ollama or OpenAI-compatible endpoints to generate AI-suggested tags
 
 ### Session Management
+
 14. The system must automatically group related prompts and responses into conversation sessions using Claude Code session IDs
 15. The system must provide a "Split Session" button on individual conversation blocks to create new sessions
 16. The system must allow users to drag and drop conversation blocks to reorganize sessions
 17. The system must maintain original session references while allowing user-defined logical sessions
 
 ### Data Storage
+
 18. The system must use SQLite database for local data storage
 19. The system must design database schema to support future migration to centralized databases (PostgreSQL/MySQL)
 20. The system must store all conversation data, ratings, tags, and session organization persistently
 21. The system must provide database migration capabilities for schema updates
 
 ### Hook Integration
+
 22. The system must create new Claude Code hooks for prompt capture without interfering with existing security scanner hooks
 23. The system must integrate with the existing Claude Code hook configuration system
 24. The system must handle hook failures gracefully without blocking Claude Code operations
@@ -77,12 +83,14 @@ The Prompt Manager is a web-based application that provides users with a compreh
 ## Design Considerations
 
 ### Technology Stack
+
 - **Backend**: Go language web service for performance and simplicity
 - **Frontend**: Vue.js application for reactive user interface
 - **Database**: SQLite for local storage with PostgreSQL-compatible schema design
 - **Communication**: RESTful API between frontend and backend
 
 ### User Interface
+
 - Clean, minimal design following modern web application patterns
 - Conversation threads displayed in chat-like format with clear visual hierarchy
 - Prompt cards showing rating, tags, and preview text in grid or list layout
@@ -90,6 +98,7 @@ The Prompt Manager is a web-based application that provides users with a compreh
 - Intuitive controls for rating (star interface) and tagging (tag input with autocomplete)
 
 ### Data Architecture
+
 - Structured storage of conversation threads maintaining original Claude Code transcript format
 - Separate user-defined sessions linked to original Claude sessions
 - Tagging system supporting both user-defined and AI-generated tags
@@ -98,24 +107,28 @@ The Prompt Manager is a web-based application that provides users with a compreh
 ## Technical Considerations
 
 ### Claude Code Integration
+
 - Hook implementation must follow existing patterns in `.claude/hooks/` directory
 - Configuration updates to `.claude/settings.json` for new hook registration
 - Error handling to prevent hook failures from affecting Claude Code operations
 - Session ID correlation between hook data and stored conversations
 
 ### Database Design
+
 - Schema designed for easy migration from SQLite to PostgreSQL/MySQL
 - Foreign key relationships between conversations, sessions, ratings, and tags
 - Indexing strategy for efficient querying of conversation data
 - Database versioning system for schema migrations
 
 ### Performance Requirements
+
 - Web interface must load within 2 seconds for up to 1000 stored prompts
 - Conversation viewing must be responsive for sessions up to 100 exchanges
 - Hook execution must not add noticeable delay to Claude Code operations
 - Database queries must be optimized for common use cases (recent prompts, highest rated, etc.)
 
 ### Security and Privacy
+
 - All data stored locally on user's machine
 - No external data transmission except for optional AI tag generation
 - AI tag generation endpoints configurable and optional
@@ -124,26 +137,31 @@ The Prompt Manager is a web-based application that provides users with a compreh
 ## Success Metrics
 
 ### User Engagement
+
 - **Frequency of Use**: Users access the web interface at least 3 times per week
 - **Time Spent Analyzing**: Users spend average of 10+ minutes per session reviewing prompts
 - **Rating Completion**: 70%+ of intercepted prompts receive ratings within one week
 
 ### Prompt Improvement  
+
 - **Rating Trends**: Users show improving average ratings over time (indicating better prompts)
 - **Tag Usage**: Users consistently apply tags to 80%+ of their prompts
 - **Session Organization**: Users utilize session splitting for 30%+ of longer conversations
 
 ### Adoption Rate
+
 - **Installation Success**: 90%+ of users successfully install and configure the system
 - **Data Capture**: System successfully captures 95%+ of Claude Code interactions
 - **Feature Usage**: All core features (rating, tagging, session management) used by 70%+ of active users
 
 ### User Feedback/Satisfaction
+
 - **Net Promoter Score**: Target NPS of 50+ from user surveys
 - **Feature Requests**: Active user engagement in requesting improvements and enhancements
 - **Bug Reports**: Low critical bug rate (<5% of user sessions affected by bugs)
 
 ### System Performance
+
 - **Hook Reliability**: 99%+ uptime for prompt capture hooks
 - **Data Integrity**: 100% data consistency between captures and web interface display
 - **Response Time**: Web interface maintains <2 second load times as data volume grows
