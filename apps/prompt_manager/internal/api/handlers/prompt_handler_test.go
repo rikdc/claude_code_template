@@ -5,35 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"testing"
 	"time"
-
-	"github.com/claude-code-template/prompt-manager/internal/database"
 )
 
-func setupTestDB(t *testing.T) *database.DB {
-	// Create temporary database file
-	tmpDir := t.TempDir()
-	dbPath := filepath.Join(tmpDir, "test.db")
-	
-	config := &database.Config{
-		DatabasePath:  dbPath,
-		MigrationsDir: "../../../database/migrations",
-	}
-	
-	db, err := database.New(config)
-	if err != nil {
-		t.Fatalf("Failed to create test database: %v", err)
-	}
-	
-	// Run migrations
-	if err := db.RunMigrations(config.MigrationsDir); err != nil {
-		t.Fatalf("Failed to run migrations: %v", err)
-	}
-	
-	return db
-}
 
 func TestNewPromptHandler(t *testing.T) {
 	db := setupTestDB(t)
@@ -159,6 +134,8 @@ func TestPromptHandler_HandlePromptSubmit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			
 			db := setupTestDB(t)
 			defer db.Close()
 			
