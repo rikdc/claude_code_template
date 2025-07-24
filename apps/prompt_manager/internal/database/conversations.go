@@ -86,7 +86,7 @@ func (db *DB) GetConversation(id int) (*Conversation, error) {
 	
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("conversation not found")
+			return nil, ErrConversationNotFound
 		}
 		return nil, fmt.Errorf("failed to get conversation: %w", err)
 	}
@@ -108,7 +108,7 @@ func (db *DB) GetConversationBySessionID(sessionID string) (*Conversation, error
 	
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("conversation not found")
+			return nil, ErrConversationNotFound
 		}
 		return nil, fmt.Errorf("failed to get conversation by session ID: %w", err)
 	}
@@ -180,7 +180,7 @@ func (db *DB) UpdateConversationTitle(id int, title string) error {
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("conversation not found")
+		return ErrConversationNotFound
 	}
 
 	return nil
@@ -213,7 +213,7 @@ func (db *DB) DeleteConversation(id int) error {
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("conversation not found")
+		return ErrConversationNotFound
 	}
 
 	return tx.Commit()

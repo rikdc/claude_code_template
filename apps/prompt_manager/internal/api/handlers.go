@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -144,7 +145,7 @@ func (s *Server) GetConversationHandler(w http.ResponseWriter, r *http.Request) 
 
 	conv, err := s.db.GetConversationWithMessages(id)
 	if err != nil {
-		if err.Error() == "conversation not found" {
+		if errors.Is(err, database.ErrConversationNotFound) {
 			errorResponse(w, "Conversation not found", http.StatusNotFound)
 			return
 		}
@@ -223,7 +224,7 @@ func (s *Server) UpdateConversationHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := s.db.UpdateConversationTitle(id, req.Title); err != nil {
-		if err.Error() == "conversation not found" {
+		if errors.Is(err, database.ErrConversationNotFound) {
 			errorResponse(w, "Conversation not found", http.StatusNotFound)
 			return
 		}
@@ -259,7 +260,7 @@ func (s *Server) DeleteConversationHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := s.db.DeleteConversation(id); err != nil {
-		if err.Error() == "conversation not found" {
+		if errors.Is(err, database.ErrConversationNotFound) {
 			errorResponse(w, "Conversation not found", http.StatusNotFound)
 			return
 		}
@@ -371,7 +372,7 @@ func (s *Server) UpdateRatingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.db.UpdateRating(id, req.Rating, req.Comment); err != nil {
-		if err.Error() == "rating not found" {
+		if errors.Is(err, database.ErrRatingNotFound) {
 			errorResponse(w, "Rating not found", http.StatusNotFound)
 			return
 		}
@@ -407,7 +408,7 @@ func (s *Server) DeleteRatingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.db.DeleteRating(id); err != nil {
-		if err.Error() == "rating not found" {
+		if errors.Is(err, database.ErrRatingNotFound) {
 			errorResponse(w, "Rating not found", http.StatusNotFound)
 			return
 		}

@@ -104,7 +104,7 @@ func (db *DB) GetRating(id int) (*Rating, error) {
 	
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("rating not found")
+			return nil, ErrRatingNotFound
 		}
 		return nil, fmt.Errorf("failed to get rating: %w", err)
 	}
@@ -188,7 +188,7 @@ func (db *DB) UpdateRating(id int, rating int, comment *string) error {
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("rating not found")
+		return ErrRatingNotFound
 	}
 
 	return nil
@@ -208,7 +208,7 @@ func (db *DB) DeleteRating(id int) error {
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("rating not found")
+		return ErrRatingNotFound
 	}
 
 	return nil
