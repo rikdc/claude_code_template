@@ -80,14 +80,14 @@ Based on analysis of Claude Code's hook system:
 
 ### File-Based Queue System
 
-```
+```text
 Claude Code Hook → Queue File → Background Processor → SQLite → REST API → Web UI
     (<1ms)         (instant)      (asynchronous)      (fast)     (standard)
 ```
 
 ### Directory Structure
 
-```
+```text
 apps/prompt_manager/
 ├── queue/
 │   ├── incoming/     # New files from hooks
@@ -167,7 +167,7 @@ Update `.claude/settings.json`:
       }]
     }],
     "Stop": [{
-      "matcher": ".*", 
+      "matcher": ".*",
       "hooks": [{
         "type": "command",
         "command": "${WORKSPACE}/apps/prompt_manager/hooks/capture-completion.sh"
@@ -215,7 +215,7 @@ CREATE TABLE ratings (
 **Service Management**:
 
 - systemd service file for Linux
-- launchd plist for macOS  
+- launchd plist for macOS
 - Process monitoring and auto-restart
 
 ### REST API Design
@@ -268,7 +268,7 @@ CREATE TABLE ratings (
 ### Logging Strategy
 
 - Hook execution logs (minimal, performance-focused)
-- Background processing logs (detailed, error-focused)  
+- Background processing logs (detailed, error-focused)
 - API access logs (standard web server logs)
 
 ### Error Scenarios
