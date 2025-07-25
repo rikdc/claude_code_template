@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/claude-code-template/prompt-manager/internal/database"
+	"github.com/claude-code-template/prompt-manager/internal/validation"
 	"github.com/gorilla/mux"
 )
 
@@ -93,20 +93,18 @@ func (s *Server) HealthHandler(w http.ResponseWriter, r *http.Request) {
 
 // ListConversationsHandler returns a paginated list of conversations
 func (s *Server) ListConversationsHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse query parameters
-	page := 1
-	perPage := 20
-
-	if pageStr := r.URL.Query().Get("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
+	// Parse and validate pagination parameters
+	page, perPage, err := validation.ParseAndValidatePage(
+		r.URL.Query().Get("page"),
+		r.URL.Query().Get("per_page"),
+	)
+	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
 		}
-	}
-
-	if perPageStr := r.URL.Query().Get("per_page"); perPageStr != "" {
-		if pp, err := strconv.Atoi(perPageStr); err == nil && pp > 0 && pp <= 100 {
-			perPage = pp
-		}
+		errorResponse(w, "Invalid pagination parameters", http.StatusBadRequest)
+		return
 	}
 
 	offset := (page - 1) * perPage
@@ -137,8 +135,12 @@ func (s *Server) GetConversationHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "conversation_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid conversation ID", http.StatusBadRequest)
 		return
 	}
@@ -177,9 +179,57 @@ func (s *Server) CreateConversationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if req.SessionID == "" {
-		errorResponse(w, "session_id is required", http.StatusBadRequest)
+	// Validate session ID
+	if err := validation.ValidateSessionID(req.SessionID); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid session ID", http.StatusBadRequest)
 		return
+	}
+
+	// Validate title
+	if err := validation.ValidateTitle(req.Title); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid title", http.StatusBadRequest)
+		return
+	}
+
+	// Validate paths
+	if err := validation.ValidatePath(req.WorkingDirectory); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid working directory path", http.StatusBadRequest)
+		return
+	}
+
+	if err := validation.ValidatePath(req.TranscriptPath); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid transcript path", http.StatusBadRequest)
+		return
+	}
+
+	// Sanitize strings
+	if req.Title != nil {
+		sanitized := validation.SanitizeString(*req.Title, validation.MaxTitleLength)
+		req.Title = &sanitized
+	}
+	if req.WorkingDirectory != nil {
+		sanitized := validation.SanitizeString(*req.WorkingDirectory, validation.MaxPathLength)
+		req.WorkingDirectory = &sanitized
+	}
+	if req.TranscriptPath != nil {
+		sanitized := validation.SanitizeString(*req.TranscriptPath, validation.MaxPathLength)
+		req.TranscriptPath = &sanitized
 	}
 
 	conv, err := s.db.CreateConversation(req.SessionID, req.Title, req.WorkingDirectory, req.TranscriptPath)
@@ -203,8 +253,12 @@ func (s *Server) UpdateConversationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "conversation_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid conversation ID", http.StatusBadRequest)
 		return
 	}
@@ -218,10 +272,23 @@ func (s *Server) UpdateConversationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// Validate title
+	if err := validation.ValidateTitle(&req.Title); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid title", http.StatusBadRequest)
+		return
+	}
+
 	if req.Title == "" {
 		errorResponse(w, "title is required", http.StatusBadRequest)
 		return
 	}
+
+	// Sanitize title
+	req.Title = validation.SanitizeString(req.Title, validation.MaxTitleLength)
 
 	if err := s.db.UpdateConversationTitle(id, req.Title); err != nil {
 		if errors.Is(err, database.ErrConversationNotFound) {
@@ -253,8 +320,12 @@ func (s *Server) DeleteConversationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "conversation_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid conversation ID", http.StatusBadRequest)
 		return
 	}
@@ -282,8 +353,12 @@ func (s *Server) CreateConversationRatingHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "conversation_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid conversation ID", http.StatusBadRequest)
 		return
 	}
@@ -298,9 +373,30 @@ func (s *Server) CreateConversationRatingHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	if req.Rating < 1 || req.Rating > 5 {
-		errorResponse(w, "rating must be between 1 and 5", http.StatusBadRequest)
+	// Validate rating
+	if err := validation.ValidateRating(req.Rating); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid rating", http.StatusBadRequest)
 		return
+	}
+
+	// Validate comment
+	if err := validation.ValidateComment(req.Comment); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid comment", http.StatusBadRequest)
+		return
+	}
+
+	// Sanitize comment
+	if req.Comment != nil {
+		sanitized := validation.SanitizeString(*req.Comment, validation.MaxCommentLength)
+		req.Comment = &sanitized
 	}
 
 	rating, err := s.db.CreateConversationRating(id, req.Rating, req.Comment)
@@ -324,8 +420,12 @@ func (s *Server) GetConversationRatingsHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "conversation_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid conversation ID", http.StatusBadRequest)
 		return
 	}
@@ -350,8 +450,12 @@ func (s *Server) UpdateRatingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "rating_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid rating ID", http.StatusBadRequest)
 		return
 	}
@@ -366,9 +470,30 @@ func (s *Server) UpdateRatingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Rating < 1 || req.Rating > 5 {
-		errorResponse(w, "rating must be between 1 and 5", http.StatusBadRequest)
+	// Validate rating
+	if err := validation.ValidateRating(req.Rating); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid rating", http.StatusBadRequest)
 		return
+	}
+
+	// Validate comment
+	if err := validation.ValidateComment(req.Comment); err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		errorResponse(w, "Invalid comment", http.StatusBadRequest)
+		return
+	}
+
+	// Sanitize comment
+	if req.Comment != nil {
+		sanitized := validation.SanitizeString(*req.Comment, validation.MaxCommentLength)
+		req.Comment = &sanitized
 	}
 
 	if err := s.db.UpdateRating(id, req.Rating, req.Comment); err != nil {
@@ -401,8 +526,12 @@ func (s *Server) DeleteRatingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(idStr)
+	id, err := validation.ParseAndValidateID(idStr, "rating_id")
 	if err != nil {
+		if validation.IsValidationError(err) {
+			errorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		errorResponse(w, "Invalid rating ID", http.StatusBadRequest)
 		return
 	}
