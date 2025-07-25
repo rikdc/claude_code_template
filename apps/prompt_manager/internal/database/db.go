@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,19 +18,51 @@ type DB struct {
 
 // Config holds database configuration
 type Config struct {
-	DatabasePath string
-	MigrationsDir string
+	DatabasePath    string
+	MigrationsDir   string
+	MaxOpenConns    int
+	MaxIdleConns    int
+	ConnMaxLifetime time.Duration
+	ConnMaxIdleTime time.Duration
+	BusyTimeout     time.Duration
+	WALMode         bool
+	Synchronous     string
+	CacheSize       int
 }
 
-// DefaultConfig returns default database configuration
+// DefaultConfig returns default database configuration optimized for SQLite
 func DefaultConfig() *Config {
 	return &Config{
-		DatabasePath:  "data/prompt_manager.db",
-		MigrationsDir: "database/migrations",
+		DatabasePath:    "data/prompt_manager.db",
+		MigrationsDir:   "database/migrations",
+		MaxOpenConns:    1,                    // SQLite works best with single writer
+		MaxIdleConns:    1,                    // Keep connection alive
+		ConnMaxLifetime: 0,                    // No connection lifetime limit
+		ConnMaxIdleTime: 30 * time.Minute,    // Close idle connections after 30 minutes
+		BusyTimeout:     30 * time.Second,     // Wait up to 30 seconds for lock
+		WALMode:         true,                 // Use WAL mode for better concurrency
+		Synchronous:     "NORMAL",             // Balance between safety and performance
+		CacheSize:       10000,                // 10MB cache (10000 pages * 1KB)
 	}
 }
 
-// New creates a new database connection
+// ProductionConfig returns production-optimized database configuration
+func ProductionConfig(dbPath string) *Config {
+	return &Config{
+		DatabasePath:    dbPath,
+		MigrationsDir:   "database/migrations",
+		MaxOpenConns:    1,                    // SQLite single writer
+		MaxIdleConns:    1,                    // Keep connection alive
+		ConnMaxLifetime: 0,                    // No connection lifetime limit
+		ConnMaxIdleTime: 10 * time.Minute,    // Shorter idle time in production
+		BusyTimeout:     60 * time.Second,     // Longer timeout for production
+		WALMode:         true,                 // WAL mode for better performance
+		Synchronous:     "NORMAL",             // Good balance for production
+		CacheSize:       20000,                // 20MB cache for production
+	}
+}
+
+// New creates a new database connection with optimized SQLite settings
 func New(config *Config) (*DB, error) {
 	// Ensure database directory exists
 	dir := filepath.Dir(config.DatabasePath)
@@ -37,15 +70,20 @@ func New(config *Config) (*DB, error) {
 		return nil, fmt.Errorf("failed to create database directory: %w", err)
 	}
 
+	// Build connection string with SQLite pragmas
+	connStr := buildConnectionString(config)
+
 	// Open database connection
-	conn, err := sql.Open("sqlite3", config.DatabasePath)
+	conn, err := sql.Open("sqlite3", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	// Configure SQLite connection
-	conn.SetMaxOpenConns(1) // SQLite works best with single connection
-	conn.SetMaxIdleConns(1)
+	// Configure connection pool
+	conn.SetMaxOpenConns(config.MaxOpenConns)
+	conn.SetMaxIdleConns(config.MaxIdleConns)
+	conn.SetConnMaxLifetime(config.ConnMaxLifetime)
+	conn.SetConnMaxIdleTime(config.ConnMaxIdleTime)
 
 	// Test connection
 	if err := conn.Ping(); err != nil {
@@ -53,10 +91,10 @@ func New(config *Config) (*DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	// Enable foreign keys
-	if _, err := conn.Exec("PRAGMA foreign_keys = ON"); err != nil {
+	// Apply additional SQLite optimizations
+	if err := applySQLiteOptimizations(conn, config); err != nil {
 		conn.Close()
-		return nil, fmt.Errorf("failed to enable foreign keys: %w", err)
+		return nil, fmt.Errorf("failed to apply SQLite optimizations: %w", err)
 	}
 
 	db := &DB{
@@ -65,6 +103,60 @@ func New(config *Config) (*DB, error) {
 	}
 
 	return db, nil
+}
+
+// buildConnectionString constructs SQLite connection string with pragmas
+func buildConnectionString(config *Config) string {
+	connStr := config.DatabasePath + "?"
+	
+	// Enable foreign keys
+	connStr += "foreign_keys=1"
+	
+	// Set busy timeout
+	if config.BusyTimeout > 0 {
+		connStr += fmt.Sprintf("&_busy_timeout=%d", int(config.BusyTimeout/time.Millisecond))
+	}
+	
+	// Enable WAL mode if configured
+	if config.WALMode {
+		connStr += "&_journal_mode=WAL"
+	}
+	
+	// Set synchronous mode
+	if config.Synchronous != "" {
+		connStr += fmt.Sprintf("&_sync=%s", config.Synchronous)
+	}
+	
+	return connStr
+}
+
+// applySQLiteOptimizations applies runtime SQLite optimizations
+func applySQLiteOptimizations(conn *sql.DB, config *Config) error {
+	optimizations := []struct {
+		pragma string
+		value  interface{}
+		desc   string
+	}{
+		{"cache_size", -config.CacheSize, "Set cache size"},
+		{"temp_store", "MEMORY", "Store temporary tables in memory"},
+		{"mmap_size", 268435456, "Enable memory-mapped I/O (256MB)"},
+		{"optimize", nil, "Optimize database"},
+	}
+	
+	for _, opt := range optimizations {
+		var query string
+		if opt.value != nil {
+			query = fmt.Sprintf("PRAGMA %s = %v", opt.pragma, opt.value)
+		} else {
+			query = fmt.Sprintf("PRAGMA %s", opt.pragma)
+		}
+		
+		if _, err := conn.Exec(query); err != nil {
+			return fmt.Errorf("failed to apply %s: %w", opt.desc, err)
+		}
+	}
+	
+	return nil
 }
 
 // Close closes the database connection
@@ -154,7 +246,7 @@ func (db *DB) Health() error {
 	return db.conn.Ping()
 }
 
-// Stats returns database statistics
+// Stats returns database statistics including SQLite-specific metrics
 func (db *DB) Stats() (map[string]interface{}, error) {
 	stats := make(map[string]interface{})
 	
@@ -187,6 +279,57 @@ func (db *DB) Stats() (map[string]interface{}, error) {
 		stats["database_size_bytes"] = info.Size()
 	}
 
+	// Connection pool stats
+	dbStats := db.conn.Stats()
+	stats["connection_pool"] = map[string]interface{}{
+		"max_open_connections":     dbStats.MaxOpenConnections,
+		"open_connections":         dbStats.OpenConnections,
+		"in_use":                  dbStats.InUse,
+		"idle":                    dbStats.Idle,
+		"wait_count":              dbStats.WaitCount,
+		"wait_duration_ms":        dbStats.WaitDuration.Milliseconds(),
+		"max_idle_closed":         dbStats.MaxIdleClosed,
+		"max_idle_time_closed":    dbStats.MaxIdleTimeClosed,
+		"max_lifetime_closed":     dbStats.MaxLifetimeClosed,
+	}
+
+	// SQLite-specific stats
+	sqliteStats, err := db.getSQLiteStats()
+	if err == nil {
+		stats["sqlite"] = sqliteStats
+	}
+
+	return stats, nil
+}
+
+// getSQLiteStats retrieves SQLite-specific statistics and settings
+func (db *DB) getSQLiteStats() (map[string]interface{}, error) {
+	stats := make(map[string]interface{})
+	
+	// SQLite pragma values to check
+	pragmas := []string{
+		"journal_mode",
+		"synchronous", 
+		"cache_size",
+		"temp_store",
+		"mmap_size",
+		"page_count",
+		"page_size",
+		"freelist_count",
+		"foreign_keys",
+	}
+	
+	for _, pragma := range pragmas {
+		var value string
+		query := fmt.Sprintf("PRAGMA %s", pragma)
+		err := db.conn.QueryRow(query).Scan(&value)
+		if err != nil {
+			// Some pragmas might not be available, continue
+			continue
+		}
+		stats[pragma] = value
+	}
+	
 	return stats, nil
 }
 
