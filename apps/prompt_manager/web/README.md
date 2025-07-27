@@ -55,7 +55,7 @@ A Vue.js 3 frontend application for managing and reviewing Claude Code conversat
 
 ## Project Structure
 
-```
+```text
 src/
 ├── components/           # Vue components
 │   ├── ConversationList.vue    # List view with pagination
