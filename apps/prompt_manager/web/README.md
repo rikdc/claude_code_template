@@ -29,11 +29,13 @@ A Vue.js 3 frontend application for managing and reviewing Claude Code conversat
 ## Quick Start
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Start development server**:
+
    ```bash
    npm run dev
    ```
@@ -84,6 +86,7 @@ The frontend communicates with the Go backend through a REST API:
 ## Component Architecture
 
 ### ConversationList.vue
+
 - Displays paginated list of conversations
 - Search functionality (ready for backend implementation)
 - Sorting options by date, title, and message count
@@ -91,6 +94,7 @@ The frontend communicates with the Go backend through a REST API:
 - Click-through to detailed view
 
 ### ConversationDetail.vue
+
 - Shows complete conversation with all messages
 - Displays tool calls and execution details
 - Message copying functionality
@@ -98,6 +102,7 @@ The frontend communicates with the Go backend through a REST API:
 - Back navigation to list view
 
 ### App.vue
+
 - Global layout and navigation
 - Error handling and display
 - Conversation count tracking
@@ -114,18 +119,21 @@ The frontend communicates with the Go backend through a REST API:
 ## Development Guidelines
 
 ### Code Style
+
 - Use Vue 3 Composition API consistently
 - Reactive refs for component state
 - Computed properties for derived data
 - Proper error boundaries and handling
 
 ### Component Communication
+
 - Props for parent-to-child data flow
 - Events for child-to-parent communication
 - Global state managed in App.vue
 - API service as single source of truth
 
 ### Testing Strategy
+
 - Unit tests for components with Vitest
 - API service mocking for isolated testing
 - User interaction testing with Vue Test Utils
@@ -134,9 +142,11 @@ The frontend communicates with the Go backend through a REST API:
 ## Configuration
 
 ### Development Proxy
+
 The Vite development server proxies `/api` requests to `http://localhost:8080` to avoid CORS issues during development.
 
 ### Build Configuration
+
 - Source maps enabled for debugging
 - Optimized production builds with Vite
 - Modern JavaScript output for better performance
@@ -144,6 +154,7 @@ The Vite development server proxies `/api` requests to `http://localhost:8080` t
 ## Deployment
 
 1. **Build for production**:
+
    ```bash
    npm run build
    ```
@@ -185,16 +196,19 @@ The Vite development server proxies `/api` requests to `http://localhost:8080` t
 ### Common Issues
 
 **API Connection Issues**:
+
 - Ensure Go backend is running on port 8080
 - Check browser console for CORS errors
 - Verify API endpoints match backend routes
 
 **Build Failures**:
+
 - Run `npm install` to ensure dependencies are up to date
 - Check Node.js version compatibility
 - Clear `node_modules` and reinstall if needed
 
 **Style Issues**:
+
 - Check for CSS class conflicts
 - Verify responsive breakpoints
 - Test in different browsers for compatibility
