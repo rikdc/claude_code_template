@@ -136,6 +136,19 @@ func (db *DB) GetConversationWithMessages(id int) (*ConversationWithMessages, er
 	}, nil
 }
 
+// GetConversationCount returns the total number of conversations
+func (db *DB) GetConversationCount() (int, error) {
+	query := "SELECT COUNT(*) FROM conversations"
+	
+	var count int
+	err := db.conn.QueryRow(query).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get conversation count: %w", err)
+	}
+	
+	return count, nil
+}
+
 // ListConversations retrieves conversations with pagination
 func (db *DB) ListConversations(limit, offset int) ([]Conversation, error) {
 	query := `

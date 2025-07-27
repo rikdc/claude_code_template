@@ -115,12 +115,22 @@ func (s *Server) ListConversationsHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Get total count for pagination
+	totalCount, err := s.db.GetConversationCount()
+	if err != nil {
+		errorResponse(w, fmt.Sprintf("Failed to get conversation count: %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	// Convert to summaries for list view
 	summaries := ConvertConversationsToSummaries(conversations)
 
+	totalPages := (totalCount + perPage - 1) / perPage // Calculate total pages with ceiling division
 	meta := &Meta{
-		Page:    page,
-		PerPage: perPage,
+		Page:       page,
+		PerPage:    perPage,
+		Total:      totalCount,
+		TotalPages: totalPages,
 	}
 
 	successResponse(w, summaries, meta)

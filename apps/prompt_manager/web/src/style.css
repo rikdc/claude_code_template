@@ -5,6 +5,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  min-width: 0; /* Allow elements to shrink below content size */
 }
 
 body {
@@ -58,16 +59,33 @@ h3 {
   flex-direction: column;
 }
 
+.flex-1 {
+  flex: 1 1 0%;
+  min-width: 0; /* Allow flex items to shrink below content size */
+}
+
 .items-center {
   align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
 }
 
 .justify-between {
   justify-content: space-between;
 }
 
+.gap-2 {
+  gap: 0.5rem;
+}
+
 .gap-4 {
   gap: 1rem;
+}
+
+.min-w-0 {
+  min-width: 0;
 }
 
 .mt-4 {
@@ -90,6 +108,24 @@ h3 {
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+/* Text wrapping utilities */
+.break-all {
+  word-break: break-all;
+}
+
+.break-words {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
 }
 
 /* Card component */

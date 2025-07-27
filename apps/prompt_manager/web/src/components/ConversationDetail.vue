@@ -30,12 +30,12 @@
         <div class="card-header">
           <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
-              <h1 class="text-2xl font-bold text-gray-900 mb-2">
+              <h1 class="text-2xl font-bold text-gray-900 mb-2 break-words">
                 {{ conversation.title || `Session ${conversation.session_id}` }}
               </h1>
               
               <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 break-all">
                   Session: {{ conversation.session_id }}
                 </span>
                 <span>{{ conversation.prompt_count }} messages</span>
@@ -45,11 +45,11 @@
                 </span>
               </div>
               
-              <div v-if="conversation.working_directory" class="text-sm text-gray-600 font-mono mb-2">
+              <div v-if="conversation.working_directory" class="text-sm text-gray-600 font-mono mb-2 break-all">
                 📁 {{ conversation.working_directory }}
               </div>
               
-              <div v-if="conversation.transcript_path" class="text-sm text-gray-600 font-mono">
+              <div v-if="conversation.transcript_path" class="text-sm text-gray-600 font-mono break-all">
                 📄 {{ conversation.transcript_path }}
               </div>
             </div>
@@ -114,7 +114,7 @@
             
             <!-- Message Content -->
             <div class="prose max-w-none">
-              <pre class="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">{{ message.content }}</pre>
+              <pre class="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed break-words overflow-wrap-anywhere">{{ message.content }}</pre>
             </div>
             
             <!-- Tool Calls -->
@@ -128,7 +128,7 @@
                 >
                   <div class="font-medium text-gray-800">{{ toolCall.name }}</div>
                   <div v-if="toolCall.arguments" class="text-gray-600 mt-1">
-                    <pre class="whitespace-pre-wrap">{{ JSON.stringify(toolCall.arguments, null, 2) }}</pre>
+                    <pre class="whitespace-pre-wrap break-words overflow-wrap-anywhere">{{ JSON.stringify(toolCall.arguments, null, 2) }}</pre>
                   </div>
                   <div v-if="toolCall.result" class="text-green-600 mt-1">
                     Result: {{ truncateText(toolCall.result, 200) }}
@@ -407,5 +407,35 @@ export default {
 
 .border-l-green-500 {
   border-left-color: #10b981;
+}
+
+/* Text wrapping utilities */
+.break-all {
+  word-break: break-all;
+}
+
+.break-words {
+  word-break: break-word;
+}
+
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
+/* Ensure containers don't overflow */
+.conversation-detail {
+  min-width: 0; /* Allow flex items to shrink below content size */
+}
+
+.conversation-detail .flex-1 {
+  min-width: 0; /* Allow flex items to shrink below content size */
+}
+
+/* Message content specific wrapping */
+.prose pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 </style>
