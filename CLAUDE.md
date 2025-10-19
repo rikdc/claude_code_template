@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code Template project that provides security hooks and testing infrastructure for Claude Code projects. The main purposes are:
-1. Prevent sensitive data from being sent to external MCP services through security scanning
-2. Enforce PR-based workflows by preventing direct edits to protected branches (main, master, production, release)
+This is a Claude Code Template project that provides security hooks and testing infrastructure for Claude Code projects. The main features are:
+1. Security scanning to prevent sensitive data from being sent to external MCP services
+2. Branch protection to enforce PR-based workflows by preventing direct edits to protected branches (main, master, production, release)
 
 ## Key Commands
 

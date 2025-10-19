@@ -74,7 +74,7 @@ run_test "Block Edit on production branch" "production" "Edit" "true"
 run_test "Block Edit on release branch" "release" "Edit" "true"
 
 run_test "Allow Edit on feature branch" "feature/test" "Edit" "false"
-run_test "Allow Write on feature branch" "alice/KH-123-feature" "Write" "false"
+run_test "Allow Write on feature branch" "alice/PROJ-123-feature" "Write" "false"
 run_test "Allow Bash on feature branch" "bob/fix-bug" "Bash" "false"
 run_test "Allow Task on feature branch" "carol/test-workflow" "Task" "false"
 

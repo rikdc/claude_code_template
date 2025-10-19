@@ -56,13 +56,13 @@ To proceed:
 
 ### Creating a Feature Branch
 
-Follow KOHO's branching conventions:
+Follow your team's branching conventions:
 
 ```bash
-# With Jira ticket
-git checkout -b your-name/KH-123-feature-description
+# With issue tracker ticket
+git checkout -b your-name/PROJ-123-feature-description
 
-# Without Jira ticket
+# Without ticket
 git checkout -b your-name/feature-description
 ```
 
@@ -190,10 +190,10 @@ chmod +x .claude/hooks/protect-main-branch.sh
 ## Best Practices
 
 ### Branch Naming
-Follow KOHO conventions:
+Follow your team's conventions:
 - Use lowercase with dashes
 - Include your name: `your-name/feature-description`
-- Include Jira ticket when applicable: `your-name/KH-123-feature`
+- Include issue ticket when applicable: `your-name/PROJ-123-feature`
 
 ### Feature Branch Workflow
 1. Create feature branch from main
@@ -217,18 +217,18 @@ Follow KOHO conventions:
 git checkout main
 
 # Create feature branch
-git checkout -b alice/KH-456-add-validation
+git checkout -b alice/PROJ-456-add-validation
 
 # Now Claude Code can make changes
 # ... make changes ...
 
 # Commit and push
 git add .
-git commit -m "feat(KH-456): add input validation"
-git push -u origin alice/KH-456-add-validation
+git commit -m "feat: add input validation"
+git push -u origin alice/PROJ-456-add-validation
 
 # Create PR through GitHub UI or CLI
-gh pr create --title "feat(KH-456): add input validation"
+gh pr create --title "feat: add input validation"
 ```
 
 ### Emergency Override
@@ -242,7 +242,7 @@ git checkout main
 # ... use Claude Code to make fix ...
 
 # Document in commit message
-git commit -m "hotfix: resolve critical payment processing issue [emergency-override]"
+git commit -m "hotfix: resolve critical issue [emergency-override]"
 
 # Remove override after fix
 unset ALLOW_PROTECTED_BRANCH_EDIT
@@ -250,13 +250,12 @@ unset ALLOW_PROTECTED_BRANCH_EDIT
 
 ## Related Documentation
 
-- [KOHO Team Workflow](../../private/etc/koho/ai/team-workflow.md)
-- [Git Workflow Best Practices](../../private/etc/koho/ai/team-workflow.md#git-workflow)
 - [Claude Code Hooks](https://docs.claude.ai/docs/hooks)
+- [MCP Security Scanner](./mcp-security-scanner.md)
 
 ## Support
 
 For issues or questions:
 - Check the log file: `.claude/protect-main-branch.log`
 - Review this documentation
-- Contact the platform team for configuration help
+- Consult your team's workflow documentation
