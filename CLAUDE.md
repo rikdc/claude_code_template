@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code Template project that provides security hooks and testing infrastructure for Claude Code projects. The main purpose is to prevent sensitive data from being sent to external MCP services through a security scanning hook.
+This is a Claude Code Template project that provides security hooks and testing infrastructure for Claude Code projects. The main purposes are:
+1. Prevent sensitive data from being sent to external MCP services through security scanning
+2. Enforce PR-based workflows by preventing direct edits to protected branches (main, master, production, release)
 
 ## Key Commands
 
@@ -33,7 +35,8 @@ This project includes custom Claude Code slash commands in `.claude/commands/`:
 ### Core Components
 
 - **Security Scanner Hook** (`.claude/hooks/mcp-security-scanner.sh`): Main security scanner that intercepts MCP requests and scans for sensitive data using regex patterns and optional external tools
-- **Hook Configuration** (`.claude/settings.json`): Claude Code hook configuration that automatically runs the security scanner for all MCP tool calls (`mcp__*`)
+- **Protected Branch Hook** (`.claude/hooks/protect-main-branch.sh`): Prevents direct edits to protected branches (main, master, production, release) by blocking Edit, Write, Bash, and Task tools, enforcing PR-based workflows
+- **Hook Configuration** (`.claude/settings.json`): Claude Code hook configuration that automatically runs hooks for MCP tools and code-modifying operations
 - **Security Patterns** (`.claude/security-patterns.conf`): Configurable regex patterns for detecting sensitive data (API keys, tokens, database URLs, etc.)
 - **Custom Commands** (`.claude/commands/`): Slash commands that provide specialized workflows for code quality, cleanup, and changelog maintenance
 
@@ -41,9 +44,10 @@ This project includes custom Claude Code slash commands in `.claude/commands/`:
 
 The project uses a simple, focused testing approach:
 
-- **Simple Test Script** (`tests/test-scanner.sh`): Single test script that validates core security scanner functionality without complex infrastructure
-- **Core Functionality Tests**: Tests clean content allowance, sensitive data detection, MCP tool filtering, and hook integration
-- **Fast Execution**: Tests run in seconds and focus on essential security functionality
+- **Security Scanner Tests** (`tests/test-scanner.sh`): Validates core security scanner functionality including sensitive data detection and MCP tool filtering
+- **Protected Branch Tests** (`tests/test-protect-main-branch.sh`): Validates branch protection logic, tool blocking, and feature branch allowance
+- **Fast Execution**: Tests run in seconds and focus on essential functionality
+- **Test Coverage**: Both hooks have comprehensive test suites ensuring correct behavior
 
 ### Security Pattern Detection
 
@@ -66,13 +70,21 @@ The scanner detects multiple categories of sensitive data:
 
 ## Hook System Architecture
 
-The security system operates through Claude Code's PreToolUse hook mechanism:
+The project uses Claude Code's PreToolUse hook mechanism with two complementary hooks:
 
-- **Hook Trigger**: All MCP tool calls matching pattern `mcp__.*` 
-- **Execution Flow**: Request → Security Scanner → Pattern Detection → Logging/Blocking
+### Security Scanner Hook
+- **Trigger**: All MCP tool calls matching pattern `mcp__.*`
+- **Flow**: Request → Security Scanner → Pattern Detection → Logging/Blocking
 - **Scope**: Monitors all MCP servers (Sequential, Context7, Magic, Playwright, etc.)
-- **Response**: Currently provides monitoring/auditing with violation logging
-- **Restart Requirement**: Hook configuration changes require Claude Code restart
+- **Response**: Provides monitoring/auditing with violation logging
+
+### Protected Branch Hook
+- **Trigger**: Edit, Write, Bash, and Task tool calls matching pattern `(Edit|Write|Bash|Task).*`
+- **Flow**: Tool Call → Branch Detection → Protection Check → Allow/Block
+- **Protected Branches**: main, master, production, release
+- **Response**: Blocks operations with guidance to create feature branches
+
+**Restart Requirement**: Hook configuration changes require Claude Code restart
 
 ## External Dependencies
 
@@ -86,20 +98,30 @@ The security system operates through Claude Code's PreToolUse hook mechanism:
 
 ## Key Files
 
-- `.claude/settings.json`: Hook configuration for all MCP tools
-- `.claude/security-patterns.conf`: Security detection patterns  
+- `.claude/settings.json`: Hook configuration for all hooks (MCP scanner and branch protection)
+- `.claude/security-patterns.conf`: Security detection patterns
 - `.claude/security-scan.log`: Audit log of all security scan activity
+- `.claude/protect-main-branch.log`: Audit log of branch protection activity
 - `.claude/commands/`: Custom slash commands (check, clean, changelog)
-- `tests/test-scanner.sh`: Simple test script for security scanner validation
+- `tests/test-scanner.sh`: Security scanner test suite
+- `tests/test-protect-main-branch.sh`: Protected branch hook test suite
 - `Makefile`: Primary interface for all project operations
 - `docs/mcp-security-scanner.md`: Comprehensive security scanner documentation
+- `docs/protect-main-branch-hook.md`: Comprehensive branch protection documentation
 
 ## Monitoring and Debugging
 
 **Security Scanning**: Check `.claude/security-scan.log` for:
-
 - Hook execution: `grep "DEBUG: Hook script started"`
-- Clean requests: `grep "Security scan passed"`  
+- Clean requests: `grep "Security scan passed"`
 - Violations: `grep "SECURITY VIOLATION"`
 
+**Branch Protection**: Check `.claude/protect-main-branch.log` for:
+- Hook execution: `grep "DEBUG: Hook script started"`
+- Allowed operations: `grep "INFO: Branch.*is not protected"`
+- Violations: `grep "ERROR: PROTECTED BRANCH VIOLATION"`
+- Blocked tools: `grep "blocked" .claude/protect-main-branch.log`
+
 **MCP Coverage**: The scanner monitors all MCP servers and extracts content from various parameter fields (`thought`, `prompt`, `topic`, `libraryName`, etc.) for comprehensive security coverage.
+
+**Branch Protection Coverage**: The hook monitors Edit, Write, Bash, and Task tools on protected branches (main, master, production, release) while allowing Read-only operations.
