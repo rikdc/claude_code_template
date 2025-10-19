@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-HOOK_NAME="protect-main-branch"
 LOG_FILE="${WORKSPACE:-.}/.claude/protect-main-branch.log"
 
 log_debug() {

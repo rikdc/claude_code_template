@@ -16,6 +16,7 @@ The Protected Branch Hook prevents direct edits to critical branches (main, mast
 ## Protected Branches
 
 By default, the following branches are protected:
+
 - `main`
 - `master`
 - `production`
@@ -24,12 +25,14 @@ By default, the following branches are protected:
 ## How It Works
 
 The hook runs on `PreToolUse` for tools that can modify code or execute commands:
+
 - `Edit` - File editing operations
 - `Write` - File creation operations
 - `Bash` - Command execution
 - `Task` - Agent task spawning
 
 When triggered on a protected branch, the hook:
+
 1. Detects the current branch using `git branch --show-current`
 2. Checks if the branch matches the protected pattern
 3. Blocks the operation and provides guidance if protected
@@ -41,7 +44,7 @@ When triggered on a protected branch, the hook:
 
 When on a protected branch, Claude Code will be blocked from making changes:
 
-```
+```text
 ❌ BLOCKED: Direct edits to protected branch 'main' are not allowed.
 
 To proceed:
@@ -126,16 +129,19 @@ grep "PROTECTED BRANCH VIOLATION" .claude/protect-main-branch.log | \
 ## Benefits
 
 ### Code Quality
+
 - Ensures all changes go through code review
 - Validates changes against CI/CD pipelines
 - Maintains consistent quality standards
 
 ### Collaboration
+
 - Encourages knowledge sharing through PRs
 - Creates audit trail for all changes
 - Prevents accidental direct commits
 
 ### Risk Management
+
 - Reduces production incidents from unreviewed code
 - Enforces testing requirements
 - Maintains deployment safety
@@ -143,6 +149,7 @@ grep "PROTECTED BRANCH VIOLATION" .claude/protect-main-branch.log | \
 ## Integration with CI/CD
 
 This hook complements CI/CD workflows by:
+
 - Preventing bypassing of PR checks
 - Ensuring branch protection rules are respected
 - Maintaining deployment pipeline integrity
@@ -152,11 +159,13 @@ This hook complements CI/CD workflows by:
 ### Hook Not Triggering
 
 1. Check Claude Code settings:
+
    ```bash
    cat .claude/settings.json
    ```
 
 2. Verify hook is executable:
+
    ```bash
    ls -l .claude/hooks/protect-main-branch.sh
    ```
@@ -168,6 +177,7 @@ This hook complements CI/CD workflows by:
 If the hook triggers unexpectedly:
 
 1. Check your current branch:
+
    ```bash
    git branch --show-current
    ```
@@ -175,6 +185,7 @@ If the hook triggers unexpectedly:
 2. Review protected branch patterns in the hook script
 
 3. Check the log for details:
+
    ```bash
    tail .claude/protect-main-branch.log
    ```
@@ -190,12 +201,15 @@ chmod +x .claude/hooks/protect-main-branch.sh
 ## Best Practices
 
 ### Branch Naming
+
 Follow your team's conventions:
+
 - Use lowercase with dashes
 - Include your name: `your-name/feature-description`
 - Include issue ticket when applicable: `your-name/PROJ-123-feature`
 
 ### Feature Branch Workflow
+
 1. Create feature branch from main
 2. Make changes and commit frequently
 3. Push to remote and create PR
@@ -203,6 +217,7 @@ Follow your team's conventions:
 5. Merge after approval and CI passes
 
 ### Emergency Hotfixes
+
 1. Document the emergency in PR description
 2. Get expedited review from team lead
 3. Monitor deployment closely
@@ -231,7 +246,7 @@ git push -u origin alice/PROJ-456-add-validation
 gh pr create --title "feat: add input validation"
 ```
 
-### Emergency Override
+### Emergency Override Example
 
 ```bash
 # Critical production issue requires immediate fix
@@ -256,6 +271,7 @@ unset ALLOW_PROTECTED_BRANCH_EDIT
 ## Support
 
 For issues or questions:
+
 - Check the log file: `.claude/protect-main-branch.log`
 - Review this documentation
 - Consult your team's workflow documentation
