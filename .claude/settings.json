@@ -9,6 +9,15 @@
             "command": "${WORKSPACE}/.claude/hooks/mcp-security-scanner.sh"
           }
         ]
+      },
+      {
+        "matcher": "(Edit|Write|Bash|Task).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${WORKSPACE}/.claude/hooks/protect-main-branch.sh"
+          }
+        ]
       }
     ]
   }

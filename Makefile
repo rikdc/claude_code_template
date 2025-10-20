@@ -15,7 +15,9 @@ HOOKS_DIR := $(CLAUDE_DIR)/hooks
 
 # Scripts
 SCANNER_SCRIPT := $(HOOKS_DIR)/mcp-security-scanner.sh
+PROTECT_BRANCH_SCRIPT := $(HOOKS_DIR)/protect-main-branch.sh
 TEST_SCRIPT := $(TESTS_DIR)/test-scanner.sh
+TEST_PROTECT_BRANCH_SCRIPT := $(TESTS_DIR)/test-protect-main-branch.sh
 INSTALL_SCRIPT := $(SCRIPTS_DIR)/install-hooks.sh
 
 # Colors for output
@@ -34,6 +36,9 @@ NC := \033[0m # No Color
 test: ## Run complete test suite
 	@echo -e "$(BLUE)🧪 Running security scanner tests...$(NC)"
 	@$(TEST_SCRIPT)
+	@echo
+	@echo -e "$(BLUE)🧪 Running protected branch hook tests...$(NC)"
+	@$(TEST_PROTECT_BRANCH_SCRIPT)
 
 ##@ Quality Assurance
 
@@ -63,6 +68,7 @@ lint: ## Run ShellCheck on shell scripts and markdownlint on Markdown files
 install: ## Install hooks to current project
 	@echo -e "$(BLUE)📦 Installing hooks...$(NC)"
 	@chmod +x "$(SCANNER_SCRIPT)"
+	@chmod +x "$(PROTECT_BRANCH_SCRIPT)"
 	@echo -e "$(GREEN)✅ Installation complete$(NC)"
 
 ##@ Maintenance
@@ -120,6 +126,7 @@ status: ## Show current status and configuration
 	@echo
 	@echo "Files:"
 	@ls -la "$(SCANNER_SCRIPT)" 2>/dev/null || echo -e "  $(RED)❌ Scanner script not found$(NC)"
+	@ls -la "$(PROTECT_BRANCH_SCRIPT)" 2>/dev/null || echo -e "  $(RED)❌ Protected branch script not found$(NC)"
 	@ls -la "$(CLAUDE_DIR)/settings.json" 2>/dev/null || echo -e "  $(RED)❌ Settings file not found$(NC)"
 	@$(MAKE) check-tools
 
