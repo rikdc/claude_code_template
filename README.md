@@ -19,20 +19,24 @@ Production-ready Claude Code project template with security hooks, workflow auto
 ## Slash Commands
 
 ### Development
+
 - `/dev:check` - Comprehensive code quality analysis with parallel auto-fixing
 - `/dev:review` - Performs detailed code review on latest commit
 - `/clean` - Removes redundant comments from codebase
 
 ### GitHub Workflow
+
 - `/gh:commit` - Creates conventional commits with emoji
 - `/gh:pr` - Creates GitHub pull requests with templates
 
 ### Project Management
+
 - `/pm:create-prd` - Interactive PRD creation with clarifying questions
 - `/pm:generate-tasks` - Generates task lists from PRDs with phased approach
 - `/pm:process-tasks` - Task management protocols and workflows
 
 ### Documentation
+
 - `/changelog` - Maintains CHANGELOG.md following Keep a Changelog format
 - `/promptify` - Generates high-quality AI prompts with best practices
 - `/prompt-reviewer` - Reviews and improves AI prompts
@@ -59,7 +63,7 @@ make status         # Show configuration and tool status
 
 ## Project Structure
 
-```
+```text
 .claude/
 ├── agents/         # Specialized agent definitions
 ├── commands/       # Slash command implementations
