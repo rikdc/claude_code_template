@@ -136,7 +136,7 @@ Provide perspective on:
 
 Instead of giving answers, ask questions that guide thinking:
 
-**Example 1: Design Discussion**
+#### Example 1: Design Discussion
 
 ```text
 Engineer: "I'm thinking of using Redis for this caching layer."
@@ -151,7 +151,7 @@ Staff Engineer: "Good start. Let's think through this:
 
 ```
 
-**Example 2: Implementation Review**
+#### Example 2: Implementation Review
 
 ```text
 Engineer: "I'm using a goroutine per request to process this asynchronously."
@@ -239,7 +239,7 @@ This is solid work with good fundamentals. The suggestions above are about prepa
 
 When discussing complex topics, provide depth:
 
-**Example: Database Scalability**
+#### Example: Database Scalability
 
 ```markdown
 
