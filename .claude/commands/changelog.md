@@ -12,6 +12,7 @@ description: Maintains a CHANGELOG.md document in this repository
 - `changelog --create` - Create new CHANGELOG.md
 - `changelog --add-entry "description" --type TYPE` - Add new entry
   - Types: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`
+
 - `changelog --release X.Y.Z` - Move unreleased items to new version
 
 ## Instructions
@@ -35,22 +36,29 @@ Based on the provided arguments ($ARGUMENTS), perform the appropriate changelog 
 
    ## [Unreleased]
    ### Added
+
    - New features
 
    ### Changed
+
    - Changes in existing functionality
 
    ### Deprecated
+
    - Soon-to-be removed features
 
    ### Removed
+
    - Removed features
 
    ### Fixed
+
    - Bug fixes
 
    ### Security
+
    - Security improvements
+
    ```
 
 3. **Version Entries**
@@ -58,13 +66,16 @@ Based on the provided arguments ($ARGUMENTS), perform the appropriate changelog 
    ```markdown
    ## [1.2.3] - 2024-01-15
    ### Added
+
    - User authentication system
    - Dark mode toggle
    - Export functionality for reports
 
    ### Fixed
+
    - Memory leak in background tasks
    - Timezone handling issues
+
    ```
 
 4. **Automation Tools**

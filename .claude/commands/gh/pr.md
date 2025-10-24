@@ -20,6 +20,7 @@ This command will:
 
 ```bash
 gh pr create --draft --title "✨(scope): Your descriptive title" --body-file .github/pull_request_template.md --base main
+
 ```
 
 ### Title Format
@@ -56,6 +57,7 @@ Sub-task 1: Validation
 Ensure all sections are included:
 
 ```markdown
+
 # Summary
 
 ## pr_agent:summary
@@ -67,19 +69,25 @@ Ensure all sections are included:
 ## Testing
 
 ## Checklist
+
 ```
 
 Common Actions
 
 ```bash
+
 # Convert draft to ready
+
 gh pr ready <PR-NUMBER>
 
 # Add reviewers
+
 gh pr edit <PR-NUMBER> --add-reviewer username1,username2
 
 # Check PR status
+
 gh pr status
+
 ```
 
 ### Error Handling
