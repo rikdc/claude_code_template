@@ -67,6 +67,7 @@ Evaluate the prompt across these dimensions:
 - **Scope**: Is the task scope clearly bounded?
 
 **Questions to Ask**:
+
 - Could this be misinterpreted?
 - Are there vague terms like "good", "better", "properly"?
 - Is it clear what the AI should and shouldn't do?
@@ -78,6 +79,7 @@ Evaluate the prompt across these dimensions:
 - **Readability**: Easy to scan and understand?
 
 **Questions to Ask**:
+
 - Can I quickly find specific information?
 - Is related information grouped together?
 - Are there clear transitions between sections?
@@ -89,6 +91,7 @@ Evaluate the prompt across these dimensions:
 - **Format**: Are examples properly formatted (code blocks, etc.)?
 
 **Questions to Ask**:
+
 - Would examples make the expectations clearer?
 - Do examples cover edge cases?
 - Are there both positive and negative examples?
@@ -100,6 +103,7 @@ Evaluate the prompt across these dimensions:
 - **Standards**: References to conventions or standards?
 
 **Questions to Ask**:
+
 - Does the AI have enough context to succeed?
 - Are domain-specific considerations covered?
 - Are there implicit assumptions that should be explicit?
@@ -111,6 +115,7 @@ Evaluate the prompt across these dimensions:
 - **Validation**: How to verify correctness?
 
 **Questions to Ask**:
+
 - Could two AIs produce wildly different outputs?
 - Is it clear when the output is "done"?
 - Are quality standards measurable?
@@ -122,6 +127,7 @@ Evaluate the prompt across these dimensions:
 - **Failure Modes**: How to respond when task is impossible?
 
 **Questions to Ask**:
+
 - What happens with edge cases?
 - How should errors be communicated?
 - Are there scenarios where the AI should ask for clarification?
@@ -133,6 +139,7 @@ Evaluate the prompt across these dimensions:
 - **Dependencies**: Are prerequisites identified?
 
 **Questions to Ask**:
+
 - What's missing that would improve outcomes?
 - Are there gaps in coverage?
 - What questions would an AI have?
@@ -148,6 +155,7 @@ Identify which prompt pattern is being used (or should be used):
 - **Structured Output**: Specific output format required
 
 **Assessment**:
+
 - Is the current pattern appropriate for this task?
 - Is the pattern being used effectively?
 - Would a different pattern work better?
@@ -263,12 +271,14 @@ Provide specific, actionable feedback:
 **Current**:
 ```
 [Problematic section]
-```
+
+```text
 
 **Recommended**:
 ```
 [Improved version]
-```
+
+```text
 
 **Why Better**: [Explanation of improvement]
 
@@ -287,7 +297,8 @@ Provide specific, actionable feedback:
 **Example**:
 ```
 [Example of improved version]
-```
+
+```text
 **Benefit**: [Why this helps]
 
 ---
@@ -329,7 +340,8 @@ Here are the critical sections rewritten with improvements:
 
 ```markdown
 [Improved version of problematic sections]
-```
+
+```text
 
 ### Quick Wins
 
@@ -421,6 +433,7 @@ Focus on **specific, actionable recommendations** the user can implement immedia
 ## After Review
 
 Suggest to the user:
+
 1. Implement high-priority changes
 2. Test the improved prompt with real inputs
 3. Request another review after changes

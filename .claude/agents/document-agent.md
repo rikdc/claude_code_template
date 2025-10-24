@@ -281,7 +281,8 @@ The Payment Processing Platform enables users to send and receive money through 
                         │  Galileo    │
                         │  Gateway    │
                         └─────────────┘
-```
+
+```text
 
 ## Components
 
@@ -328,7 +329,8 @@ The Payment Processing Platform enables users to send and receive money through 
 Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
                              ├─▶ Fraud Service (checks patterns)
                              └─▶ Notification Service (sends push)
-```
+
+```text
 
 ## Cross-Cutting Concerns
 
@@ -424,42 +426,51 @@ This guide will help you set up your development environment and understand our 
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/yourorg/payment-service.git
+git clone <https://github.com/yourorg/payment-service.git>
 cd payment-service
-```
+
+```text
 
 ### 2. Install Dependencies
 ```bash
 go mod download
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-```
+
+```text
 
 ### 3. Start Local Services
 ```bash
 docker-compose up -d postgres rabbitmq redis
-```
+
+```text
 
 ### 4. Run Database Migrations
 ```bash
 make db-migrate
-```
+
+```text
 
 ### 5. Set Environment Variables
 ```bash
 cp .env.example .env
+
 # Edit .env with your local configuration
-```
+
+```text
 
 ### 6. Run Application
 ```bash
 go run cmd/api/main.go
-```
+
+```text
 
 ### 7. Verify Installation
 ```bash
-curl http://localhost:8080/health
+curl <http://localhost>:8080/health
+
 # Expected: {"status":"healthy"}
-```
+
+```text
 
 ## Development Workflow
 
@@ -473,6 +484,7 @@ curl http://localhost:8080/health
 
 ### Running Tests
 ```bash
+
 # All tests
 make test
 
@@ -484,7 +496,8 @@ make test-coverage
 
 # With race detector
 go test -race ./...
-```
+
+```text
 
 ### Code Review Process
 1. All PRs require 2 approvals
@@ -527,6 +540,7 @@ We use a 3-tier architecture:
 
 ### Database Migrations
 ```bash
+
 # Create migration
 make migration-create name=add_users_table
 
@@ -535,16 +549,19 @@ make db-migrate
 
 # Rollback migration
 make db-rollback
-```
+
+```text
 
 ### Debugging
 ```bash
+
 # Run with Delve debugger
 dlv debug cmd/api/main.go
 
 # View logs
 docker-compose logs -f api
-```
+
+```text
 
 ## Getting Help
 
@@ -579,14 +596,16 @@ Guide operators through common scenarios.
 
 ### Service Health
 ```bash
-curl https://api.example.com/health
-```
+curl <https://api.example.com/health>
+
+```text
 Expected: `{"status":"healthy","version":"1.2.3"}`
 
 ### Database Connectivity
 ```bash
-curl https://api.example.com/health/db
-```
+curl <https://api.example.com/health/db>
+
+```text
 
 ### Dependency Health
 - Galileo API: https://status.galileo-ft.com
@@ -621,12 +640,14 @@ curl https://api.example.com/health/db
 
 **Resolution**:
 ```bash
+
 # Check current connections
 kubectl exec -it payment-service-pod -- psql -c "SELECT count(*) FROM pg_stat_activity;"
 
 # Restart service to reset connections
 kubectl rollout restart deployment/payment-service
-```
+
+```text
 
 **Prevention**: Increase max_connections in PostgreSQL config
 
@@ -634,19 +655,23 @@ kubectl rollout restart deployment/payment-service
 
 ### Standard Deployment
 ```bash
+
 # Triggered automatically via GitHub Actions on merge to main
 # Manual trigger:
 gh workflow run deploy.yml -f environment=production
-```
+
+```text
 
 ### Rollback Procedure
 ```bash
+
 # Rollback to previous version
 kubectl rollout undo deployment/payment-service
 
 # Rollback to specific version
 kubectl rollout undo deployment/payment-service --to-revision=5
-```
+
+```text
 
 ### Hotfix Deployment
 1. Create hotfix branch from `main`

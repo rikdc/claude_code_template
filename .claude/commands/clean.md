@@ -8,6 +8,7 @@ description: Removes useless comments from the code
   - Commented out code.
   - Comments that describe edits like "added", "removed", or "changed" something.
   - Explanations that are just obvious because they are close to method names.
+
 - Do not delete all comments:
   - Don't remove comments that indicate code is a stub for future work.
   - Don't remove comments that start with TODO.
@@ -15,6 +16,7 @@ description: Removes useless comments from the code
     block or an empty else block.
   - Don't remove comments that suppress linters or formatters, like
     `// prettier-ignore`
+
 - If you find any end-of-line comments, move them above the code they describe.
   Comments should go on their own lines.
 

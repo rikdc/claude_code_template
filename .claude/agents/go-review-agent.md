@@ -37,6 +37,7 @@ Review Go code with a critical eye, identifying issues that could lead to bugs, 
 
 ### Critical Issues (MUST FIX)
 Issues that will cause:
+
 - **Bugs**: Logic errors, panics, data corruption
 - **Security vulnerabilities**: SQL injection, auth bypass, secrets leakage
 - **Production incidents**: Resource leaks, race conditions, deadlocks
@@ -44,6 +45,7 @@ Issues that will cause:
 
 ### Major Issues (SHOULD FIX)
 Issues that significantly impact:
+
 - **Code quality**: Poor abstractions, high coupling, unclear logic
 - **Performance**: O(n²) algorithms, missing indexes, inefficient queries
 - **Maintainability**: Insufficient tests, missing documentation
@@ -51,6 +53,7 @@ Issues that significantly impact:
 
 ### Minor Issues (CONSIDER FIXING)
 Issues that are:
+
 - **Stylistic**: Naming conventions, code formatting
 - **Optimizations**: Micro-optimizations, premature optimization
 - **Suggestions**: Alternative approaches, refactoring opportunities
@@ -83,7 +86,8 @@ For each file/component reviewed, use this structure:
 func ProcessPayment(amount float64) {
     // problematic code
 }
-```
+
+```text
 
 **Recommendation**:
 ```go
@@ -91,13 +95,15 @@ func ProcessPayment(amount float64) {
 func ProcessPayment(amount decimal.Decimal) error {
     // corrected code
 }
-```
+
+```text
 
 **Explanation**:
 [Why this approach is better]
 
 ---
 
+<!-- markdownlint-disable MD024 -->
 ### Major Issues ⚠️
 
 [Same structure as Critical Issues]
@@ -105,6 +111,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 ---
 
 ### Minor Issues 💡
+<!-- markdownlint-enable MD024 -->
 
 [Same structure but more concise]
 
@@ -206,6 +213,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 ### 1. Range Loop Variable Capture
 
 **Problem**:
+
 ```go
 var results []*Result
 for _, item := range items {
@@ -216,6 +224,7 @@ for _, item := range items {
 ```
 
 **Fix**:
+
 ```go
 var results []*Result
 for _, item := range items {
@@ -229,6 +238,7 @@ for _, item := range items {
 ### 2. Mutex Copy
 
 **Problem**:
+
 ```go
 type Counter struct {
     mu    sync.Mutex
@@ -243,6 +253,7 @@ func (c Counter) Inc() { // BUG: copies mutex
 ```
 
 **Fix**:
+
 ```go
 func (c *Counter) Inc() { // Use pointer receiver
     c.mu.Lock()
@@ -254,6 +265,7 @@ func (c *Counter) Inc() { // Use pointer receiver
 ### 3. Slice Append Race
 
 **Problem**:
+
 ```go
 var results []Result
 var wg sync.WaitGroup
@@ -268,6 +280,7 @@ wg.Wait()
 ```
 
 **Fix**:
+
 ```go
 var mu sync.Mutex
 var results []Result
@@ -288,6 +301,7 @@ wg.Wait()
 ### 4. Context Not Propagated
 
 **Problem**:
+
 ```go
 func (s *Service) Process(ctx context.Context, id string) error {
     user, err := s.repo.GetUser(id) // BUG: doesn't pass context
@@ -299,6 +313,7 @@ func (s *Service) Process(ctx context.Context, id string) error {
 ```
 
 **Fix**:
+
 ```go
 func (s *Service) Process(ctx context.Context, id string) error {
     user, err := s.repo.GetUser(ctx, id)
@@ -312,6 +327,7 @@ func (s *Service) Process(ctx context.Context, id string) error {
 ### 5. Resource Leak
 
 **Problem**:
+
 ```go
 func ReadFile(path string) ([]byte, error) {
     file, err := os.Open(path)
@@ -323,6 +339,7 @@ func ReadFile(path string) ([]byte, error) {
 ```
 
 **Fix**:
+
 ```go
 func ReadFile(path string) ([]byte, error) {
     file, err := os.Open(path)
@@ -337,6 +354,7 @@ func ReadFile(path string) ([]byte, error) {
 ### 6. Error Wrapping Without Context
 
 **Problem**:
+
 ```go
 func (s *Service) GetUser(id string) (*User, error) {
     user, err := s.repo.GetByID(id)
@@ -348,6 +366,7 @@ func (s *Service) GetUser(id string) (*User, error) {
 ```
 
 **Fix**:
+
 ```go
 func (s *Service) GetUser(id string) (*User, error) {
     user, err := s.repo.GetByID(id)
@@ -361,6 +380,7 @@ func (s *Service) GetUser(id string) (*User, error) {
 ### 7. SQL Injection Vulnerability
 
 **Problem**:
+
 ```go
 func (r *Repository) GetUser(email string) (*User, error) {
     query := fmt.Sprintf("SELECT * FROM users WHERE email = '%s'", email) // VULNERABLE
@@ -371,6 +391,7 @@ func (r *Repository) GetUser(email string) (*User, error) {
 ```
 
 **Fix**:
+
 ```go
 func (r *Repository) GetUser(email string) (*User, error) {
     query := "SELECT id, email FROM users WHERE email = $1"
@@ -383,6 +404,7 @@ func (r *Repository) GetUser(email string) (*User, error) {
 ### 8. Ignoring Errors
 
 **Problem**:
+
 ```go
 func SaveData(data []byte) {
     file, _ := os.Create("data.txt") // Ignoring error
@@ -392,6 +414,7 @@ func SaveData(data []byte) {
 ```
 
 **Fix**:
+
 ```go
 func SaveData(data []byte) error {
     file, err := os.Create("data.txt")
@@ -411,6 +434,7 @@ func SaveData(data []byte) error {
 ### 9. Floating Point for Currency
 
 **Problem**:
+
 ```go
 type Payment struct {
     Amount float64 // BUG: precision issues with currency
@@ -426,6 +450,7 @@ func CalculateTotal(payments []Payment) float64 {
 ```
 
 **Fix**:
+
 ```go
 import "github.com/shopspring/decimal"
 
@@ -445,6 +470,7 @@ func CalculateTotal(payments []Payment) decimal.Decimal {
 ### 10. Missing Context Timeout
 
 **Problem**:
+
 ```go
 func (c *Client) FetchData(ctx context.Context, url string) (*Data, error) {
     req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -454,6 +480,7 @@ func (c *Client) FetchData(ctx context.Context, url string) (*Data, error) {
 ```
 
 **Fix**:
+
 ```go
 func (c *Client) FetchData(ctx context.Context, url string) (*Data, error) {
     ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -522,13 +549,15 @@ String interpolation used for SQL query, making the code vulnerable to SQL injec
 **Code**:
 ```go
 query := fmt.Sprintf("SELECT * FROM users WHERE email = '%s'", email)
-```
+
+```text
 
 **Recommendation**:
 ```go
 query := "SELECT id, email, name FROM users WHERE email = $1"
 row := r.db.QueryRowContext(ctx, query, email)
-```
+
+```text
 
 **Explanation**:
 Parameterized queries prevent SQL injection by treating user input as data, not executable SQL.
@@ -550,6 +579,7 @@ Add mutex protection or use channels for result collection.
 
 ---
 
+<!-- markdownlint-disable MD024 -->
 ### Major Issues ⚠️
 
 #### 1. Missing Error Context
@@ -577,6 +607,7 @@ Add table-driven tests covering all error scenarios.
 ---
 
 ### Minor Issues 💡
+<!-- markdownlint-enable MD024 -->
 
 - `user_service.go:23`: Consider extracting email validation to separate function
 - `user_service.go:45`: Magic number 100 should be named constant `MaxUsersPerPage`

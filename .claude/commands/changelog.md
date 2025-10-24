@@ -12,6 +12,7 @@ description: Maintains a CHANGELOG.md document in this repository
 - `changelog --create` - Create new CHANGELOG.md
 - `changelog --add-entry "description" --type TYPE` - Add new entry
   - Types: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`
+
 - `changelog --release X.Y.Z` - Move unreleased items to new version
 
 ## Instructions

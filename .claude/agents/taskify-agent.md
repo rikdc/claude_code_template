@@ -9,6 +9,7 @@ Transform comprehensive specifications into a structured task breakdown that dev
 ## Input Format
 
 You will receive specification documents containing:
+
 - Functional and non-functional requirements
 - Architecture and component design
 - Data models and API contracts
@@ -122,7 +123,8 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 CREATE INDEX idx_users_email ON users(email);
-```
+
+```text
 
 **Testing**:
 - Run migration up/down locally
@@ -155,7 +157,8 @@ type IUserRepository interface {
     Update(ctx context.Context, user *User) error
     Delete(ctx context.Context, id uuid.UUID) error
 }
-```
+
+```text
 
 **Testing**: N/A (interface definition only)
 
@@ -207,7 +210,8 @@ type IUserRepository interface {
 3.1 (Event Bus) ─────────────────────────────→ 3.2 (Integration)
                                                     ↓
 4.1 (E2E Tests) ─────────────────────────────→ 5.1 (Deployment)
-```
+
+```text
 
 ## Parallel Work Opportunities
 
@@ -342,6 +346,7 @@ When analyzing a specification:
 ## Quality Checklist
 
 Before finalizing task breakdown:
+
 - [ ] Every task has clear acceptance criteria
 - [ ] Dependencies are explicitly stated
 - [ ] No task exceeds 4 hours (1 day max)

@@ -51,7 +51,7 @@ Select the appropriate pattern based on the task:
 #### Pattern 1: Role-Based Prompt
 Best for: Tasks requiring specific expertise or perspective
 
-```
+```text
 You are a [specific role/expert] with [X years/level] of experience in [domain].
 
 Your task is to [specific action] by [method/approach].
@@ -62,7 +62,8 @@ Your task is to [specific action] by [method/approach].
 ```
 
 **Example**:
-```
+
+```text
 You are a Senior Security Engineer with 10 years of experience in application security.
 
 Your task is to review code for security vulnerabilities by analyzing authentication,
@@ -81,7 +82,7 @@ Output format: Markdown with code blocks
 #### Pattern 2: Task-Oriented Prompt
 Best for: Clear, specific tasks with defined inputs/outputs
 
-```
+```text
 Task: [Clear description of what to do]
 
 Input: [What data/information will be provided]
@@ -97,7 +98,8 @@ Constraints: [Any limitations or requirements]
 ```
 
 **Example**:
-```
+
+```text
 Task: Convert natural language to SQL queries for a PostgreSQL database
 
 Input: Natural language question about data in the database
@@ -121,7 +123,7 @@ Constraints:
 #### Pattern 3: Few-Shot Learning Prompt
 Best for: Tasks where examples clarify expectations
 
-```
+```text
 Your task is to [description].
 
 Here are examples of correct outputs:
@@ -143,7 +145,8 @@ Input: [actual input]
 ```
 
 **Example**:
-```
+
+```text
 Your task is to classify code complexity as Low, Medium, or High.
 
 Example 1:
@@ -184,7 +187,7 @@ Output: High - Recursive algorithm, multiple comprehensions, nested logic, condi
 #### Pattern 4: Chain-of-Thought Prompt
 Best for: Complex reasoning or multi-step problems
 
-```
+```text
 Your task is to [description].
 
 Think through this step-by-step:
@@ -202,7 +205,8 @@ Final Output: [Based on the analysis above]
 ```
 
 **Example**:
-```
+
+```text
 Your task is to estimate the performance impact of a code change.
 
 Think through this step-by-step:
@@ -232,7 +236,7 @@ Final Output:
 #### Pattern 5: Structured Output Prompt
 Best for: Tasks requiring consistent, parseable output
 
-```
+```text
 Your task is to [description].
 
 Output must follow this exact structure:
@@ -250,7 +254,8 @@ Output must follow this exact structure:
 ```
 
 **Example**:
-```
+
+```text
 Your task is to review a pull request and provide structured feedback.
 
 Output must follow this exact structure:
@@ -281,30 +286,35 @@ Use Markdown formatting with code blocks for examples.
 Enhance the prompt with these principles:
 
 **1. Clarity**
+
 - Use specific, unambiguous language
 - Define technical terms if needed
 - Provide concrete examples
 - Avoid vague words like "good", "better", "properly"
 
 **2. Specificity**
+
 - Define exact input/output formats
 - Specify constraints and boundaries
 - Include edge cases to consider
 - State what NOT to do
 
 **3. Context**
+
 - Provide necessary background information
 - Include domain-specific knowledge
 - Reference standards or conventions
 - Explain the purpose
 
 **4. Structure**
+
 - Use clear sections and headings
 - Number steps in sequences
 - Format with bullet points and lists
 - Use code blocks for examples
 
 **5. Verifiability**
+
 - Define success criteria
 - Include quality standards
 - Specify how to validate output
@@ -315,12 +325,14 @@ Enhance the prompt with these principles:
 Consider adding these elements to improve prompt effectiveness:
 
 **Output Format**:
-```
+
+```text
 Output format: [JSON/Markdown/Code/Structured text]
 ```
 
 **Constraints**:
-```
+
+```text
 Constraints:
 - Maximum length: X characters/words
 - Required fields: [list]
@@ -328,7 +340,8 @@ Constraints:
 ```
 
 **Quality Criteria**:
-```
+
+```text
 Your output must:
 - Be accurate and factual
 - Include specific examples
@@ -337,14 +350,16 @@ Your output must:
 ```
 
 **Error Handling**:
-```
+
+```text
 If the input is [invalid/unclear/missing information]:
 - [What to do]
 - [What to respond]
 ```
 
 **Edge Cases**:
-```
+
+```text
 Consider these special cases:
 - [Edge case 1]: How to handle
 - [Edge case 2]: How to handle
@@ -372,12 +387,14 @@ Based on the user's request "{{prompt}}", create an effective AI prompt:
 ## Usage Notes
 
 **For the user**:
+
 1. Copy the generated prompt above
 2. Test it with sample inputs
 3. Use `/prompt-reviewer` to review and improve it
 4. Iterate based on actual results
 
 **Key Success Factors**:
+
 - ✅ Clear, specific instructions
 - ✅ Concrete examples provided
 - ✅ Output format specified
@@ -385,6 +402,7 @@ Based on the user's request "{{prompt}}", create an effective AI prompt:
 - ✅ Quality criteria defined
 
 **Common Pitfalls to Avoid**:
+
 - ❌ Vague or ambiguous language
 - ❌ Missing output format specification
 - ❌ No examples provided

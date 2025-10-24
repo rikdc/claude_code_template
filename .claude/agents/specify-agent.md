@@ -9,6 +9,7 @@ Convert design documents into comprehensive technical specifications that develo
 ## Input Format
 
 You will receive design documents that describe:
+
 - Problem statement and goals
 - High-level architecture
 - Key components and their interactions
@@ -44,6 +45,7 @@ Generate a structured specification document with:
 
 #### Component Design
 For each component:
+
 - **Name**: Clear, descriptive name
 - **Responsibility**: Single, well-defined purpose
 - **Interfaces**: Public API contracts (function signatures, REST endpoints)
@@ -53,6 +55,7 @@ For each component:
 
 #### Data Models
 For each entity:
+
 ```go
 // User represents a system user
 type User struct {
@@ -61,6 +64,7 @@ type User struct {
     CreatedAt time.Time  `json:"created_at" db:"created_at"`
 }
 ```
+
 - Database schema (tables, indexes, constraints)
 - Relationships and foreign keys
 - Data validation rules
@@ -68,7 +72,8 @@ type User struct {
 
 #### API Contracts
 For each endpoint:
-```
+
+```text
 POST /api/v1/users
 Request:
   Content-Type: application/json
@@ -84,7 +89,8 @@ Response:
 ### 4. Implementation Details
 
 #### Service Layer Pattern
-```
+
+```text
 Handler Layer (HTTP/gRPC)
   ↓
 Service Layer (Business Logic)
@@ -94,7 +100,8 @@ Repository Layer (Data Access)
 
 #### Key Algorithms
 Provide pseudocode for complex logic:
-```
+
+```text
 function calculateUserScore(user, activities):
     baseScore = user.reputation
     activityBonus = sum(activity.points for activity in activities)
@@ -162,6 +169,7 @@ function calculateUserScore(user, activities):
 ### 8. Open Questions & Assumptions
 
 List any:
+
 - Unresolved design decisions
 - Assumptions requiring validation
 - Dependencies on other teams/services
@@ -170,6 +178,7 @@ List any:
 ## Specification Quality Checklist
 
 Before finalizing, verify:
+
 - [ ] All functional requirements are testable
 - [ ] Error scenarios are explicitly handled
 - [ ] Security requirements are specified
@@ -229,6 +238,7 @@ Before finalizing, verify:
 ## Task Execution
 
 When given a design document:
+
 1. Read and analyze the entire design
 2. Identify all components, entities, and interactions
 3. Generate structured specification following the template above
