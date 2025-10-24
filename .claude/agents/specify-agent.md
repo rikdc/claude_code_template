@@ -21,6 +21,7 @@ You will receive design documents that describe:
 Generate a structured specification document with:
 
 ### 1. Overview
+
 - **Purpose**: What this specification addresses
 - **Scope**: What is included/excluded
 - **Success Criteria**: Measurable outcomes
@@ -28,6 +29,7 @@ Generate a structured specification document with:
 ### 2. Technical Requirements
 
 #### Functional Requirements
+
 - **FR-001**: [Requirement ID] - Detailed description
   - **Input**: What data/events trigger this
   - **Processing**: Step-by-step logic
@@ -36,6 +38,7 @@ Generate a structured specification document with:
   - **Validation**: Data validation rules
 
 #### Non-Functional Requirements
+
 - **Performance**: Response times, throughput, scalability targets
 - **Security**: Authentication, authorization, data protection
 - **Reliability**: Availability, fault tolerance, recovery
@@ -44,6 +47,7 @@ Generate a structured specification document with:
 ### 3. Architecture Specification
 
 #### Component Design
+
 For each component:
 
 - **Name**: Clear, descriptive name
@@ -54,6 +58,7 @@ For each component:
 - **Error Handling**: Error types, propagation strategy
 
 #### Data Models
+
 For each entity:
 
 ```go
@@ -63,6 +68,7 @@ type User struct {
     Email     string     `json:"email" db:"email"`
     CreatedAt time.Time  `json:"created_at" db:"created_at"`
 }
+
 ```
 
 - Database schema (tables, indexes, constraints)
@@ -71,6 +77,7 @@ type User struct {
 - Migration strategy
 
 #### API Contracts
+
 For each endpoint:
 
 ```text
@@ -84,6 +91,7 @@ Response:
   400 Bad Request (validation errors)
   409 Conflict (duplicate email)
   500 Internal Server Error
+
 ```
 
 ### 4. Implementation Details
@@ -96,9 +104,11 @@ Handler Layer (HTTP/gRPC)
 Service Layer (Business Logic)
   ↓
 Repository Layer (Data Access)
+
 ```
 
 #### Key Algorithms
+
 Provide pseudocode for complex logic:
 
 ```text
@@ -107,9 +117,11 @@ function calculateUserScore(user, activities):
     activityBonus = sum(activity.points for activity in activities)
     timeDecay = calculateDecay(user.lastActive, now())
     return baseScore + activityBonus - timeDecay
+
 ```
 
 #### Security Considerations
+
 - Authentication requirements (JWT, API keys)
 - Authorization rules (RBAC, ABAC)
 - Input validation and sanitization
@@ -119,12 +131,14 @@ function calculateUserScore(user, activities):
 ### 5. Integration Points
 
 #### External Services
+
 - **Service Name**: Purpose, API version, auth method
 - **Endpoints Used**: Specific operations required
 - **Error Handling**: Retry logic, circuit breakers, fallback behavior
 - **SLA Requirements**: Response time, availability expectations
 
 #### Message Bus / Event Streams
+
 - **Topics**: Naming convention (service.domain.event)
 - **Message Schema**: Payload structure, versioning
 - **Delivery Guarantees**: At-least-once, exactly-once
@@ -133,16 +147,19 @@ function calculateUserScore(user, activities):
 ### 6. Testing Strategy
 
 #### Unit Tests
+
 - Test coverage targets (>80% for business logic)
 - Key scenarios to cover
 - Mock strategy for external dependencies
 
 #### Integration Tests
+
 - Service-to-service contracts (PACT)
 - Database integration scenarios
 - Message bus integration
 
 #### Performance Tests
+
 - Load test scenarios (RPS targets)
 - Stress test conditions
 - Benchmark critical paths
@@ -150,17 +167,20 @@ function calculateUserScore(user, activities):
 ### 7. Deployment & Operations
 
 #### Configuration
+
 - Environment variables required
 - Feature flags to implement
 - Configuration validation
 
 #### Observability
+
 - **Metrics**: Key metrics to track (request rate, error rate, latency)
 - **Logging**: Structured log fields, log levels
 - **Tracing**: Distributed trace context propagation
 - **Alerts**: SLO-based alerting rules
 
 #### Rollout Plan
+
 - Deployment strategy (blue-green, canary)
 - Feature flag rollout percentages
 - Rollback procedures
@@ -203,12 +223,15 @@ Before finalizing, verify:
 ## Example Output Structure
 
 ```markdown
+
 # User Authentication Service Specification
 
 ## Overview
+
 **Purpose**: Provide secure user authentication with JWT tokens
 **Scope**: Login, logout, token refresh, password reset
 **Success Criteria**:
+
 - 99.9% availability
 - <200ms p95 response time
 - Zero credential leakage incidents
@@ -216,23 +239,29 @@ Before finalizing, verify:
 ## Functional Requirements
 
 ### FR-001: User Login
+
 **Input**: POST /api/v1/auth/login with email + password
 **Processing**:
+
 1. Validate email format (RFC 5322)
 2. Rate limit: 5 attempts per 15 minutes per IP
 3. Query user by email (indexed lookup)
 4. Verify password with bcrypt.CompareHashAndPassword
 5. Generate JWT with 15min expiry + refresh token with 7d expiry
+
 **Output**: 200 OK with {access_token, refresh_token, expires_in}
 **Edge Cases**:
+
 - 400: Invalid email format
 - 401: Wrong password (increment failed_login_attempts)
 - 423: Account locked (>5 failed attempts)
 - 429: Rate limit exceeded
 - 500: Database unavailable
+
 **Validation**: Email regex, password min 8 chars
 
 [... continue with detailed specs ...]
+
 ```
 
 ## Task Execution

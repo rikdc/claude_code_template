@@ -32,37 +32,44 @@ assignees: []
 ---
 
 ## Task Description
+
 Clear, concise description of what needs to be implemented.
 
 ## Acceptance Criteria
+
 - [ ] Criterion 1: Specific, testable outcome
 - [ ] Criterion 2: Specific, testable outcome
 - [ ] Tests written and passing
 - [ ] Code reviewed and approved
 
 ## Technical Details
+
 - **Component**: ServiceName / PackageName
 - **Files to modify**: `path/to/file.go`, `path/to/test.go`
 - **Dependencies**: Task IDs this depends on (e.g., #123, #124)
 - **Estimated effort**: 2-4 hours
 
 ## Implementation Notes
+
 - Key functions/methods to implement
 - Important edge cases to handle
 - Security/performance considerations
 - Links to relevant spec sections
 
 ## Testing Requirements
+
 - Unit tests to write
 - Integration tests needed
 - Manual testing steps
 
 ## Definition of Done
+
 - [ ] Code implemented per specification
 - [ ] Unit tests written (>80% coverage)
 - [ ] Integration tests passing
 - [ ] Code reviewed and merged
 - [ ] Documentation updated
+
 ```
 
 ### Option 2: Structured Task File Format
@@ -70,6 +77,7 @@ Clear, concise description of what needs to be implemented.
 Create a hierarchical task breakdown in a markdown file:
 
 ```markdown
+
 # Project Task Breakdown: [Project Name]
 
 **Generated from**: [Specification file path]
@@ -79,18 +87,23 @@ Create a hierarchical task breakdown in a markdown file:
 ## Task Organization
 
 ### Phase 1: Foundation (Days 1-2)
+
 Tasks that establish base infrastructure and must be completed first.
 
 ### Phase 2: Core Implementation (Days 3-5)
+
 Main feature development building on foundation.
 
 ### Phase 3: Integration (Days 6-7)
+
 Connecting components and external services.
 
 ### Phase 4: Testing & Polish (Days 8-9)
+
 Comprehensive testing, error handling, observability.
 
 ### Phase 5: Deployment (Day 10)
+
 Production readiness and rollout.
 
 ---
@@ -100,11 +113,13 @@ Production readiness and rollout.
 ### Phase 1: Foundation
 
 #### Task 1.1: Database Schema Setup
+
 **Priority**: Critical | **Effort**: 2h | **Dependencies**: None
 
 **Description**: Create database migration for [entity] tables with indexes.
 
 **Acceptance Criteria**:
+
 - [ ] Migration file created following naming convention
 - [ ] All tables defined with proper types and constraints
 - [ ] Indexes created for query access patterns
@@ -112,11 +127,14 @@ Production readiness and rollout.
 - [ ] Migration tested on local database
 
 **Files**:
+
 - `migrations/YYYYMMDD_create_entity_tables.sql`
 - `migrations/YYYYMMDD_create_entity_tables.down.sql`
 
 **Implementation**:
+
 ```sql
+
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -127,6 +145,7 @@ CREATE INDEX idx_users_email ON users(email);
 ```text
 
 **Testing**:
+
 - Run migration up/down locally
 - Verify indexes with EXPLAIN ANALYZE
 - Test constraints (uniqueness, foreign keys)
@@ -134,22 +153,27 @@ CREATE INDEX idx_users_email ON users(email);
 ---
 
 #### Task 1.2: Repository Interface Definition
+
 **Priority**: Critical | **Effort**: 1h | **Dependencies**: 1.1
 
 **Description**: Define repository interface for data access layer.
 
 **Acceptance Criteria**:
+
 - [ ] Interface defined with all CRUD operations
 - [ ] Method signatures match specification
 - [ ] Error types defined
 - [ ] Documentation comments added
 
 **Files**:
+
 - `internal/repository/user_repository.go`
 - `internal/repository/errors.go`
 
 **Implementation**:
+
 ```go
+
 type IUserRepository interface {
     Create(ctx context.Context, user *User) error
     GetByID(ctx context.Context, id uuid.UUID) (*User, error)
@@ -167,11 +191,13 @@ type IUserRepository interface {
 ### Phase 2: Core Implementation
 
 #### Task 2.1: User Service Implementation
+
 **Priority**: High | **Effort**: 4h | **Dependencies**: 1.2
 
 **Description**: Implement business logic for user management in service layer.
 
 **Acceptance Criteria**:
+
 - [ ] Service struct created with dependencies injected
 - [ ] CreateUser method with validation
 - [ ] GetUser method with error handling
@@ -180,16 +206,19 @@ type IUserRepository interface {
 - [ ] Unit tests with >85% coverage
 
 **Files**:
+
 - `internal/service/user_service.go`
 - `internal/service/user_service_test.go`
 
 **Implementation Notes**:
+
 - Email validation using regex
 - Password hashing with bcrypt (cost=12)
 - Event publishing on user creation
 - Correlation ID propagation
 
 **Testing**:
+
 - Table-driven tests for each method
 - Mock repository using testify/mock
 - Test error scenarios (duplicate email, not found)
@@ -204,6 +233,7 @@ type IUserRepository interface {
 ## Task Dependencies Graph
 
 ```
+
 1.1 (DB Schema) → 1.2 (Repository Interface) → 2.1 (Service) → 2.2 (Handlers)
                                                → 2.3 (Tests)
                                                     ↓
@@ -216,6 +246,7 @@ type IUserRepository interface {
 ## Parallel Work Opportunities
 
 These tasks can be worked on simultaneously:
+
 - **Track 1**: Tasks 1.1 → 1.2 → 2.1 (Core user service)
 - **Track 2**: Tasks 1.3 → 2.4 (Authentication service)
 - **Track 3**: Task 3.1 (Event bus integration - independent)
@@ -238,35 +269,41 @@ The longest dependency chain (determines minimum completion time):
 | **Total** | **17** | **49** | **6.2** |
 
 *Assumes 8-hour work days, single developer*
+
 ```
 
 ## Task Decomposition Principles
 
 ### 1. Atomic Tasks
+
 - Each task is independently completable
 - 2-4 hour time boxes (max 1 day)
 - Single responsibility - one clear outcome
 - No ambiguity in what "done" means
 
 ### 2. Clear Dependencies
+
 - Explicit prerequisites (task IDs)
 - Dependency graph prevents blocking
 - Identify parallel work opportunities
 - Critical path analysis for scheduling
 
 ### 3. Testable Acceptance Criteria
+
 - Checkbox format for tracking
 - Specific, measurable outcomes
 - Include testing requirements
 - Code quality gates (tests, coverage, review)
 
 ### 4. Implementation Guidance
+
 - File paths to create/modify
 - Key code snippets or signatures
 - Important edge cases
 - Security/performance notes
 
 ### 5. Right-Sized Effort
+
 - Junior dev: 4-6 hours
 - Mid-level dev: 2-4 hours
 - Senior dev: 1-2 hours
@@ -275,6 +312,7 @@ The longest dependency chain (determines minimum completion time):
 ## Task Categorization
 
 ### By Type
+
 - **type:feature** - New functionality
 - **type:refactor** - Code improvement, no behavior change
 - **type:bugfix** - Fixing defects
@@ -283,17 +321,20 @@ The longest dependency chain (determines minimum completion time):
 - **type:infra** - Infrastructure, deployment, tooling
 
 ### By Priority
+
 - **priority:critical** - Blocking other work, must do first
 - **priority:high** - Core functionality
 - **priority:medium** - Important but not blocking
 - **priority:low** - Nice-to-have, polish
 
 ### By Size
+
 - **size:small** - 1-2 hours
 - **size:medium** - 2-4 hours
 - **size:large** - 4-8 hours (consider breaking down)
 
 ### By Component
+
 - **component:api** - REST/gRPC handlers
 - **component:service** - Business logic
 - **component:repository** - Data access
@@ -315,6 +356,7 @@ When analyzing a specification:
 ## Common Task Patterns
 
 ### Pattern 1: New Feature (8-12 tasks)
+
 1. Database schema
 2. Repository interface + implementation
 3. Service layer + business logic
@@ -329,6 +371,7 @@ When analyzing a specification:
 12. E2E testing
 
 ### Pattern 2: External Integration (4-6 tasks)
+
 1. Client interface definition
 2. Client implementation with auth
 3. Error handling + retries
@@ -337,6 +380,7 @@ When analyzing a specification:
 6. Circuit breaker + monitoring
 
 ### Pattern 3: Refactoring (3-5 tasks)
+
 1. Add characterization tests
 2. Extract interface
 3. Implement new structure

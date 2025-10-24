@@ -26,6 +26,7 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 The generated task list _must_ follow this structure:
 
 ```markdown
+
 ## Relevant Files
 
 - `path/to/potential/file1.ts` - Brief description of why this file is relevant (e.g., Contains the main component for this feature).
@@ -48,6 +49,7 @@ The generated task list _must_ follow this structure:
 - [ ] 2.0 Parent Task Title
   - [ ] 2.1 [Sub-task description 2.1]
 - [ ] 3.0 Parent Task Title (may not require sub-tasks if purely structural or configuration)
+
 ```
 
 ## Interaction Model

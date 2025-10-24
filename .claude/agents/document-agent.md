@@ -22,9 +22,13 @@ info:
   description: API for managing user accounts and authentication
 
 servers:
+
   - url: https://api.example.com/v1
+
     description: Production server
+
   - url: https://staging.api.example.com/v1
+
     description: Staging server
 
 paths:
@@ -34,7 +38,9 @@ paths:
       description: Creates a new user account with the provided details
       operationId: createUser
       tags:
+
         - Users
+
       requestBody:
         required: true
         content:
@@ -91,6 +97,7 @@ components:
           format: date-time
           description: Account creation timestamp
       required:
+
         - id
         - email
         - name
@@ -111,6 +118,7 @@ components:
           minLength: 8
           description: Must contain uppercase, lowercase, number, and special character
       required:
+
         - email
         - name
         - password
@@ -129,6 +137,7 @@ components:
           items:
             type: string
           description: Additional error context
+
 ```
 
 ### 2. Architecture Documentation (ADR)
@@ -138,6 +147,7 @@ Document architectural decisions with context and rationale.
 **Format**: Architecture Decision Record (ADR)
 
 ```markdown
+
 # ADR-001: Use PostgreSQL for Primary Data Store
 
 **Status**: Accepted
@@ -148,6 +158,7 @@ Document architectural decisions with context and rationale.
 ## Context and Problem Statement
 
 We need to choose a primary data store for our user management and payment processing system. The system requires:
+
 - ACID transactions for financial data
 - Complex queries with joins across multiple tables
 - Strong consistency guarantees
@@ -187,17 +198,20 @@ We need to choose a primary data store for our user management and payment proce
 ### Consequences
 
 **Positive**:
+
 - Strong data consistency and integrity
 - Rich querying capabilities for analytics
 - Well-understood operational patterns
 - Active community and extensive documentation
 
 **Negative**:
+
 - Vertical scaling limits (though sufficient for 5+ years)
 - Schema migrations require more planning than schemaless DBs
 - Read replicas add operational complexity
 
 **Neutral**:
+
 - Will need to implement caching layer (Redis) for hot data
 - May need to move high-volume logging to time-series DB later
 
@@ -213,17 +227,20 @@ We need to choose a primary data store for our user management and payment proce
 ## Alternatives Rejected
 
 ### MySQL
+
 - Less feature-rich than PostgreSQL
 - Team has less expertise
 - Migration path from MySQL to PostgreSQL is well-trodden if needed later
 
 ### DynamoDB
+
 - Strong for key-value access patterns
 - Weak for complex queries and analytics
 - Would require denormalization and complex access pattern design
 - Team has limited expertise
 
 ### MongoDB
+
 - Flexible schema not beneficial for our structured financial data
 - Lacks ACID transactions across documents (older versions)
 - Team has minimal experience
@@ -239,6 +256,7 @@ We need to choose a primary data store for our user management and payment proce
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [AWS Aurora Best Practices](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/)
 - [Financial Services on AWS](https://aws.amazon.com/financial-services/)
+
 ```
 
 ### 3. System Architecture Documentation
@@ -246,6 +264,7 @@ We need to choose a primary data store for our user management and payment proce
 High-level system design and component interactions.
 
 ```markdown
+
 # System Architecture: Payment Processing Platform
 
 ## Overview
@@ -255,6 +274,7 @@ The Payment Processing Platform enables users to send and receive money through 
 ## Architecture Diagram
 
 ```
+
 ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
 │   Mobile    │────────▶│   API       │────────▶│   User      │
 │     App     │         │   Gateway   │         │   Service   │
@@ -287,12 +307,14 @@ The Payment Processing Platform enables users to send and receive money through 
 ## Components
 
 ### API Gateway
+
 - **Technology**: AWS API Gateway + Lambda
 - **Responsibility**: Request routing, authentication, rate limiting
 - **Scale**: 50,000 requests/second
 - **Monitoring**: CloudWatch metrics, X-Ray tracing
 
 ### User Service
+
 - **Technology**: Go 1.21, PostgreSQL
 - **Responsibility**: User account management, authentication, authorization
 - **API**: REST (OpenAPI 3.0)
@@ -300,6 +322,7 @@ The Payment Processing Platform enables users to send and receive money through 
 - **Caching**: Redis for session data
 
 ### Payment Service
+
 - **Technology**: Go 1.21, Temporal
 - **Responsibility**: Payment orchestration, workflow management
 - **Patterns**: Event-driven, saga pattern for distributed transactions
@@ -307,6 +330,7 @@ The Payment Processing Platform enables users to send and receive money through 
 - **External Integration**: Galileo payment processor
 
 ### Ledger Service
+
 - **Technology**: Go 1.21, DynamoDB
 - **Responsibility**: Real-time balance tracking, transaction history
 - **Database**: DynamoDB (single-table design)
@@ -315,6 +339,7 @@ The Payment Processing Platform enables users to send and receive money through 
 ## Data Flow
 
 ### Payment Creation Flow
+
 1. User initiates payment via mobile app
 2. API Gateway authenticates request, forwards to Payment Service
 3. Payment Service validates amount, checks fraud rules
@@ -325,7 +350,9 @@ The Payment Processing Platform enables users to send and receive money through 
 8. On failure: Ledger Service rolls back, User Service notified
 
 ### Event Flow
+
 ```
+
 Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
                              ├─▶ Fraud Service (checks patterns)
                              └─▶ Notification Service (sends push)
@@ -335,24 +362,28 @@ Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
 ## Cross-Cutting Concerns
 
 ### Authentication & Authorization
+
 - JWT tokens with 15-minute expiry
 - Refresh tokens with 7-day expiry
 - Role-based access control (RBAC)
 - API key authentication for service-to-service
 
 ### Observability
+
 - **Logging**: Structured JSON logs to Datadog
 - **Metrics**: Prometheus metrics scraped by Datadog agent
 - **Tracing**: OpenTelemetry with Jaeger backend
 - **Alerting**: SLO-based alerts in PagerDuty
 
 ### Security
+
 - TLS 1.3 for all external communication
 - mTLS for service-to-service communication
 - Secrets stored in AWS Secrets Manager
 - PCI DSS compliance for cardholder data
 
 ### Reliability
+
 - **Availability**: 99.95% SLA
 - **Recovery Time Objective (RTO)**: 30 minutes
 - **Recovery Point Objective (RPO)**: 5 minutes
@@ -361,12 +392,14 @@ Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
 ## Deployment
 
 ### Infrastructure
+
 - **Cloud Provider**: AWS
 - **Orchestration**: Kubernetes (EKS)
 - **CI/CD**: GitHub Actions → ArgoCD
 - **IaC**: Terraform for infrastructure
 
 ### Environments
+
 - **Development**: Local Docker Compose
 - **Staging**: AWS EKS (single AZ)
 - **Production**: AWS EKS (multi-AZ, multi-region)
@@ -374,11 +407,13 @@ Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
 ## Scalability
 
 ### Current Scale
+
 - 10,000 payments/day
 - 100,000 users
 - 1M transactions/day (all types)
 
 ### Growth Projections
+
 - 10x scale in 2 years
 - Vertical scaling sufficient for 5 years
 - Horizontal scaling via sharding if needed
@@ -395,6 +430,7 @@ Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
 - **Backup Strategy**: Automated daily backups, 30-day retention
 - **Recovery Process**: Documented runbooks for each failure mode
 - **Testing**: Quarterly disaster recovery drills
+
 ```
 
 ### 4. Developer Onboarding Guide
@@ -402,6 +438,7 @@ Payment Created ──▶ RabbitMQ ──▶ Ledger Service (updates balance)
 Help new developers get up to speed.
 
 ```markdown
+
 # Developer Onboarding Guide
 
 ## Welcome!
@@ -411,6 +448,7 @@ This guide will help you set up your development environment and understand our 
 ## Prerequisites
 
 ### Required Tools
+
 - Go 1.21+
 - Docker Desktop
 - PostgreSQL 14+ (via Docker)
@@ -418,6 +456,7 @@ This guide will help you set up your development environment and understand our 
 - VS Code or GoLand
 
 ### Optional Tools
+
 - pgAdmin 4 (database management)
 - Postman (API testing)
 - golangci-lint (code quality)
@@ -425,33 +464,43 @@ This guide will help you set up your development environment and understand our 
 ## Setup
 
 ### 1. Clone Repository
+
 ```bash
+
 git clone <https://github.com/yourorg/payment-service.git>
 cd payment-service
 
 ```text
 
 ### 2. Install Dependencies
+
 ```bash
+
 go mod download
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 ```text
 
 ### 3. Start Local Services
+
 ```bash
+
 docker-compose up -d postgres rabbitmq redis
 
 ```text
 
 ### 4. Run Database Migrations
+
 ```bash
+
 make db-migrate
 
 ```text
 
 ### 5. Set Environment Variables
+
 ```bash
+
 cp .env.example .env
 
 # Edit .env with your local configuration
@@ -459,13 +508,17 @@ cp .env.example .env
 ```text
 
 ### 6. Run Application
+
 ```bash
+
 go run cmd/api/main.go
 
 ```text
 
 ### 7. Verify Installation
+
 ```bash
+
 curl <http://localhost>:8080/health
 
 # Expected: {"status":"healthy"}
@@ -475,6 +528,7 @@ curl <http://localhost>:8080/health
 ## Development Workflow
 
 ### Making Changes
+
 1. Create feature branch: `git checkout -b feature/your-feature`
 2. Make changes following our coding standards
 3. Run tests: `make test`
@@ -483,23 +537,29 @@ curl <http://localhost>:8080/health
 6. Push and create pull request
 
 ### Running Tests
+
 ```bash
 
 # All tests
+
 make test
 
 # Specific package
+
 go test ./internal/service/...
 
 # With coverage
+
 make test-coverage
 
 # With race detector
+
 go test -race ./...
 
 ```text
 
 ### Code Review Process
+
 1. All PRs require 2 approvals
 2. All tests must pass
 3. Linter must pass
@@ -512,17 +572,21 @@ See [Project Structure Documentation](./project-structure.md)
 ## Key Concepts
 
 ### Service Architecture
+
 We use a 3-tier architecture:
+
 - **Handler Layer**: HTTP request/response
 - **Service Layer**: Business logic
 - **Repository Layer**: Data access
 
 ### Error Handling
+
 - Use sentinel errors for known error types
 - Wrap errors with context
 - Log errors with structured fields
 
 ### Testing Philosophy
+
 - Write tests first (TDD)
 - Table-driven tests for comprehensive coverage
 - Mock external dependencies
@@ -531,6 +595,7 @@ We use a 3-tier architecture:
 ## Common Tasks
 
 ### Adding a New Endpoint
+
 1. Define handler in `internal/handler/`
 2. Implement service method in `internal/service/`
 3. Add repository method if needed
@@ -539,26 +604,33 @@ We use a 3-tier architecture:
 6. Add integration test
 
 ### Database Migrations
+
 ```bash
 
 # Create migration
+
 make migration-create name=add_users_table
 
 # Run migrations
+
 make db-migrate
 
 # Rollback migration
+
 make db-rollback
 
 ```text
 
 ### Debugging
+
 ```bash
 
 # Run with Delve debugger
+
 dlv debug cmd/api/main.go
 
 # View logs
+
 docker-compose logs -f api
 
 ```text
@@ -576,6 +648,7 @@ docker-compose logs -f api
 2. Review [Coding Standards](./coding-standards.md)
 3. Pick a "good first issue" from backlog
 4. Join daily standup (10am daily)
+
 ```
 
 ### 5. Runbook / Operational Documentation
@@ -583,6 +656,7 @@ docker-compose logs -f api
 Guide operators through common scenarios.
 
 ```markdown
+
 # Runbook: Payment Service
 
 ## Service Overview
@@ -595,19 +669,24 @@ Guide operators through common scenarios.
 ## Health Checks
 
 ### Service Health
+
 ```bash
+
 curl <https://api.example.com/health>
 
 ```text
 Expected: `{"status":"healthy","version":"1.2.3"}`
 
 ### Database Connectivity
+
 ```bash
+
 curl <https://api.example.com/health/db>
 
 ```text
 
 ### Dependency Health
+
 - Galileo API: https://status.galileo-ft.com
 - RabbitMQ: Check AWS MQ console
 - DynamoDB: Check AWS console
@@ -617,15 +696,18 @@ curl <https://api.example.com/health/db>
 ### Issue: High Error Rate
 
 **Symptoms**:
+
 - Error rate >1% in Datadog
 - PagerDuty alert: "Payment Service Error Rate High"
 
 **Diagnosis**:
+
 1. Check Datadog dashboard: https://app.datadoghq.com/dashboard/payments
 2. Review error logs: `grep ERROR /var/log/payment-service.log`
 3. Check external dependencies (Galileo, database)
 
 **Resolution**:
+
 1. If Galileo timeout: Increase timeout or enable circuit breaker
 2. If database connection: Check connection pool settings
 3. If specific endpoint: Roll back recent deployment
@@ -635,16 +717,20 @@ curl <https://api.example.com/health/db>
 ### Issue: Database Connection Pool Exhausted
 
 **Symptoms**:
+
 - Logs show "no connections available"
 - Requests timing out
 
 **Resolution**:
+
 ```bash
 
 # Check current connections
+
 kubectl exec -it payment-service-pod -- psql -c "SELECT count(*) FROM pg_stat_activity;"
 
 # Restart service to reset connections
+
 kubectl rollout restart deployment/payment-service
 
 ```text
@@ -654,26 +740,32 @@ kubectl rollout restart deployment/payment-service
 ## Deployment
 
 ### Standard Deployment
+
 ```bash
 
 # Triggered automatically via GitHub Actions on merge to main
 # Manual trigger:
+
 gh workflow run deploy.yml -f environment=production
 
 ```text
 
 ### Rollback Procedure
+
 ```bash
 
 # Rollback to previous version
+
 kubectl rollout undo deployment/payment-service
 
 # Rollback to specific version
+
 kubectl rollout undo deployment/payment-service --to-revision=5
 
 ```text
 
 ### Hotfix Deployment
+
 1. Create hotfix branch from `main`
 2. Make fix, get expedited review
 3. Merge to `main`
@@ -682,16 +774,19 @@ kubectl rollout undo deployment/payment-service --to-revision=5
 ## Monitoring
 
 ### Key Metrics
+
 - **Request Rate**: 100-500 req/sec (normal)
 - **Error Rate**: <0.5%
 - **P95 Latency**: <500ms
 - **Database Connections**: <80% of pool
 
 ### Dashboards
+
 - [Payment Service Dashboard](https://app.datadoghq.com/dashboard/payments)
 - [Database Performance](https://app.datadoghq.com/dashboard/db-performance)
 
 ### Alerts
+
 - High error rate (>1%): Page on-call
 - High latency (P95 >1s): Slack notification
 - Database connection exhausted: Page on-call
@@ -699,12 +794,14 @@ kubectl rollout undo deployment/payment-service --to-revision=5
 ## Disaster Recovery
 
 ### Database Failure
+
 1. Automatic failover to standby (AWS Aurora)
 2. If failover fails: Manual promotion via AWS console
 3. Update DNS if needed
 4. Verify service health
 
 ### Complete Service Outage
+
 1. Check AWS service health dashboard
 2. Verify Kubernetes cluster health
 3. Review recent deployments (potential rollback)
@@ -715,29 +812,34 @@ kubectl rollout undo deployment/payment-service --to-revision=5
 - **Primary On-Call**: See PagerDuty schedule
 - **Team Slack**: #payments-team
 - **Escalation**: @tech-lead, @engineering-manager
+
 ```
 
 ## Documentation Principles
 
 ### 1. Audience-Focused
+
 - **Developers**: Code examples, architecture diagrams
 - **Operators**: Runbooks, troubleshooting guides
 - **Product**: High-level overviews, API capabilities
 - **New Hires**: Onboarding guides, glossaries
 
 ### 2. Maintainability
+
 - Keep docs close to code (in repo)
 - Review docs during code reviews
 - Mark obsolete docs clearly
 - Use automation to generate where possible (API docs from OpenAPI)
 
 ### 3. Clarity
+
 - Use clear, concise language
 - Avoid jargon without explanation
 - Provide examples and diagrams
 - Structure with headings and lists
 
 ### 4. Completeness
+
 - Cover all public APIs
 - Document error cases
 - Include troubleshooting sections

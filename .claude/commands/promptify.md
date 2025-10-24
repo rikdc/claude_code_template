@@ -11,6 +11,7 @@ Generate high-quality prompts for AI systems, LLMs, and agents that produce effe
 
 ```bash
 /promptify <description_of_what_you_want>
+
 ```
 
 ## Examples
@@ -20,6 +21,7 @@ Generate high-quality prompts for AI systems, LLMs, and agents that produce effe
 /promptify Create a prompt for summarizing technical documentation
 /promptify Generate SQL queries from natural language descriptions
 /promptify Analyze code for performance bottlenecks and suggest optimizations
+
 ```
 
 ## Prompt
@@ -49,6 +51,7 @@ First, understand what the user needs:
 Select the appropriate pattern based on the task:
 
 #### Pattern 1: Role-Based Prompt
+
 Best for: Tasks requiring specific expertise or perspective
 
 ```text
@@ -59,6 +62,7 @@ Your task is to [specific action] by [method/approach].
 [Specific instructions and constraints]
 
 [Output format requirements]
+
 ```
 
 **Example**:
@@ -70,6 +74,7 @@ Your task is to review code for security vulnerabilities by analyzing authentica
 authorization, input validation, and data handling.
 
 For each vulnerability found:
+
 - Severity: Critical/High/Medium/Low
 - Location: File and line number
 - Description: What the vulnerability is
@@ -77,9 +82,11 @@ For each vulnerability found:
 - Fix: Specific code changes to address it
 
 Output format: Markdown with code blocks
+
 ```
 
 #### Pattern 2: Task-Oriented Prompt
+
 Best for: Clear, specific tasks with defined inputs/outputs
 
 ```text
@@ -88,6 +95,7 @@ Task: [Clear description of what to do]
 Input: [What data/information will be provided]
 
 Process:
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
@@ -95,6 +103,7 @@ Process:
 Output: [Exact format and content required]
 
 Constraints: [Any limitations or requirements]
+
 ```
 
 **Example**:
@@ -105,22 +114,27 @@ Task: Convert natural language to SQL queries for a PostgreSQL database
 Input: Natural language question about data in the database
 
 Process:
+
 1. Identify the tables and columns mentioned
 2. Determine the query type (SELECT, JOIN, aggregate, etc.)
 3. Apply appropriate WHERE clauses and filters
 4. Generate valid PostgreSQL syntax
 
 Output:
+
 - SQL query as a code block
 - Brief explanation of what the query does
 
 Constraints:
+
 - Use only standard PostgreSQL functions
 - Always use parameterized queries (prevent SQL injection)
 - Include comments in complex queries
+
 ```
 
 #### Pattern 3: Few-Shot Learning Prompt
+
 Best for: Tasks where examples clarify expectations
 
 ```text
@@ -142,6 +156,7 @@ Output: [example output 3]
 
 Now, apply the same pattern to:
 Input: [actual input]
+
 ```
 
 **Example**:
@@ -182,9 +197,11 @@ def complex_sort(data, key, reverse=False):
             complex_sort(greater, key, reverse))
 
 Output: High - Recursive algorithm, multiple comprehensions, nested logic, conditional return
+
 ```
 
 #### Pattern 4: Chain-of-Thought Prompt
+
 Best for: Complex reasoning or multi-step problems
 
 ```text
@@ -202,6 +219,7 @@ Step 3: [Third consideration]
 [What to analyze/determine]
 
 Final Output: [Based on the analysis above]
+
 ```
 
 **Example**:
@@ -212,28 +230,34 @@ Your task is to estimate the performance impact of a code change.
 Think through this step-by-step:
 
 Step 1: Analyze current performance
+
 - Identify time complexity of current implementation
 - Note any I/O operations, database queries, or network calls
 - Estimate current resource usage
 
 Step 2: Analyze proposed change
+
 - Identify time complexity of new implementation
 - Note changes to I/O, queries, or network patterns
 - Estimate new resource usage
 
 Step 3: Compare and assess
+
 - Calculate complexity difference (Big O notation)
 - Identify bottlenecks introduced or removed
 - Consider cache/memory implications
 
 Final Output:
+
 - Performance impact: Improved/Degraded/Neutral
 - Magnitude: Negligible/Moderate/Significant
 - Specific concerns: [Any issues to watch]
 - Recommendation: [Should we make this change?]
+
 ```
 
 #### Pattern 5: Structured Output Prompt
+
 Best for: Tasks requiring consistent, parseable output
 
 ```text
@@ -242,15 +266,19 @@ Your task is to [description].
 Output must follow this exact structure:
 
 ## [Section 1]
+
 [Required fields]
 
 ## [Section 2]
+
 [Required fields]
 
 ## [Section 3]
+
 [Required fields]
 
 [Additional formatting requirements]
+
 ```
 
 **Example**:
@@ -261,59 +289,68 @@ Your task is to review a pull request and provide structured feedback.
 Output must follow this exact structure:
 
 ## Summary
+
 Overall assessment in 1-2 sentences
 
 ## Critical Issues
+
 List any blocking problems (security, bugs, data corruption)
+
 - [Issue]: Description and fix
 
 ## Improvements Needed
+
 List code quality or maintainability concerns
+
 - [Concern]: Description and suggestion
 
 ## Positive Observations
+
 Highlight what was done well
+
 - [Good practice]: Why this is valuable
 
 ## Recommendation
+
 [APPROVE / REQUEST CHANGES / NEEDS DISCUSSION]
 
 Use Markdown formatting with code blocks for examples.
+
 ```
 
 ### Step 3: Apply Prompt Quality Principles
 
 Enhance the prompt with these principles:
 
-**1. Clarity**
+#### 1. Clarity
 
 - Use specific, unambiguous language
 - Define technical terms if needed
 - Provide concrete examples
 - Avoid vague words like "good", "better", "properly"
 
-**2. Specificity**
+#### 2. Specificity
 
 - Define exact input/output formats
 - Specify constraints and boundaries
 - Include edge cases to consider
 - State what NOT to do
 
-**3. Context**
+#### 3. Context
 
 - Provide necessary background information
 - Include domain-specific knowledge
 - Reference standards or conventions
 - Explain the purpose
 
-**4. Structure**
+#### 4. Structure
 
 - Use clear sections and headings
 - Number steps in sequences
 - Format with bullet points and lists
 - Use code blocks for examples
 
-**5. Verifiability**
+#### 5. Verifiability
 
 - Define success criteria
 - Include quality standards
@@ -328,41 +365,50 @@ Consider adding these elements to improve prompt effectiveness:
 
 ```text
 Output format: [JSON/Markdown/Code/Structured text]
+
 ```
 
 **Constraints**:
 
 ```text
 Constraints:
+
 - Maximum length: X characters/words
 - Required fields: [list]
 - Forbidden elements: [list]
+
 ```
 
 **Quality Criteria**:
 
 ```text
 Your output must:
+
 - Be accurate and factual
 - Include specific examples
 - Follow [standard/convention]
 - Be complete (cover all edge cases)
+
 ```
 
 **Error Handling**:
 
 ```text
 If the input is [invalid/unclear/missing information]:
+
 - [What to do]
 - [What to respond]
+
 ```
 
 **Edge Cases**:
 
 ```text
 Consider these special cases:
+
 - [Edge case 1]: How to handle
 - [Edge case 2]: How to handle
+
 ```
 
 ## Generation Process

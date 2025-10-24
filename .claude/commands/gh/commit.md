@@ -14,6 +14,7 @@ To create a commit, just type:
 
 ```bash
 /commit [--no-verify] [--no-emoji] [--help]
+
 ```
 
 ## Workflow
@@ -49,6 +50,7 @@ If multiple distinct changes are detected, suggests splitting into atomic commit
 ```markdown
 <emoji> <type>: <description>
 [optional body]
+
 ```
 
 - Use present tense, imperative mood ("add feature" not "added feature")

@@ -15,6 +15,7 @@ You are a senior Go developer with 8+ years of experience building:
 ## Core Competencies
 
 ### Go Language Mastery
+
 - Idiomatic Go patterns and conventions
 - Effective use of interfaces for abstraction
 - Proper error handling with wrapped errors
@@ -23,6 +24,7 @@ You are a senior Go developer with 8+ years of experience building:
 - Performance optimization and profiling
 
 ### Production Engineering
+
 - Structured logging with correlation IDs
 - Metrics instrumentation (Prometheus, Datadog)
 - Distributed tracing (OpenTelemetry)
@@ -31,6 +33,7 @@ You are a senior Go developer with 8+ years of experience building:
 - Configuration management and feature flags
 
 ### Testing Excellence
+
 - Table-driven tests with subtests
 - Interface mocking with testify/mock
 - Test independence and parallelization
@@ -105,6 +108,7 @@ func TestCalculateTotal(t *testing.T) {
         })
     }
 }
+
 ```
 
 **DON'T**:
@@ -128,6 +132,7 @@ func calculate() (result int, err error) {
     result = 42
     return // unclear what's being returned
 }
+
 ```
 
 ### 2. Project Structure
@@ -161,6 +166,7 @@ project/
 ├── go.mod
 ├── go.sum
 └── Makefile
+
 ```
 
 ### 3. Service Layer Pattern
@@ -244,6 +250,7 @@ func (r *userRepository) Create(ctx context.Context, user *User) error {
 
     return nil
 }
+
 ```
 
 ### 4. Error Handling
@@ -287,6 +294,7 @@ var validationErr *ValidationError
 if errors.As(err, &validationErr) {
     // handle validation error
 }
+
 ```
 
 ### 5. Context Usage
@@ -321,6 +329,7 @@ func (s *Service) LongRunning(ctx context.Context) error {
     }
     return nil
 }
+
 ```
 
 ### 6. Database Patterns
@@ -369,6 +378,7 @@ func (r *repository) Transfer(ctx context.Context, from, to uuid.UUID, amount de
 
     return nil
 }
+
 ```
 
 ### 7. Testing Best Practices
@@ -447,6 +457,7 @@ func TestUserService_CreateUser(t *testing.T) {
         })
     }
 }
+
 ```
 
 ### 8. Observability
@@ -491,6 +502,7 @@ func (s *Service) Process(ctx context.Context, req Request) error {
     s.metrics.IncrementCounter("service.process.success")
     return nil
 }
+
 ```
 
 ## Code Quality Standards

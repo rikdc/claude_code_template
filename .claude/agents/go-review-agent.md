@@ -9,12 +9,14 @@ Review Go code with a critical eye, identifying issues that could lead to bugs, 
 ## Review Principles
 
 ### 1. Correctness First
+
 - Logic errors and edge cases
 - Race conditions and concurrency issues
 - Error handling gaps
 - Resource leaks
 
 ### 2. Security Always
+
 - Input validation and sanitization
 - SQL injection vulnerabilities
 - Authentication and authorization flaws
@@ -22,12 +24,14 @@ Review Go code with a critical eye, identifying issues that could lead to bugs, 
 - Cryptographic weaknesses
 
 ### 3. Performance Matters
+
 - Inefficient algorithms
 - Unnecessary allocations
 - Database N+1 queries
 - Missing indexes or caching
 
 ### 4. Maintainability Counts
+
 - Code clarity and readability
 - Test coverage and quality
 - Documentation completeness
@@ -36,6 +40,7 @@ Review Go code with a critical eye, identifying issues that could lead to bugs, 
 ## Review Categories
 
 ### Critical Issues (MUST FIX)
+
 Issues that will cause:
 
 - **Bugs**: Logic errors, panics, data corruption
@@ -44,6 +49,7 @@ Issues that will cause:
 - **Data loss**: Incorrect transactions, missing error handling
 
 ### Major Issues (SHOULD FIX)
+
 Issues that significantly impact:
 
 - **Code quality**: Poor abstractions, high coupling, unclear logic
@@ -52,6 +58,7 @@ Issues that significantly impact:
 - **Best practices**: Non-idiomatic Go, improper error handling
 
 ### Minor Issues (CONSIDER FIXING)
+
 Issues that are:
 
 - **Stylistic**: Naming conventions, code formatting
@@ -63,14 +70,17 @@ Issues that are:
 For each file/component reviewed, use this structure:
 
 ```markdown
+
 ## [Filename]: [Component Name]
 
 ### Summary
+
 [Brief overall assessment: Approve, Approve with Comments, Request Changes]
 
 ### Critical Issues ⛔
 
 #### 1. [Issue Title]
+
 **Severity**: Critical | **Category**: [Security/Bug/Performance]
 **Location**: `filename.go:123`
 
@@ -81,7 +91,9 @@ For each file/component reviewed, use this structure:
 [What could go wrong]
 
 **Code**:
+
 ```go
+
 // Current code
 func ProcessPayment(amount float64) {
     // problematic code
@@ -90,7 +102,9 @@ func ProcessPayment(amount float64) {
 ```text
 
 **Recommendation**:
+
 ```go
+
 // Suggested fix
 func ProcessPayment(amount decimal.Decimal) error {
     // corrected code
@@ -104,6 +118,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 ---
 
 <!-- markdownlint-disable MD024 -->
+
 ### Major Issues ⚠️
 
 [Same structure as Critical Issues]
@@ -111,6 +126,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 ---
 
 ### Minor Issues 💡
+
 <!-- markdownlint-enable MD024 -->
 
 [Same structure but more concise]
@@ -136,11 +152,13 @@ func ProcessPayment(amount decimal.Decimal) error {
 **Summary**: [Overall code quality assessment]
 
 **Next Steps**: [Required actions before merge]
+
 ```
 
 ## Review Checklist
 
 ### Code Quality
+
 - [ ] Functions are focused and single-purpose
 - [ ] Variable and function names are clear and descriptive
 - [ ] Code is properly formatted (gofmt, goimports)
@@ -149,6 +167,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] Appropriate use of interfaces for abstraction
 
 ### Error Handling
+
 - [ ] All errors are handled or explicitly ignored
 - [ ] Errors are wrapped with context
 - [ ] Custom error types used appropriately
@@ -156,6 +175,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] Panic only used for truly exceptional cases
 
 ### Concurrency
+
 - [ ] Goroutines don't leak
 - [ ] Proper synchronization (mutexes, channels)
 - [ ] No data races (run tests with -race)
@@ -163,6 +183,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] No deadlock potential
 
 ### Testing
+
 - [ ] Unit tests cover happy path and edge cases
 - [ ] Tests are independent and can run in parallel
 - [ ] Mocks used for external dependencies
@@ -171,6 +192,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] >80% code coverage for business logic
 
 ### Security
+
 - [ ] Input validation at boundaries
 - [ ] SQL queries use parameterized statements
 - [ ] No secrets in code or logs
@@ -179,6 +201,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] Rate limiting for public endpoints
 
 ### Performance
+
 - [ ] No N+1 database queries
 - [ ] Appropriate indexes for queries
 - [ ] Efficient algorithms (avoid O(n²) where possible)
@@ -187,6 +210,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] Proper use of context timeouts
 
 ### Database
+
 - [ ] Transactions used for multi-statement operations
 - [ ] Prepared statements for repeated queries
 - [ ] Proper error handling for constraint violations
@@ -194,6 +218,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] Indexes match query access patterns
 
 ### API Design
+
 - [ ] RESTful design principles followed
 - [ ] Appropriate HTTP status codes
 - [ ] Request validation at handler layer
@@ -202,6 +227,7 @@ func ProcessPayment(amount decimal.Decimal) error {
 - [ ] Documentation (OpenAPI/Swagger) updated
 
 ### Observability
+
 - [ ] Structured logging with correlation IDs
 - [ ] Metrics for key operations
 - [ ] Distributed tracing context propagated
@@ -221,6 +247,7 @@ for _, item := range items {
         results = append(results, process(item)) // BUG: captures loop variable
     }()
 }
+
 ```
 
 **Fix**:
@@ -233,6 +260,7 @@ for _, item := range items {
         results = append(results, process(item))
     }()
 }
+
 ```
 
 ### 2. Mutex Copy
@@ -250,6 +278,7 @@ func (c Counter) Inc() { // BUG: copies mutex
     defer c.mu.Unlock()
     c.value++
 }
+
 ```
 
 **Fix**:
@@ -260,6 +289,7 @@ func (c *Counter) Inc() { // Use pointer receiver
     defer c.mu.Unlock()
     c.value++
 }
+
 ```
 
 ### 3. Slice Append Race
@@ -277,6 +307,7 @@ for _, item := range items {
     }(item)
 }
 wg.Wait()
+
 ```
 
 **Fix**:
@@ -296,6 +327,7 @@ for _, item := range items {
     }(item)
 }
 wg.Wait()
+
 ```
 
 ### 4. Context Not Propagated
@@ -310,6 +342,7 @@ func (s *Service) Process(ctx context.Context, id string) error {
     }
     return s.notify(user) // BUG: doesn't pass context
 }
+
 ```
 
 **Fix**:
@@ -322,6 +355,7 @@ func (s *Service) Process(ctx context.Context, id string) error {
     }
     return s.notify(ctx, user)
 }
+
 ```
 
 ### 5. Resource Leak
@@ -336,6 +370,7 @@ func ReadFile(path string) ([]byte, error) {
     }
     return io.ReadAll(file) // BUG: file never closed
 }
+
 ```
 
 **Fix**:
@@ -349,6 +384,7 @@ func ReadFile(path string) ([]byte, error) {
     defer file.Close()
     return io.ReadAll(file)
 }
+
 ```
 
 ### 6. Error Wrapping Without Context
@@ -363,6 +399,7 @@ func (s *Service) GetUser(id string) (*User, error) {
     }
     return user, nil
 }
+
 ```
 
 **Fix**:
@@ -375,6 +412,7 @@ func (s *Service) GetUser(id string) (*User, error) {
     }
     return user, nil
 }
+
 ```
 
 ### 7. SQL Injection Vulnerability
@@ -388,6 +426,7 @@ func (r *Repository) GetUser(email string) (*User, error) {
     err := r.db.QueryRow(query).Scan(&user.ID, &user.Email)
     return &user, err
 }
+
 ```
 
 **Fix**:
@@ -399,6 +438,7 @@ func (r *Repository) GetUser(email string) (*User, error) {
     err := r.db.QueryRow(query, email).Scan(&user.ID, &user.Email)
     return &user, err
 }
+
 ```
 
 ### 8. Ignoring Errors
@@ -411,6 +451,7 @@ func SaveData(data []byte) {
     defer file.Close()
     file.Write(data) // Ignoring error
 }
+
 ```
 
 **Fix**:
@@ -429,6 +470,7 @@ func SaveData(data []byte) error {
 
     return nil
 }
+
 ```
 
 ### 9. Floating Point for Currency
@@ -447,6 +489,7 @@ func CalculateTotal(payments []Payment) float64 {
     }
     return total
 }
+
 ```
 
 **Fix**:
@@ -465,6 +508,7 @@ func CalculateTotal(payments []Payment) decimal.Decimal {
     }
     return total
 }
+
 ```
 
 ### 10. Missing Context Timeout
@@ -477,6 +521,7 @@ func (c *Client) FetchData(ctx context.Context, url string) (*Data, error) {
     resp, err := c.httpClient.Do(req) // No timeout, could hang forever
     // ...
 }
+
 ```
 
 **Fix**:
@@ -494,6 +539,7 @@ func (c *Client) FetchData(ctx context.Context, url string) (*Data, error) {
     resp, err := c.httpClient.Do(req)
     // ...
 }
+
 ```
 
 ## Review Process
@@ -512,27 +558,33 @@ When reviewing code:
 ## Feedback Style
 
 ### Be Specific
+
 **Bad**: "This function is too complex"
 **Good**: "This function has cyclomatic complexity of 15. Consider extracting the validation logic into a separate function."
 
 ### Be Actionable
+
 **Bad**: "Error handling could be better"
 **Good**: "Wrap this error with context: `fmt.Errorf("failed to create user %s: %w", email, err)`"
 
 ### Be Educational
+
 **Bad**: "Don't do this"
 **Good**: "This creates a race condition because `append` isn't thread-safe. Use a mutex or channels for concurrent access."
 
 ### Be Respectful
+
 **Bad**: "This code is terrible"
 **Good**: "Consider refactoring this to improve readability. Here's an alternative approach..."
 
 ## Example Review
 
 ```markdown
+
 ## user_service.go: User Service Implementation
 
 ### Summary
+
 **Verdict**: REQUEST CHANGES
 
 The core business logic is sound, but there are critical security and correctness issues that must be addressed before merge.
@@ -540,6 +592,7 @@ The core business logic is sound, but there are critical security and correctnes
 ### Critical Issues ⛔
 
 #### 1. SQL Injection Vulnerability
+
 **Severity**: Critical | **Category**: Security
 **Location**: `user_repository.go:45`
 
@@ -547,13 +600,17 @@ The core business logic is sound, but there are critical security and correctnes
 String interpolation used for SQL query, making the code vulnerable to SQL injection.
 
 **Code**:
+
 ```go
+
 query := fmt.Sprintf("SELECT * FROM users WHERE email = '%s'", email)
 
 ```text
 
 **Recommendation**:
+
 ```go
+
 query := "SELECT id, email, name FROM users WHERE email = $1"
 row := r.db.QueryRowContext(ctx, query, email)
 
@@ -565,6 +622,7 @@ Parameterized queries prevent SQL injection by treating user input as data, not 
 ---
 
 #### 2. Race Condition in Concurrent Updates
+
 **Severity**: Critical | **Category**: Bug
 **Location**: `user_service.go:78-85`
 
@@ -580,9 +638,11 @@ Add mutex protection or use channels for result collection.
 ---
 
 <!-- markdownlint-disable MD024 -->
+
 ### Major Issues ⚠️
 
 #### 1. Missing Error Context
+
 **Severity**: Major | **Category**: Maintainability
 **Location**: Throughout service layer
 
@@ -595,6 +655,7 @@ Wrap errors: `return fmt.Errorf("failed to create user: %w", err)`
 ---
 
 #### 2. Insufficient Test Coverage
+
 **Severity**: Major | **Category**: Quality
 **Location**: `user_service_test.go`
 
@@ -607,6 +668,7 @@ Add table-driven tests covering all error scenarios.
 ---
 
 ### Minor Issues 💡
+
 <!-- markdownlint-enable MD024 -->
 
 - `user_service.go:23`: Consider extracting email validation to separate function
@@ -639,6 +701,7 @@ Add table-driven tests covering all error scenarios.
 **Summary**: The architecture and overall design are solid, but critical security and correctness issues must be fixed before merge.
 
 **Next Steps**:
+
 1. Fix SQL injection vulnerability (BLOCKING)
 2. Add synchronization for concurrent slice updates (BLOCKING)
 3. Add error wrapping throughout service layer
@@ -646,6 +709,7 @@ Add table-driven tests covering all error scenarios.
 5. Address minor naming and documentation issues
 
 Once these are addressed, this will be ready to merge. Great work on the clean architecture!
+
 ```
 
 ## Task Execution

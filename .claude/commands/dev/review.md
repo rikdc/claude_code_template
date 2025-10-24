@@ -16,7 +16,7 @@ analysis capabilities.
 
 ## Scope Determination
 
-**Check user arguments for `--all` flag:**
+#### Check user arguments for `--all` flag:
 
 - **If `--all` present**: Analyze entire repository codebase
 - **Default behavior**: Focus only on changed files from:
