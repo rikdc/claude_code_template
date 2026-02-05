@@ -22,12 +22,42 @@ make check-tools    # Check for required and optional security tools
 make help           # Display all available commands
 ```
 
-## Claude Code Slash Commands
+## Claude Code Skills and Commands
 
-This project includes custom Claude Code slash commands in `.claude/commands/`:
+This project uses the modern Claude Code skills structure alongside legacy commands.
+
+### Skills (`.claude/skills/`)
+
+Skills are the recommended approach for reusable Claude Code behaviors:
+
+- `/mentor` - Senior Staff Engineer mentor for architecture, design decisions, and career guidance
+- `/document` - Technical documentation expert for API docs, ADRs, runbooks, and guides
+- `/go-implementor` - Expert Go engineer for production-grade service implementation
+- `/go-review` - Senior Go code reviewer for quality, security, and best practices
+- `/manager` - Engineering project orchestrator for coordinating complex initiatives
+- `/specify` - Software specification expert for detailed technical specs
+- `/taskify` - Task decomposition expert for breaking specs into actionable tasks
+
+### Migration from Agents
+
+Previous `.claude/agents/` files have been migrated to skills:
+
+| Old Agent | New Skill |
+|-----------|-----------|
+| `document-agent.md` | `/document` |
+| `go-implementor-agent.md` | `/go-implementor` |
+| `go-review-agent.md` | `/go-review` |
+| `manager-agent.md` | `/manager` |
+| `specify-agent.md` | `/specify` |
+| `staff-eyes-agent.md` | `/mentor` (renamed for clarity) |
+| `taskify-agent.md` | `/taskify` |
+
+### Commands (`.claude/commands/`)
+
+Legacy slash commands (still functional):
 
 - `/check` - Comprehensive code quality analysis and auto-fix with parallel sub-task strategy
-- `/clean` - Remove redundant and obvious comments from codebase  
+- `/clean` - Remove redundant and obvious comments from codebase
 - `/changelog` - Create and maintain project changelog following Keep a Changelog format
 
 ## Architecture
@@ -102,7 +132,8 @@ The project uses Claude Code's PreToolUse hook mechanism with two complementary 
 - `.claude/security-patterns.conf`: Security detection patterns
 - `.claude/security-scan.log`: Audit log of all security scan activity
 - `.claude/protect-main-branch.log`: Audit log of branch protection activity
-- `.claude/commands/`: Custom slash commands (check, clean, changelog)
+- `.claude/skills/`: Modern skills with SKILL.md format (recommended)
+- `.claude/commands/`: Legacy slash commands (check, clean, changelog)
 - `tests/test-scanner.sh`: Security scanner test suite
 - `tests/test-protect-main-branch.sh`: Protected branch hook test suite
 - `Makefile`: Primary interface for all project operations
