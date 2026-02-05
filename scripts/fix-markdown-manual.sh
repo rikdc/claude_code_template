@@ -8,6 +8,15 @@
 
 set -euo pipefail
 
+# Portable sed in-place edit (macOS uses -i '', GNU/Linux uses -i)
+sed_inplace() {
+    if sed --version 2>/dev/null | grep -q GNU; then
+        sed -i "$@"
+    else
+        sed -i '' "$@"
+    fi
+}
+
 # Get the target directory (default to current directory)
 TARGET_DIR="${1:-.}"
 
@@ -22,14 +31,14 @@ fi
 
 # Fix go-review-agent.md - Add inline disable comments for duplicate headings in example template
 if [[ -f "$TARGET_DIR/.claude/agents/go-review-agent.md" ]]; then
-    sed -i '' 's/^### Major Issues ⚠️$/<!-- markdownlint-disable MD024 -->\n### Major Issues ⚠️/' \
+    sed_inplace 's/^### Major Issues ⚠️$/<!-- markdownlint-disable MD024 -->\n### Major Issues ⚠️/' \
         "$TARGET_DIR/.claude/agents/go-review-agent.md"
 
-    sed -i '' 's/^### Minor Issues 💡$/### Minor Issues 💡\n<!-- markdownlint-enable MD024 -->/' \
+    sed_inplace 's/^### Minor Issues 💡$/### Minor Issues 💡\n<!-- markdownlint-enable MD024 -->/' \
         "$TARGET_DIR/.claude/agents/go-review-agent.md"
 
     # Fix heading increment issue - change h4 to h3 in go-review-agent.md line 538
-    sed -i '' '540s/^#### 2\. Race Condition in Concurrent Updates$/### 2. Race Condition in Concurrent Updates/' \
+    sed_inplace '540s/^#### 2\. Race Condition in Concurrent Updates$/### 2. Race Condition in Concurrent Updates/' \
         "$TARGET_DIR/.claude/agents/go-review-agent.md"
 fi
 
@@ -37,16 +46,16 @@ fi
 # Change **Example 1:** to #### Example 1: (proper heading)
 if [[ -d "$TARGET_DIR/.claude/agents" ]]; then
     find "$TARGET_DIR/.claude/agents" \
-        -name "*.md" -exec sed -i '' 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' {} \;
+        -name "*.md" -exec sed_inplace 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' {} \;
 fi
 
 if [[ -d "$TARGET_DIR/.claude/commands" ]]; then
     find "$TARGET_DIR/.claude/commands" \
-        -name "*.md" -exec sed -i '' 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' {} \;
+        -name "*.md" -exec sed_inplace 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' {} \;
 
     # Fix **1. Clarity** style headings to proper subheadings
     find "$TARGET_DIR/.claude/commands" \
-        -name "*.md" -exec sed -i '' 's/^\*\*\([0-9]\+\)\. \(.*\)\*\*$/#### \1. \2/' {} \;
+        -name "*.md" -exec sed_inplace 's/^\*\*\([0-9]\+\)\. \(.*\)\*\*$/#### \1. \2/' {} \;
 fi
 
 echo "Manual markdown fixes applied to $TARGET_DIR"
