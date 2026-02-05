@@ -34,6 +34,9 @@ Skills are the recommended approach for reusable Claude Code behaviors:
 - `/document` - Technical documentation expert for API docs, ADRs, runbooks, and guides
 - `/go-implementor` - Expert Go engineer for production-grade service implementation
 - `/go-review` - Senior Go code reviewer for quality, security, and best practices
+- `/temporal-review` - Expert Temporal code reviewer for workflows, activities, timeouts, determinism, and orchestration patterns
+- `/temporal-implement` - Expert Temporal engineer for creating workflows, activities, and common patterns (saga, debounce)
+- `/temporal-test` - Expert Temporal test engineer for creating comprehensive test suites (unit, integration, replay)
 - `/manager` - Engineering project orchestrator for coordinating complex initiatives
 - `/specify` - Software specification expert for detailed technical specs
 - `/taskify` - Task decomposition expert for breaking specs into actionable tasks
