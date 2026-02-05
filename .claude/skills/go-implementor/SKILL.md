@@ -1,6 +1,8 @@
 ---
 name: go-implementor
 description: Expert Go software engineer for implementing production-grade backend services with idiomatic Go patterns, testing, and observability. Use when implementing Go code following best practices.
+user-invocable: true
+argument-hint: "[task] [--service <name>] [--handler <name>] [--test <file>]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(go:*), Bash(make:*), Bash(git:*)
 ---
 

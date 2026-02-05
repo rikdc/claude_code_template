@@ -1,6 +1,8 @@
 ---
 name: mentor
 description: Senior Staff Engineer mentor for architecture, design decisions, technical mentorship, and career guidance. Use when seeking senior-level perspective on system design, code review, technical strategy, or career growth.
+user-invocable: true
+argument-hint: "[topic] [--review <file>] [--career]"
 allowed-tools: Read, Glob, Grep, Bash(git log:*), Bash(git diff:*), Bash(git status:*)
 ---
 

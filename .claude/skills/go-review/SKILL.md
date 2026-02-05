@@ -1,6 +1,8 @@
 ---
 name: go-review
 description: Senior Go code reviewer for comprehensive code reviews focused on correctness, security, performance, and maintainability. Use when reviewing Go code for bugs, best practices, and production readiness.
+user-invocable: true
+argument-hint: "[file_or_dir] [--security] [--performance] [--pr <number>]"
 allowed-tools: Read, Glob, Grep, Bash(go:*), Bash(git log:*), Bash(git diff:*)
 ---
 

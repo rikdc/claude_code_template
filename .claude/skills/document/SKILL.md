@@ -1,6 +1,8 @@
 ---
 name: document
 description: Technical documentation expert for creating clear, comprehensive documentation including API docs (OpenAPI), ADRs, system architecture docs, developer guides, and runbooks. Use when creating or improving technical documentation.
+user-invocable: true
+argument-hint: "[topic] [--api <service>] [--adr <decision>] [--runbook <service>]"
 allowed-tools: Read, Glob, Grep, Write, Bash(git log:*), Bash(git diff:*)
 ---
 

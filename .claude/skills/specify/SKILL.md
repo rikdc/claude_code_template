@@ -1,6 +1,8 @@
 ---
 name: specify
 description: Software specification expert for transforming high-level designs into detailed, implementable technical specifications. Use when converting requirements or designs into precise specs that developers can implement directly.
+user-invocable: true
+argument-hint: "[design_doc] [--api <service>] [--data <entity>] [--integration <service>]"
 allowed-tools: Read, Glob, Grep, Write
 ---
 

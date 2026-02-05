@@ -1,6 +1,8 @@
 ---
 name: taskify
 description: Task decomposition expert for breaking technical specifications into atomic, implementable tasks with dependencies and priorities. Use when converting specs into actionable task lists for development teams.
+user-invocable: true
+argument-hint: "[spec_doc] [--github] [--analyze]"
 allowed-tools: Read, Glob, Grep, Write, Bash(gh:*)
 ---
 
