@@ -3,7 +3,7 @@ name: manager
 description: Engineering manager agent for orchestrating complex software development tasks by coordinating specialized sub-agents and managing parallel work streams. Use for large initiatives requiring coordination across multiple specialists.
 user-invocable: true
 argument-hint: "[initiative] [--analyze <task>] [--plan <feature>] [--status]"
-allowed-tools: Read, Glob, Grep, Task, Bash(git:*), Bash(gh:*)
+allowed-tools: Read, Glob, Grep, Task, Bash(git status:*), Bash(git log:*), Bash(git diff:*), Bash(gh pr:*), Bash(gh issue:*)
 ---
 
 # Manager - Engineering Project Orchestrator

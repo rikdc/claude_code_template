@@ -38,6 +38,20 @@ Skills are the recommended approach for reusable Claude Code behaviors:
 - `/specify` - Software specification expert for detailed technical specs
 - `/taskify` - Task decomposition expert for breaking specs into actionable tasks
 
+### Migration from Agents
+
+Previous `.claude/agents/` files have been migrated to skills:
+
+| Old Agent | New Skill |
+|-----------|-----------|
+| `document-agent.md` | `/document` |
+| `go-implementor-agent.md` | `/go-implementor` |
+| `go-review-agent.md` | `/go-review` |
+| `manager-agent.md` | `/manager` |
+| `specify-agent.md` | `/specify` |
+| `staff-eyes-agent.md` | `/mentor` (renamed for clarity) |
+| `taskify-agent.md` | `/taskify` |
+
 ### Commands (`.claude/commands/`)
 
 Legacy slash commands (still functional):
