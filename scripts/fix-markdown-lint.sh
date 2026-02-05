@@ -2,6 +2,9 @@
 #
 # fix-markdown-lint.sh - Automatically fix common markdown linting issues
 #
+# Usage: fix-markdown-lint.sh [target_directory]
+#        If no directory provided, uses current directory
+#
 # This script fixes the following markdown issues:
 # - MD031: Add blank lines around fenced code blocks
 # - MD040: Add language tags to code blocks
@@ -141,27 +144,41 @@ fix_markdown_file() {
 
 # Main execution
 main() {
-    local base_dir="/Users/richard.claydon/go/src/github.com/kohofinancial/personal/claude_code_template/.conductor/auckland"
+    # Get the target directory (default to current directory)
+    local base_dir="${1:-.}"
 
-    log_info "Starting markdown lint fixes..."
+    # Resolve to absolute path
+    base_dir="$(cd "$base_dir" && pwd)"
+
+    # Verify .claude directory exists
+    if [[ ! -d "$base_dir/.claude" ]]; then
+        log_error "No .claude directory found in $base_dir"
+        exit 1
+    fi
+
+    log_info "Starting markdown lint fixes in $base_dir..."
 
     # Fix agent files
-    log_info "Fixing agent files..."
-    for file in "$base_dir/.claude/agents"/*.md; do
-        if [[ -f "$file" ]]; then
-            fix_markdown_file "$file"
-        fi
-    done
+    if [[ -d "$base_dir/.claude/agents" ]]; then
+        log_info "Fixing agent files..."
+        for file in "$base_dir/.claude/agents"/*.md; do
+            if [[ -f "$file" ]]; then
+                fix_markdown_file "$file"
+            fi
+        done
+    fi
 
     # Fix command files
-    log_info "Fixing command files..."
-    for file in "$base_dir/.claude/commands"/*.md; do
-        if [[ -f "$file" ]]; then
-            fix_markdown_file "$file"
-        fi
-    done
+    if [[ -d "$base_dir/.claude/commands" ]]; then
+        log_info "Fixing command files..."
+        for file in "$base_dir/.claude/commands"/*.md; do
+            if [[ -f "$file" ]]; then
+                fix_markdown_file "$file"
+            fi
+        done
+    fi
 
-    log_info "✓ All markdown files fixed!"
+    log_info "All markdown files fixed!"
     log_warn "Note: Some issues may require manual review (duplicate headings, heading levels, emphasis as headings)"
 }
 
