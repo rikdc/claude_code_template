@@ -45,17 +45,20 @@ fi
 # Fix emphasis as headings in agents and commands
 # Change **Example 1:** to #### Example 1: (proper heading)
 if [[ -d "$TARGET_DIR/.claude/agents" ]]; then
-    find "$TARGET_DIR/.claude/agents" \
-        -name "*.md" -exec sed_inplace 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' {} \;
+    while IFS= read -r -d '' file; do
+        sed_inplace 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' "$file"
+    done < <(find "$TARGET_DIR/.claude/agents" -name "*.md" -print0)
 fi
 
 if [[ -d "$TARGET_DIR/.claude/commands" ]]; then
-    find "$TARGET_DIR/.claude/commands" \
-        -name "*.md" -exec sed_inplace 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' {} \;
+    while IFS= read -r -d '' file; do
+        sed_inplace 's/^\*\*Example \([0-9]\+\):/#### Example \1:/' "$file"
+    done < <(find "$TARGET_DIR/.claude/commands" -name "*.md" -print0)
 
     # Fix **1. Clarity** style headings to proper subheadings
-    find "$TARGET_DIR/.claude/commands" \
-        -name "*.md" -exec sed_inplace 's/^\*\*\([0-9]\+\)\. \(.*\)\*\*$/#### \1. \2/' {} \;
+    while IFS= read -r -d '' file; do
+        sed_inplace 's/^\*\*\([0-9]\+\)\. \(.*\)\*\*$/#### \1. \2/' "$file"
+    done < <(find "$TARGET_DIR/.claude/commands" -name "*.md" -print0)
 fi
 
 echo "Manual markdown fixes applied to $TARGET_DIR"
