@@ -1,0 +1,23 @@
+{
+  "name": "claude-code-template",
+  "owner": {
+    "name": "Richard Claydon"
+  },
+  "metadata": {
+    "description": "Security hooks, branch protection, and development skills for Claude Code projects",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "security-hooks",
+      "source": {
+        "source": "github",
+        "repo": "rikdc/claude_code_template"
+      },
+      "description": "MCP security scanner and protected branch hooks for Claude Code",
+      "version": "1.0.0",
+      "keywords": ["security", "hooks", "mcp", "branch-protection"],
+      "category": "security"
+    }
+  ]
+}
