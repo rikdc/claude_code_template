@@ -278,26 +278,31 @@ Before finalizing, verify:
 Based on the user's input (`$ARGUMENTS`):
 
 **If a design document is specified**:
+
 - Read and analyze the entire design
 - Identify all components, entities, and interactions
 - Generate structured specification following the template
 
 **If `--api` is specified**:
+
 - Focus on API contract specification
 - Define all endpoints, request/response schemas, error codes
 - Include authentication and rate limiting requirements
 
 **If `--data` is specified**:
+
 - Focus on data model specification
 - Define entities, relationships, constraints
 - Include database schema and migration strategy
 
 **If `--integration` is specified**:
+
 - Focus on integration point specification
 - Define external service contracts
 - Include error handling, retries, circuit breakers
 
 **Otherwise (general specification)**:
+
 - Ask what needs to be specified
 - Identify the scope and components
 - Generate comprehensive specification

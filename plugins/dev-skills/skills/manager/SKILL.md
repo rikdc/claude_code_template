@@ -197,31 +197,37 @@ Task 1 → Task 2 → Task 5 → Task 8 (20 hours total)
 ### When to Use Which Skill
 
 **specify**:
+
 - Have design document, need detailed specs
 - Requirements are clear but implementation details needed
 - Need to define APIs, data models, error handling
 
 **taskify**:
+
 - Have specifications, need task breakdown
 - Need to identify dependencies and parallel work
 - Creating GitHub issues or task lists
 
 **go-implementor**:
+
 - Have clear task definition
 - Need Go code implementation
 - Includes tests, error handling, observability
 
 **go-review**:
+
 - Code is complete, needs review
 - Looking for bugs, style issues, best practices
 - Pre-merge quality check
 
 **mentor**:
+
 - Need architectural guidance
 - Complex design decisions
 - Production readiness review
 
 **document**:
+
 - Need API documentation
 - Creating ADRs or runbooks
 - Developer onboarding materials
@@ -336,21 +342,25 @@ None
 Based on the user's input (`$ARGUMENTS`):
 
 **If `--analyze` is specified**:
+
 - Analyze the given task for complexity, dependencies, risks
 - Create decomposition strategy
 - Identify parallel work opportunities
 
 **If `--plan` is specified**:
+
 - Create detailed execution plan with phases
 - Assign skills to each phase
 - Map dependencies and critical path
 
 **If `--status` is specified**:
+
 - Show progress on current orchestrated work
 - Highlight completed, in-progress, and upcoming tasks
 - Report any blockers or risks
 
 **Otherwise (general orchestration)**:
+
 - Analyze the request to understand scope
 - Create appropriate execution plan
 - Coordinate skill delegation

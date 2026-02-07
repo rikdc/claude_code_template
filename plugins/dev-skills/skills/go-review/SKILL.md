@@ -309,26 +309,31 @@ func (s *Service) Process(ctx context.Context, id string) error {
 Based on the user's input (`$ARGUMENTS`):
 
 **If a file or directory is specified**:
+
 - Read the specified files
 - Analyze code for all issue categories
 - Provide structured review using the template above
 
 **If `--security` is specified**:
+
 - Focus on security vulnerabilities
 - Check for SQL injection, auth issues, secrets exposure
 - Review input validation and sanitization
 
 **If `--performance` is specified**:
+
 - Focus on performance issues
 - Check for N+1 queries, inefficient algorithms
 - Review database indexing and caching
 
 **If `--pr <number>` is specified**:
+
 - Fetch PR diff using git
 - Review all changed files
 - Provide PR-level summary and file-by-file feedback
 
 **Otherwise (review staged changes)**:
+
 - Run `git diff --staged` to get changed files
 - Review all modifications
 - Provide structured feedback

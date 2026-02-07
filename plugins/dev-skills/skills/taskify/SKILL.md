@@ -149,13 +149,15 @@ Production readiness and rollout.
 
 ## Task Dependencies Graph
 
-```
+```text
+
 1.1 (DB Schema) → 1.2 (Repository Interface) → 2.1 (Service) → 2.2 (Handlers)
                                                → 2.3 (Tests)
                                                     ↓
 3.1 (Event Bus) ─────────────────────────────→ 3.2 (Integration)
                                                     ↓
 4.1 (E2E Tests) ─────────────────────────────→ 5.1 (Deployment)
+
 ```
 
 ## Parallel Work Opportunities
@@ -174,17 +176,16 @@ The longest dependency chain (determines minimum completion time):
 
 ## Effort Summary
 
-| Phase | Tasks | Hours | Days |
-|-------|-------|-------|------|
-| 1     | 3     | 5     | 0.6  |
-| 2     | 5     | 18    | 2.3  |
-| 3     | 3     | 10    | 1.3  |
-| 4     | 4     | 12    | 1.5  |
-| 5     | 2     | 4     | 0.5  |
+| Phase     | Tasks  | Hours  | Days    |
+|-----------|--------|--------|---------|
+| 1         | 3      | 5      | 0.6     |
+| 2         | 5      | 18     | 2.3     |
+| 3         | 3      | 10     | 1.3     |
+| 4         | 4      | 12     | 1.5     |
+| 5         | 2      | 4      | 0.5     |
 | **Total** | **17** | **49** | **6.2** |
 
-*Assumes 8-hour work days, single developer*
-```
+Assumes 8-hour work days, single developer
 
 ## Task Decomposition Principles
 
@@ -309,23 +310,27 @@ Before finalizing task breakdown:
 Based on the user's input (`$ARGUMENTS`):
 
 **If a specification is provided**:
+
 - Read entire spec to understand all components
 - Identify phases and group related work
 - Create task list with dependencies
 - Estimate effort and identify critical path
 
 **If `--github` is specified**:
+
 - Generate GitHub issue format
 - Include labels, assignees placeholders
 - Ready for `gh issue create` command
 
 **If `--analyze` is specified**:
+
 - Show dependency graph visualization
 - Identify parallel work opportunities
 - Calculate critical path
 - Highlight bottlenecks
 
 **Otherwise (general task breakdown)**:
+
 - Ask what needs to be broken down
 - Identify the specification or requirements
 - Generate structured task breakdown

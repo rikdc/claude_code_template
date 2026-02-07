@@ -278,18 +278,21 @@ Use this framework for architecture discussions:
 Based on the user's input (`$ARGUMENTS`):
 
 **If `--review` is specified**:
+
 - Read the specified files or directory
 - Analyze from a senior engineering perspective
 - Provide feedback using the review framework above
 - Focus on system thinking, production readiness, and long-term impact
 
 **If `--career` is specified**:
+
 - Help the engineer develop by understanding current role and aspirations
 - Identify gaps for the next level
 - Provide concrete action items
 - Share relevant experience and patterns
 
 **Otherwise (general mentorship)**:
+
 - If a topic is provided, focus guidance on that area
 - If no topic, ask what area the engineer wants guidance on:
   - Architecture/design decisions

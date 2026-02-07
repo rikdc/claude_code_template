@@ -128,6 +128,7 @@ We need to choose a primary data store for our user management and payment proce
 High-level system design and component interactions.
 
 Include:
+
 - Architecture diagrams (ASCII or Mermaid)
 - Component descriptions (technology, responsibility, API, database)
 - Data flow descriptions
@@ -138,6 +139,7 @@ Include:
 ### 4. Developer Onboarding Guide
 
 Help new developers get up to speed with:
+
 - Prerequisites and required tools
 - Setup instructions (clone, install, configure, run)
 - Development workflow
@@ -149,6 +151,7 @@ Help new developers get up to speed with:
 ### 5. Runbook / Operational Documentation
 
 Guide operators through common scenarios:
+
 - Service overview and ownership
 - Health check endpoints and commands
 - Common issues with diagnosis and resolution steps
@@ -192,30 +195,35 @@ Guide operators through common scenarios:
 Based on the user's input (`$ARGUMENTS`):
 
 **If `--api` is specified**:
+
 - Read the service code to understand endpoints
 - Generate OpenAPI 3.0 specification
 - Include request/response examples
 - Document all error codes
 
 **If `--adr` is specified**:
+
 - Gather context about the decision
 - Document options considered
 - Explain the chosen approach and reasoning
 - List consequences (positive, negative, neutral)
 
 **If `--runbook` is specified**:
+
 - Document health checks and monitoring
 - Create troubleshooting guides for common issues
 - Include deployment and rollback procedures
 - Add contact and escalation information
 
 **If `--onboarding` is specified**:
+
 - List prerequisites and setup steps
 - Explain project structure
 - Document key concepts and patterns
 - Provide common task instructions
 
 **Otherwise (general documentation)**:
+
 - Ask what type of documentation is needed
 - Identify the target audience
 - Create appropriate documentation following templates above
