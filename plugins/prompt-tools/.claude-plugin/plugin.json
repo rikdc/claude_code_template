@@ -1,0 +1,12 @@
+{
+  "name": "prompt-tools",
+  "description": "AI prompt generation and review tools for LLM development",
+  "version": "1.0.0",
+  "author": {
+    "name": "Richard Claydon"
+  },
+  "license": "MIT",
+  "category": "ai",
+  "keywords": ["prompts", "ai", "llm", "prompt-engineering"],
+  "commands": ["./commands/"]
+}
