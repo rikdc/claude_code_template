@@ -1,0 +1,12 @@
+{
+  "name": "dev-skills",
+  "description": "Expert development skills for Go, documentation, architecture, and project management",
+  "version": "1.0.0",
+  "author": {
+    "name": "Richard Claydon"
+  },
+  "license": "MIT",
+  "category": "development",
+  "keywords": ["skills", "go", "documentation", "architecture", "mentorship"],
+  "skills": ["./skills/"]
+}
