@@ -1,11 +1,11 @@
 ---
 allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git log:*)
-description: Creates well-formatted commits with conventional commit messages and emoji
+description: Creates well-formatted commits with conventional commit messages
 ---
 
 # Claude Command: Commit
 
-Creates well-formatted commits with conventional commit messages and emoji.
+Creates well-formatted commits with conventional commit messages.
 Runs pre-commit checks and suggests commit splitting when appropriate.
 
 ## Usage
@@ -13,7 +13,7 @@ Runs pre-commit checks and suggests commit splitting when appropriate.
 To create a commit, just type:
 
 ```bash
-/commit [--no-verify] [--no-emoji] [--help]
+/commit [--no-verify] [--help]
 
 ```
 
@@ -23,32 +23,30 @@ This command spawns parallel sub-tasks for efficiency:
 
 1. **Pre-commit checks** (unless `--no-verify`): Runs `make checks` if available.
 2. **Git analysis**: Checks staged files, runs `git diff`, analyzes change patterns
-3. **Commit preparation**: Generates conventional commit messages with appropriate emoji
+3. **Commit preparation**: Generates conventional commit messages. Omit emoji from commit messages.
 
 If no files are staged, automatically stages all modified files.
 If multiple distinct changes are detected, suggests splitting into atomic commits.
 
-## Core Commit Types & Emoji
+## Core Commit Types
 
-- ✨ `feat`: New feature
-- 🐛 `fix`: Bug fix
-- 📝 `docs`: Documentation
-- 💄 `style`: Formatting/style
-- ♻️ `refactor`: Code refactoring
-- ⚡️ `perf`: Performance improvements
-- ✅ `test`: Tests
-- 🔧 `chore`: Tooling, configuration
-- 🚀 `ci`: CI/CD improvements
-- 🚨 `fix`: Fix compiler/linter warnings
-- 🔒️ `fix`: Security fixes
-- 🩹 `fix`: Simple non-critical fixes
-
-*Type `/commit --help` for extended emoji reference*
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Formatting/style
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Tests
+- `chore`: Tooling, configuration
+- `ci`: CI/CD improvements
+- `fix`: Fix compiler/linter warnings
+- `fix`: Security fixes
+- `fix`: Simple non-critical fixes
 
 ## Commit Message Format
 
 ```markdown
-<emoji> <type>: <description>
+<type>: <description>
 [optional body]
 
 ```
@@ -69,22 +67,20 @@ Suggests multiple commits when changes involve:
 
 Good commit messages:
 
-- ✨ feat: add user authentication system
-- 🐛 fix: resolve memory leak in rendering process
-- 📝 docs: update API documentation with new endpoints
-- ♻️ refactor: simplify error handling logic
+- feat: add user authentication system
+- fix: resolve memory leak in rendering process
+- docs: update API documentation with new endpoints
+- refactor: simplify error handling logic
 
 Example split:
 
-- ✨ feat: add new API endpoints
-- 📝 docs: update API documentation
-- ✅ test: add unit tests for new endpoints
+- feat: add new API endpoints
+- docs: update API documentation
+- test: add unit tests for new endpoints
 
 ## Options
 
 - `--no-verify`: Skip pre-commit checks
-- `--no-emoji`: Omit emoji from commit messages
-- `--help`: Show extended emoji reference and examples
 
 ## Notes
 
