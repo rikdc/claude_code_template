@@ -5,9 +5,11 @@ Code quality analysis, review, and cleanup commands.
 ## Commands Included
 
 ### `/dev:check`
+
 Comprehensive code quality analysis and auto-fix with parallel sub-task strategy.
 
 **Features**:
+
 - Static analysis and linting
 - Security vulnerability scanning
 - Code complexity analysis
@@ -15,9 +17,11 @@ Comprehensive code quality analysis and auto-fix with parallel sub-task strategy
 - Parallel execution for speed
 
 ### `/dev:review`
+
 Performs a comprehensive code review of the repository.
 
 **Features**:
+
 - Best practices review
 - Code organization analysis
 - Security review
@@ -25,9 +29,11 @@ Performs a comprehensive code review of the repository.
 - Maintainability assessment
 
 ### `/clean`
+
 Removes redundant and obvious comments from codebase.
 
 **Features**:
+
 - Identifies redundant comments
 - Preserves important documentation
 - Improves code readability
