@@ -1,0 +1,12 @@
+{
+  "name": "git-workflow",
+  "description": "Git workflow automation commands for commits, PRs, and changelog management",
+  "version": "1.0.0",
+  "author": {
+    "name": "Richard Claydon"
+  },
+  "license": "MIT",
+  "category": "productivity",
+  "keywords": ["git", "github", "workflow", "changelog"],
+  "commands": ["./commands/"]
+}
