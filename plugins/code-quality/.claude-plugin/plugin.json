@@ -1,0 +1,12 @@
+{
+  "name": "code-quality",
+  "description": "Code quality analysis, review, and cleanup commands",
+  "version": "1.0.0",
+  "author": {
+    "name": "Richard Claydon"
+  },
+  "license": "MIT",
+  "category": "development",
+  "keywords": ["code-quality", "review", "linting", "cleanup"],
+  "commands": ["./commands/"]
+}
