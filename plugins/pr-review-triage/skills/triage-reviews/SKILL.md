@@ -22,7 +22,7 @@ You are a **PR Review Triage Agent** that systematically processes code review c
 
 ## Workflow Overview
 
-```
+```text
 Fetch PR comments → Classify each → Evaluate → Present summary → Act on approval
 ```
 
@@ -38,17 +38,20 @@ Determine the target PR:
 
 - If a PR URL or number is provided via `$ARGUMENTS`, use that
 - Otherwise, detect the current branch and find its open PR:
+
   ```bash
   gh pr view --json number,url,title,headRefName
   ```
 
 Fetch all review comments:
+
 ```bash
 gh api repos/{owner}/{repo}/pulls/{number}/reviews --jq '.[] | {id, user: .user.login, state: .state, body: .body}'
 gh api repos/{owner}/{repo}/pulls/{number}/comments --jq '.[] | {id, path: .path, line: .line, body: .body, user: .user.login, in_reply_to_id: .in_reply_to_id, html_url: .html_url}'
 ```
 
 Also fetch the PR diff for context:
+
 ```bash
 gh pr diff {number}
 ```
@@ -91,6 +94,7 @@ For each classified comment, decide: **accept**, **reject**, or **acknowledge**.
 ### Decision Framework
 
 **Accept** when:
+
 - The comment identifies a real bug or security issue (always accept critical)
 - The suggestion improves code and aligns with project conventions
 - The performance improvement is measurable or the pattern is known-bad
@@ -98,6 +102,7 @@ For each classified comment, decide: **accept**, **reject**, or **acknowledge**.
 - The design feedback addresses a real coupling or abstraction problem
 
 **Reject** when:
+
 - The suggestion contradicts project conventions (cite the convention)
 - The style preference is purely subjective and not in the linter config
 - The change would introduce unnecessary complexity
@@ -105,6 +110,7 @@ For each classified comment, decide: **accept**, **reject**, or **acknowledge**.
 - The nit has no practical impact on readability or correctness
 
 **Acknowledge** when:
+
 - The comment is praise → thank the reviewer
 - The comment is a question → provide the answer
 - The comment is valid but out of scope → acknowledge and note for future
@@ -168,6 +174,7 @@ Upon user approval, execute all actions:
 ### For Accepted Comments
 
 1. **React** with a thumbsup emoji:
+
    ```bash
    gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions -f content='+1'
    ```
@@ -185,6 +192,7 @@ Upon user approval, execute all actions:
 ### For Rejected Comments
 
 1. **Post a reply** explaining the rejection:
+
    ```bash
    gh api repos/{owner}/{repo}/pulls/{pr_number}/comments -f body="..." -F in_reply_to={comment_id}
    ```
@@ -198,11 +206,12 @@ Upon user approval, execute all actions:
    Example tone:
    > Thanks for the suggestion. In this project we follow [convention X] per our CLAUDE.md, so this naming is intentional. Happy to discuss if you see a reason to diverge here.
 
-2. **Resolve the thread** (unless `--no-resolve` is specified):
+2. **Resolve the thread** (unless `--no-resolve` is specified).
+   Rejected comments are fully handled once a reply is posted — leaving them open creates noise.
+
    ```bash
    gh api graphql -f query='mutation { minimizeComment(input: {subjectId: "{node_id}", classifier: RESOLVED}) { minimizedComment { isMinimized } } }'
    ```
-   Rejected comments are fully handled once a reply is posted — leaving them open creates noise.
 
 ### For Acknowledged Comments (Praise)
 
@@ -220,6 +229,7 @@ Upon user approval, execute all actions:
 ## Idempotency
 
 Before acting on any comment:
+
 - Check if a thumbsup reaction already exists from the bot/user
 - Check if a reply already exists in the thread
 - Check if a beads issue already references this comment URL
@@ -269,23 +279,29 @@ batch-limit: 50
 Based on the user's input (`$ARGUMENTS`):
 
 **If a PR URL or number is provided**:
+
 - Target that specific PR
 
 **If no PR is specified**:
+
 - Detect the current branch's PR via `gh pr view`
 
 **If `--dry-run` is specified**:
+
 - Perform Steps 1-4 only (fetch, classify, evaluate, present)
 - Do not take any GitHub actions or create beads issues
 
 **If `--auto-approve <category>` is specified**:
+
 - Skip user confirmation for comments in that category
 - Still present the summary but act immediately on auto-approved items
 
 **If `--no-resolve` is specified**:
+
 - Skip resolving comment threads (by default, rejected/acknowledged threads are resolved after posting replies)
 
 **Default flow**:
+
 1. Fetch all review comments
 2. Classify and evaluate each
 3. Present grouped summary
