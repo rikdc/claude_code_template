@@ -18,6 +18,17 @@
       "version": "1.0.0",
       "keywords": ["security", "hooks", "mcp", "branch-protection"],
       "category": "security"
+    },
+    {
+      "name": "pr-review-triage",
+      "source": {
+        "source": "github",
+        "repo": "rikdc/claude_code_template"
+      },
+      "description": "Triage PR review comments — classify, accept/reject, and track follow-up work",
+      "version": "1.0.0",
+      "keywords": ["pr-review", "triage", "code-review", "github", "workflow"],
+      "category": "workflow"
     }
   ]
 }
