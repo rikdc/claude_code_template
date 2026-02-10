@@ -1,0 +1,13 @@
+{
+  "name": "pr-review-triage",
+  "description": "Triage PR review comments — classify, accept/reject, and track follow-up work",
+  "version": "1.0.0",
+  "author": {
+    "name": "Richard Claydon"
+  },
+  "license": "MIT",
+  "category": "workflow",
+  "keywords": ["pr-review", "triage", "code-review", "github", "workflow"],
+  "commands": ["./commands/"],
+  "skills": ["./skills/"]
+}
