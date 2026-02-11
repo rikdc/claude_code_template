@@ -6,7 +6,6 @@
     "name": "Richard Claydon"
   },
   "license": "MIT",
-  "category": "ai",
   "keywords": ["prompts", "ai", "llm", "prompt-engineering"],
   "commands": ["./commands/"]
 }
