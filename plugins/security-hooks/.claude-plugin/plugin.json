@@ -6,7 +6,6 @@
     "name": "Richard Claydon"
   },
   "license": "MIT",
-  "category": "security",
   "keywords": ["security", "hooks", "mcp", "branch-protection"],
   "hooks": "./hooks.json"
 }
