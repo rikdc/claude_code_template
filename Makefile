@@ -113,36 +113,6 @@ check-tools: ## Check for required and optional tools
 		fi; \
 	done
 
-.PHONY: sync-plugins
-sync-plugins: ## Sync files from .claude/ to plugins/ directories
-	@echo -e "$(BLUE)🔄 Syncing files to plugins/...$(NC)"
-	@echo
-	@echo "Syncing skills to plugins/dev-skills/..."
-	@mkdir -p plugins/dev-skills/skills
-	@cp -r .claude/skills/* plugins/dev-skills/skills/
-	@echo
-	@echo "Syncing commands to plugin directories..."
-	@mkdir -p plugins/git-workflow/commands
-	@cp .claude/commands/gh/commit.md plugins/git-workflow/commands/commit.md
-	@cp .claude/commands/gh/pr.md plugins/git-workflow/commands/pr.md
-	@cp .claude/commands/changelog.md plugins/git-workflow/commands/changelog.md
-	@mkdir -p plugins/pm-tools/commands
-	@cp .claude/commands/pm/*.md plugins/pm-tools/commands/
-	@mkdir -p plugins/code-quality/commands
-	@cp .claude/commands/dev/*.md plugins/code-quality/commands/
-	@cp .claude/commands/clean.md plugins/code-quality/commands/clean.md
-	@mkdir -p plugins/prompt-tools/commands
-	@cp .claude/commands/prompt-reviewer.md plugins/prompt-tools/commands/prompt-reviewer.md
-	@cp .claude/commands/promptify.md plugins/prompt-tools/commands/promptify.md
-	@echo
-	@echo "Syncing hooks to plugins/security-hooks/..."
-	@mkdir -p plugins/security-hooks/hooks
-	@cp .claude/hooks/*.sh plugins/security-hooks/hooks/
-	@cp .claude/security-patterns.conf plugins/security-hooks/
-	@chmod +x plugins/security-hooks/hooks/*.sh
-	@echo
-	@echo -e "$(GREEN)✅ Plugin sync complete!$(NC)"
-
 ##@ Information
 
 .PHONY: status

@@ -22,16 +22,6 @@ The repository maintains two parallel directory structures:
    - Easier for development and testing
    - Single source of truth for code
 
-### Synchronization
-
-Changes made to `.claude/` should be synced to `plugins/` using:
-
-```bash
-make sync-plugins
-```
-
-This ensures the marketplace distribution stays up-to-date with development changes.
-
 ## Available Plugins
 
 ### 1. security-hooks
@@ -274,10 +264,9 @@ The top-level `.claude-plugin/marketplace.json` registers all plugins:
 
 ### For Contributors
 
-1. **Make changes** in `.claude/` directory (skills, commands, hooks)
-2. **Test locally** using the `.claude/` structure
-3. **Sync to plugins** using `make sync-plugins`
-4. **Commit both** `.claude/` and `plugins/` changes
+1. **Make changes** directly in `plugins/` directories
+2. **Test locally** using the test suite
+3. **Commit** `plugins/` changes
 
 ### For Users
 

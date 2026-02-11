@@ -24,7 +24,6 @@ The repository is organized as a **marketplace with 6 installable plugins**:
 - **`plugins/`**: Marketplace plugin distribution (for users to install individual plugins)
 - **`.claude/`**: Local development structure (for contributors working on the codebase)
 
-Use `make sync-plugins` to sync changes from `.claude/` to `plugins/` for marketplace distribution.
 
 ## Key Commands
 
@@ -37,7 +36,6 @@ make install        # Install hooks (make scanner script executable)
 make clean          # Remove test artifacts and logs
 make status         # Show current status and configuration
 make check-tools    # Check for required and optional security tools
-make sync-plugins   # Sync .claude/ changes to plugins/ for distribution
 make help           # Display all available commands
 ```
 

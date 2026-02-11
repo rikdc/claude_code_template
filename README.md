@@ -101,7 +101,6 @@ make test           # Run complete test suite
 make lint           # Run ShellCheck and markdownlint
 make check-tools    # Verify required and optional tools
 make status         # Show configuration and tool status
-make sync-plugins   # Sync .claude/ changes to plugins/ for distribution
 ```
 
 ## Project Structure
@@ -129,7 +128,7 @@ tests/                           # Test suite
 Makefile                         # Command interface
 ```
 
-**Note**: The `plugins/` directory is for marketplace distribution. The `.claude/` directory is used for local development. Use `make sync-plugins` to sync changes from `.claude/` to `plugins/`.
+**Note**: The `plugins/` directory is the canonical location for all plugin content.
 
 ## Attribution
 

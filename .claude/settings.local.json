@@ -8,9 +8,6 @@
       "Bash(git checkout:*)",
       "WebSearch",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(for plugin in security-hooks dev-skills git-workflow pm-tools code-quality prompt-tools)",
-      "Bash(do mkdir -p \"plugins/$plugin/.claude-plugin\")",
-      "Bash(done)",
       "Bash(find:*)"
     ],
     "deny": []
