@@ -5,15 +5,13 @@
   },
   "metadata": {
     "description": "Security hooks, branch protection, and development skills for Claude Code projects",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "security-hooks",
-      "source": {
-        "source": "github",
-        "repo": "rikdc/claude_code_template"
-      },
+      "source": "./plugins/security-hooks",
       "description": "MCP security scanner and protected branch hooks for Claude Code",
       "version": "1.0.0",
       "keywords": ["security", "hooks", "mcp", "branch-protection"],
@@ -21,10 +19,7 @@
     },
     {
       "name": "pr-review-triage",
-      "source": {
-        "source": "github",
-        "repo": "rikdc/claude_code_template"
-      },
+      "source": "./plugins/pr-review-triage",
       "description": "Triage PR review comments — classify, accept/reject, and track follow-up work",
       "version": "1.0.0",
       "keywords": ["pr-review", "triage", "code-review", "github", "workflow"],
