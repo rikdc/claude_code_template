@@ -5,7 +5,10 @@
       "Bash(go run:*)",
       "Bash(go build:*)",
       "Bash(*prompt-manager*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "WebSearch",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(find:*)"
     ],
     "deny": []
   },
