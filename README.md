@@ -8,6 +8,48 @@ Production-ready Claude Code project template with security hooks, workflow auto
 - **Slash Commands**: Workflow automation for code quality, documentation, and project management
 - **Specialized Agents**: Expert agents for Go development, code review, and documentation
 - **Testing Infrastructure**: Comprehensive test suite with ~2000 lines of test coverage
+- **Marketplace Plugins**: Modular plugin architecture with 6 installable plugins
+
+## Installation
+
+### Install Individual Plugins
+
+The repository is organized as a marketplace with 6 independent plugins:
+
+```bash
+# Install specific plugins
+claude code plugins install security-hooks
+claude code plugins install dev-skills
+claude code plugins install git-workflow
+claude code plugins install pm-tools
+claude code plugins install code-quality
+claude code plugins install prompt-tools
+
+# Or install from GitHub
+claude code plugins install github:rikdc/claude_code_template/security-hooks
+```
+
+### Clone for Local Development
+
+Clone the entire repository for local development with all components:
+
+```bash
+git clone https://github.com/rikdc/claude_code_template.git
+cd claude_code_template
+make install
+make test
+```
+
+## Available Plugins
+
+| Plugin | Category | Description |
+|--------|----------|-------------|
+| [security-hooks](plugins/security-hooks/) | Security | MCP security scanner and protected branch hooks |
+| [dev-skills](plugins/dev-skills/) | Development | Expert skills for Go, documentation, and architecture |
+| [git-workflow](plugins/git-workflow/) | Productivity | Git automation for commits, PRs, and changelog |
+| [pm-tools](plugins/pm-tools/) | Productivity | Project management commands for PRDs and tasks |
+| [code-quality](plugins/code-quality/) | Development | Code quality analysis, review, and cleanup |
+| [prompt-tools](plugins/prompt-tools/) | AI | AI prompt generation and review tools |
 
 ## Security Hooks
 
@@ -59,25 +101,35 @@ make test           # Run complete test suite
 make lint           # Run ShellCheck and markdownlint
 make check-tools    # Verify required and optional tools
 make status         # Show configuration and tool status
+make sync-plugins   # Sync .claude/ changes to plugins/ for distribution
 ```
 
 ## Project Structure
 
 ```text
-.claude/
-├── agents/         # Specialized agent definitions
-├── commands/       # Slash command implementations
-│   ├── dev/       # Development workflow commands
-│   ├── gh/        # GitHub automation commands
-│   └── pm/        # Project management commands
-├── hooks/         # Security and workflow hooks
-└── settings.json  # Hook configuration
+plugins/                          # Marketplace plugin distribution
+├── security-hooks/              # MCP security and branch protection
+├── dev-skills/                  # Development skills (Go, docs, etc.)
+├── git-workflow/                # Git automation commands
+├── pm-tools/                    # Project management commands
+├── code-quality/                # Code review and cleanup
+└── prompt-tools/                # AI prompt generation
 
-docs/              # Documentation
-tests/             # Test suite
-scripts/           # Utility scripts
-Makefile           # Command interface
+.claude/                         # Local development structure
+├── skills/                      # Specialized skills
+├── commands/                    # Slash command implementations
+│   ├── dev/                    # Development workflow commands
+│   ├── gh/                     # GitHub automation commands
+│   └── pm/                     # Project management commands
+├── hooks/                       # Security and workflow hooks
+└── settings.json                # Hook configuration
+
+docs/                            # Documentation
+tests/                           # Test suite
+Makefile                         # Command interface
 ```
+
+**Note**: The `plugins/` directory is for marketplace distribution. The `.claude/` directory is used for local development. Use `make sync-plugins` to sync changes from `.claude/` to `plugins/`.
 
 ## Attribution
 

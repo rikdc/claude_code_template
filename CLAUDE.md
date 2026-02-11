@@ -8,6 +8,24 @@ This is a Claude Code Template project that provides security hooks and testing 
 1. Security scanning to prevent sensitive data from being sent to external MCP services
 2. Branch protection to enforce PR-based workflows by preventing direct edits to protected branches (main, master, production, release)
 
+## Marketplace Structure
+
+The repository is organized as a **marketplace with 6 installable plugins**:
+
+- **security-hooks**: MCP security scanner and protected branch hooks
+- **dev-skills**: Expert skills for Go, documentation, and architecture
+- **git-workflow**: Git automation for commits, PRs, and changelog
+- **pm-tools**: Project management commands for PRDs and tasks
+- **code-quality**: Code quality analysis, review, and cleanup
+- **prompt-tools**: AI prompt generation and review tools
+
+### Directory Structure
+
+- **`plugins/`**: Marketplace plugin distribution (for users to install individual plugins)
+- **`.claude/`**: Local development structure (for contributors working on the codebase)
+
+Use `make sync-plugins` to sync changes from `.claude/` to `plugins/` for marketplace distribution.
+
 ## Key Commands
 
 All project operations are managed through the Makefile:
@@ -19,6 +37,7 @@ make install        # Install hooks (make scanner script executable)
 make clean          # Remove test artifacts and logs
 make status         # Show current status and configuration
 make check-tools    # Check for required and optional security tools
+make sync-plugins   # Sync .claude/ changes to plugins/ for distribution
 make help           # Display all available commands
 ```
 
