@@ -5,18 +5,19 @@
   },
   "metadata": {
     "description": "Security hooks, branch protection, and development skills for Claude Code projects",
-    "version": "1.0.0",
-    "pluginRoot": "./plugins"
+    "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "security-hooks",
-      "source": "./plugins/security-hooks",
+      "source": {
+        "source": "github",
+        "repo": "rikdc/claude_code_template"
+      },
       "description": "MCP security scanner and protected branch hooks for Claude Code",
       "version": "1.0.0",
       "keywords": ["security", "hooks", "mcp", "branch-protection"],
       "category": "security"
-<<<<<<< Updated upstream
     },
     {
       "name": "pr-review-triage",
@@ -28,49 +29,6 @@
       "version": "1.0.0",
       "keywords": ["pr-review", "triage", "code-review", "github", "workflow"],
       "category": "workflow"
-||||||| Stash base
-=======
-    },
-    {
-      "name": "dev-skills",
-      "source": "./plugins/dev-skills",
-      "description": "Expert development skills for Go, documentation, architecture, and project management",
-      "version": "1.0.0",
-      "keywords": ["skills", "go", "documentation", "architecture", "mentorship"],
-      "category": "development"
-    },
-    {
-      "name": "git-workflow",
-      "source": "./plugins/git-workflow",
-      "description": "Git workflow automation commands for commits, PRs, and changelog management",
-      "version": "1.0.0",
-      "keywords": ["git", "github", "workflow", "changelog"],
-      "category": "productivity"
-    },
-    {
-      "name": "pm-tools",
-      "source": "./plugins/pm-tools",
-      "description": "Project management commands for PRDs, task generation, and task tracking",
-      "version": "1.0.0",
-      "keywords": ["project-management", "prd", "tasks", "planning"],
-      "category": "productivity"
-    },
-    {
-      "name": "code-quality",
-      "source": "./plugins/code-quality",
-      "description": "Code quality analysis, review, and cleanup commands",
-      "version": "1.0.0",
-      "keywords": ["code-quality", "review", "linting", "cleanup"],
-      "category": "development"
-    },
-    {
-      "name": "prompt-tools",
-      "source": "./plugins/prompt-tools",
-      "description": "AI prompt generation and review tools for LLM development",
-      "version": "1.0.0",
-      "keywords": ["prompts", "ai", "llm", "prompt-engineering"],
-      "category": "ai"
->>>>>>> Stashed changes
     }
   ]
 }
