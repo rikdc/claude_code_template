@@ -6,7 +6,6 @@
     "name": "Richard Claydon"
   },
   "license": "MIT",
-  "category": "productivity",
   "keywords": ["project-management", "prd", "tasks", "planning"],
   "commands": ["./commands/"]
 }
