@@ -16,6 +16,12 @@ Senior Go code reviewer for comprehensive code reviews focused on correctness, s
 
 **Use when**: Reviewing Go code for bugs, best practices, and production readiness.
 
+### `/golang-expert`
+
+Senior Go engineer and technical advisor covering all aspects of Go development — idiomatic patterns, concurrency, error handling, project structure, performance optimisation, observability, and testing. Operates in implement, review, debug, advise, or optimise mode depending on the task.
+
+**Use when**: Any Go question, design decision, debugging session, performance investigation, or implementation task.
+
 ### `/document`
 
 Technical documentation expert for creating clear, comprehensive documentation including API docs (OpenAPI), ADRs, system architecture docs, developer guides, and runbooks.
@@ -83,6 +89,12 @@ claude code plugins install github:rikdc/claude_code_template/dev-skills
 
 # Orchestrate complex project
 /manager Implement user authentication with tests and docs
+
+# Get comprehensive Go expert guidance
+/golang-expert How should I structure error handling across my service layers?
+
+# Debug a Go concurrency issue
+/golang-expert Why is my worker pool leaking goroutines?
 ```
 
 ## License

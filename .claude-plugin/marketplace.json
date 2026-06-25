@@ -24,6 +24,14 @@
       "version": "1.0.0",
       "keywords": ["pr-review", "triage", "code-review", "github", "workflow"],
       "category": "workflow"
+    },
+    {
+      "name": "dev-skills",
+      "source": "./plugins/dev-skills",
+      "description": "Expert development skills for Go, documentation, architecture, and project management",
+      "version": "1.0.0",
+      "keywords": ["skills", "go", "documentation", "architecture", "mentorship"],
+      "category": "skills"
     }
   ]
 }
