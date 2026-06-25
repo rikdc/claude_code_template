@@ -40,7 +40,7 @@ Load these on demand — read only the file(s) relevant to the current task:
 Every piece of Go you produce or review must satisfy these:
 
 1. **All errors handled** — no `_` discard without an explicit reason in a comment
-2. **Errors wrapped with context** — `fmt.Errorf("doing X: %w", err)`, lowercase, no trailing punctuation
+2. **Errors wrapped with context** — `fmt.Errorf("doing X: %w", err)`, lowercase, no trailing punctuation (see [Error handling](#error-handling-wrap-dont-swallow))
 3. **Context propagated** — every blocking call takes `context.Context` as its first parameter
 4. **Goroutines have bounded lifetimes** — always clear when they exit and how
 5. **Interfaces defined at the consumer** — small, focused, discovered not invented
@@ -60,6 +60,8 @@ type Store interface {
 ```
 
 ### Error handling: wrap, don't swallow
+
+*Authoritative rule: standard #2 above — lowercase message, no trailing punctuation, always `%w`.*
 
 ```go
 var ErrNotFound = errors.New("not found")
@@ -81,7 +83,6 @@ func (r *repo) GetUser(ctx context.Context, id string) (*User, error) {
 ```go
 g, ctx := errgroup.WithContext(ctx)
 for _, item := range items {
-    item := item // capture loop variable (pre-Go 1.22)
     g.Go(func() error {
         return process(ctx, item)
     })
@@ -90,6 +91,8 @@ if err := g.Wait(); err != nil {
     return fmt.Errorf("processing batch: %w", err)
 }
 ```
+
+> **Pre-Go 1.22 (old pattern):** Loop variables were shared across iterations. Add `item := item` inside the loop body before the goroutine launch to capture the value. Go 1.22+ fixed this; the extra line is unnecessary in modern code.
 
 ### Constructors: accept interfaces, return concrete or interface
 
@@ -105,18 +108,15 @@ func NewUserService(store Store, log *slog.Logger) *UserService {
 ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 defer stop()
 
-srv := &http.Server{Addr: ":8080", Handler: mux}
-go func() {
-    if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-        log.Error("server error", "err", err)
-    }
-}()
+// start server / workers ...
 
 <-ctx.Done()
 shutCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 defer cancel()
-srv.Shutdown(shutCtx)
+srv.Shutdown(shutCtx) // or g.Wait() if using errgroup
 ```
+
+*Full wiring (server launch, errgroup fan-out, drain) lives in `references/concurrency.md`.*
 
 ## Implementation workflow
 
