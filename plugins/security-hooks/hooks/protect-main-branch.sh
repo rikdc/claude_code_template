@@ -2,42 +2,61 @@
 
 set -euo pipefail
 
-LOG_FILE="${WORKSPACE:-.}/.claude/protect-main-branch.log"
+LOG_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}/.claude"
+LOG_FILE="$LOG_DIR/protect-main-branch.log"
 
-log_debug() {
-    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] DEBUG: $*" >> "$LOG_FILE"
+log() {
+    local level="$1"
+    shift
+    [[ -d "$LOG_DIR" ]] || return 0
+    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] $level: $*" >> "$LOG_FILE" 2>/dev/null || true
 }
 
-log_info() {
-    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] INFO: $*" >> "$LOG_FILE"
+log_debug() { log DEBUG "$@"; }
+log_info()  { log INFO "$@"; }
+log_warn()  { log WARN "$@"; }
+log_error() { log ERROR "$@"; }
+
+# PreToolUse hooks always exit 0. A deny is expressed through
+# hookSpecificOutput.permissionDecision on stdout, not an exit code.
+allow() {
+    exit 0
 }
 
-log_warn() {
-    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] WARN: $*" >> "$LOG_FILE"
-}
-
-log_error() {
-    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] ERROR: $*" >> "$LOG_FILE"
+deny() {
+    local reason="$1"
+    jq -n --arg reason "$reason" '{
+      hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: "deny",
+        permissionDecisionReason: $reason
+      }
+    }'
+    exit 0
 }
 
 log_debug "Hook script started"
 log_debug "Working directory: $(pwd)"
 
 STDIN_CONTENT=$(cat)
-log_debug "Received stdin: $STDIN_CONTENT"
 
-TOOL_NAME=$(echo "$STDIN_CONTENT" | jq -r '.tool // empty')
+TOOL_NAME=$(echo "$STDIN_CONTENT" | jq -r '.tool_name // empty')
 log_debug "Tool name: $TOOL_NAME"
 
 if [[ -z "$TOOL_NAME" ]]; then
     log_error "No tool name found in stdin"
-    exit 0
+    allow
 fi
 
 PROTECTED_TOOLS_PATTERN="^(Edit|Write|Bash|Task)$"
 if [[ ! "$TOOL_NAME" =~ $PROTECTED_TOOLS_PATTERN ]]; then
     log_debug "Tool '$TOOL_NAME' is not a protected tool, skipping"
-    exit 0
+    allow
+fi
+
+if [[ -n "${ALLOW_PROTECTED_BRANCH_EDIT:-}" ]]; then
+    log_warn "ALLOW_PROTECTED_BRANCH_EDIT set, bypassing protection for '$TOOL_NAME'"
+    allow
 fi
 
 PROTECTED_BRANCHES=("main" "master" "production" "release")
@@ -53,24 +72,17 @@ fi
 
 if [[ -z "$CURRENT_BRANCH" ]]; then
     log_warn "Could not determine current branch"
-    exit 0
+    allow
 fi
 
-is_protected_branch() {
-    local branch="$1"
-    if [[ "$branch" =~ $PROTECTED_PATTERN ]]; then
-        return 0
-    fi
-    return 1
-}
+if [[ ! "$CURRENT_BRANCH" =~ $PROTECTED_PATTERN ]]; then
+    log_info "Branch '$CURRENT_BRANCH' is not protected, allowing tool execution"
+    allow
+fi
 
-if is_protected_branch "$CURRENT_BRANCH"; then
-    log_error "PROTECTED BRANCH VIOLATION: Attempt to use tool '$TOOL_NAME' on protected branch '$CURRENT_BRANCH'"
+log_error "PROTECTED BRANCH VIOLATION: Attempt to use tool '$TOOL_NAME' on protected branch '$CURRENT_BRANCH'"
 
-    cat <<EOF
-{
-  "blocked": true,
-  "reason": "Direct edits to protected branch '$CURRENT_BRANCH' are not allowed.
+deny "Direct edits to protected branch '$CURRENT_BRANCH' are not allowed.
 
 Protected branches enforce PR-based workflows to ensure:
 - Code review and quality standards
@@ -93,10 +105,3 @@ For emergency changes, use the override environment variable:
 ALLOW_PROTECTED_BRANCH_EDIT=1
 
 This hook ensures repository safety and collaboration best practices."
-}
-EOF
-    exit 1
-fi
-
-log_info "Branch '$CURRENT_BRANCH' is not protected, allowing tool execution"
-exit 0

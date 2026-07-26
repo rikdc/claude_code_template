@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-SCANNER="./.claude/hooks/mcp-security-scanner.sh"
+SCANNER="./plugins/security-hooks/hooks/mcp-security-scanner.sh"
 PASSED=0
 FAILED=0
 
