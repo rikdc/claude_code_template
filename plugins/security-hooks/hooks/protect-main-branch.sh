@@ -224,6 +224,9 @@ strip_wrappers() {
                     TOKENS=("${TOKENS[@]:1}")
                 done
                 ;;
+            *)
+                # Not a wrapper: TOKENS[0] is the real command.
+                ;;
         esac
     done
 }
@@ -237,6 +240,9 @@ git_subcommand_always_writes() {
     case "$1" in
         commit|push|merge|rebase|cherry-pick|revert|am|filter-branch|update-ref|fast-import)
             return 0
+            ;;
+        *)
+            # Read-only or index-only subcommand: status, diff, log, add, ...
             ;;
     esac
     return 1
@@ -257,6 +263,9 @@ git_reset_writes() {
                 # Path-limited unstage: git reset -- file
                 return 1
                 ;;
+            *)
+                # Keep scanning the remaining arguments.
+                ;;
         esac
     done
     # A bare commit-ish argument (git reset HEAD~1) moves the branch pointer.
@@ -275,6 +284,9 @@ git_branch_writes() {
         case "$arg" in
             -D|-d|--delete|-f|--force|-M|-m|--move|-C|--copy|--edit-description)
                 return 0
+                ;;
+            *)
+                # Listing or plain creation: harmless.
                 ;;
         esac
     done
@@ -301,6 +313,9 @@ git_checkout_writes() {
             --)
                 # Path restore: git checkout -- file. Does not move HEAD.
                 return 1
+                ;;
+            *)
+                # Keep scanning the remaining arguments.
                 ;;
         esac
     done
@@ -368,6 +383,9 @@ inspect_git() {
                 echo "git $subcommand moves HEAD off the protected branch"
                 return 0
             fi
+            ;;
+        *)
+            # Unrecognised subcommand: fail open, consistent with the parser.
             ;;
     esac
 
