@@ -69,11 +69,6 @@ This hook ensures repository safety and collaboration best practices."
 
 # ---------------------------------------------------------------------------
 # Shell parsing helpers
-#
-# The whole point of this hook's rewrite: decisions are made on parsed argv,
-# never on substring matches against the raw command string. A command like
-# "curl https://host/main | grep push" contains every dangerous-looking token
-# you can think of and must still be allowed through.
 # ---------------------------------------------------------------------------
 
 # Split a command string into pipeline/list segments on unquoted | ; & and
@@ -264,7 +259,6 @@ git_reset_writes() {
                 return 1
                 ;;
             *)
-                # Keep scanning the remaining arguments.
                 ;;
         esac
     done
@@ -315,7 +309,6 @@ git_checkout_writes() {
                 return 1
                 ;;
             *)
-                # Keep scanning the remaining arguments.
                 ;;
         esac
     done
@@ -402,7 +395,6 @@ inspect_git_dir_write() {
     local cmd
     cmd="$(basename -- "${args[0]:-}")"
 
-    # Redirection into .git/ regardless of the command driving it.
     if [[ "$raw" =~ \>\>?[[:space:]]*[^[:space:]]*\.git/ ]]; then
         echo "shell redirection writes under .git/"
         return 0
@@ -471,7 +463,6 @@ inspect_segment() {
     return 1
 }
 
-# Analyse a full command string across all its segments.
 inspect_command() {
     local command="$1"
     local depth="${2:-0}"
@@ -553,8 +544,7 @@ if [[ "$TOOL_NAME" == "Bash" ]]; then
 
     log_debug "Inspecting command: $COMMAND"
 
-    # Fail OPEN on anything unparseable. A blanket deny on commands the parser
-    # cannot understand is the exact failure mode this rewrite exists to fix.
+    # Fail open: anything the parser cannot read is allowed, not denied.
     if ! REASON="$(inspect_command "$COMMAND" 2>/dev/null)"; then
         log_info "Command is read-only or non-git, allowing: $COMMAND"
         allow
