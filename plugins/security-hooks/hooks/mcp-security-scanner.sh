@@ -107,8 +107,9 @@ scan_with_patterns() {
         [[ -z "$pattern_name" ]] && continue
         [[ -z "$pattern_regex" ]] && continue
 
-        # Use case-insensitive grep with basic patterns (macOS compatible)
-        if echo "$content" | grep -qi "$pattern_regex" 2>/dev/null; then
+        # -e is required: patterns such as the private key header begin with
+        # dashes, which grep would otherwise parse as command-line options.
+        if echo "$content" | grep -qi -e "$pattern_regex" 2>/dev/null; then
             log "Pattern match found: $pattern_name"
             violations+=("$pattern_name")
         fi

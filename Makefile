@@ -11,14 +11,16 @@ PROJECT_ROOT := $(shell pwd)
 TESTS_DIR := $(PROJECT_ROOT)/tests
 SCRIPTS_DIR := $(PROJECT_ROOT)/scripts
 CLAUDE_DIR := $(PROJECT_ROOT)/.claude
-HOOKS_DIR := $(CLAUDE_DIR)/hooks
+PLUGIN_DIR := $(PROJECT_ROOT)/plugins/security-hooks
+HOOKS_DIR := $(PLUGIN_DIR)/hooks
 
 # Scripts
 SCANNER_SCRIPT := $(HOOKS_DIR)/mcp-security-scanner.sh
 PROTECT_BRANCH_SCRIPT := $(HOOKS_DIR)/protect-main-branch.sh
+MANIFEST_FILE := $(PLUGIN_DIR)/.claude-plugin/plugin.json
 TEST_SCRIPT := $(TESTS_DIR)/test-scanner.sh
 TEST_PROTECT_BRANCH_SCRIPT := $(TESTS_DIR)/test-protect-main-branch.sh
-INSTALL_SCRIPT := $(SCRIPTS_DIR)/install-hooks.sh
+VALIDATE_SCRIPT := $(SCRIPTS_DIR)/validate-config.sh
 
 # Colors for output
 BLUE := \033[0;34m
@@ -39,6 +41,10 @@ test: ## Run complete test suite
 	@echo
 	@echo -e "$(BLUE)🧪 Running protected branch hook tests...$(NC)"
 	@$(TEST_PROTECT_BRANCH_SCRIPT)
+
+.PHONY: validate
+validate: ## Validate plugin manifest, hook scripts, and dependencies
+	@$(VALIDATE_SCRIPT)
 
 ##@ Quality Assurance
 
@@ -77,6 +83,7 @@ install: ## Install hooks to current project
 clean: ## Remove test artifacts and logs
 	@echo -e "$(BLUE)🧹 Cleaning up test artifacts...$(NC)"
 	@find "$(CLAUDE_DIR)" -name "*.log" -type f -delete 2>/dev/null || true
+	@find "$(PLUGIN_DIR)" -name "*.log" -type f -delete 2>/dev/null || true
 	@find "$(TESTS_DIR)" -name "*.log" -type f -delete 2>/dev/null || true
 	@echo -e "$(GREEN)✅ Cleanup complete$(NC)"
 
@@ -121,13 +128,13 @@ status: ## Show current status and configuration
 	@echo
 	@echo "Configuration:"
 	@echo "  Project root: $(PROJECT_ROOT)"
-	@echo "  Claude directory: $(CLAUDE_DIR)"
+	@echo "  Plugin directory: $(PLUGIN_DIR)"
 	@echo "  Scanner script: $(SCANNER_SCRIPT)"
 	@echo
 	@echo "Files:"
 	@ls -la "$(SCANNER_SCRIPT)" 2>/dev/null || echo -e "  $(RED)❌ Scanner script not found$(NC)"
 	@ls -la "$(PROTECT_BRANCH_SCRIPT)" 2>/dev/null || echo -e "  $(RED)❌ Protected branch script not found$(NC)"
-	@ls -la "$(CLAUDE_DIR)/settings.json" 2>/dev/null || echo -e "  $(RED)❌ Settings file not found$(NC)"
+	@ls -la "$(MANIFEST_FILE)" 2>/dev/null || echo -e "  $(RED)❌ Plugin manifest not found$(NC)"
 	@$(MAKE) check-tools
 
 .PHONY: help
@@ -138,8 +145,9 @@ help: ## Display this help
 	@echo
 	@echo -e "$(BLUE)Examples:$(NC)"
 	@echo "  make test              # Run all tests"
+	@echo "  make validate          # Validate plugin configuration"
 	@echo "  make lint              # Run code quality checks"
-	@echo "  make install           # Install hooks"
+	@echo "  make install           # Make hook scripts executable"
 	@echo "  make clean             # Clean up artifacts"
 	@echo
 
