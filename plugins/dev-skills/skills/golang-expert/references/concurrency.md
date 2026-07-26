@@ -211,9 +211,8 @@ ch := make(chan int, 1)
 
 Always run `go test -race ./...` before considering concurrent code correct. The race detector catches real bugs; false positives are extremely rare.
 
-Add to CI:
+Add to CI (as the body of a `test` target, or a step in your pipeline):
 
-```makefile
-test:
-	go test -race -count=1 ./...
+```bash
+go test -race -count=1 ./...
 ```
