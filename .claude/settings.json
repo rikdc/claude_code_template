@@ -1,3 +1,0 @@
-{
-  "$comment": "Hooks are delivered by the security-hooks plugin (plugins/security-hooks) and registered in its .claude-plugin/plugin.json. Install the plugin from the claude-code-template marketplace rather than registering hooks here, which would run them twice."
-}
