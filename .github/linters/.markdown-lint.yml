@@ -36,4 +36,6 @@ MD046:
   style: "fenced"
 
 # MD040/fenced-code-language - Fenced code blocks should have a language specified
-MD040: true
+# Disabled: docs contain illustrative fenced blocks (directory trees, plain
+# command output) with no meaningful language to tag
+MD040: false
