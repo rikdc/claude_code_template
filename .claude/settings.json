@@ -1,24 +1,3 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "mcp__.*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/mcp-security-scanner.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "(Edit|Write|Bash|Task).*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/protect-main-branch.sh"
-          }
-        ]
-      }
-    ]
-  }
+  "$comment": "Hooks are delivered by the security-hooks plugin (plugins/security-hooks) and registered in its .claude-plugin/plugin.json. Install the plugin from the claude-code-template marketplace rather than registering hooks here, which would run them twice."
 }

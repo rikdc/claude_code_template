@@ -7,5 +7,26 @@
   },
   "license": "MIT",
   "keywords": ["security", "hooks", "mcp", "branch-protection"],
-  "hooks": "./hooks.json"
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/mcp-security-scanner.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "^(Edit|Write|Bash|Task)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/protect-main-branch.sh"
+          }
+        ]
+      }
+    ]
+  }
 }
