@@ -61,6 +61,12 @@ test_basic "Database URL" \
     '{"hook_event_name":"PreToolUse","tool_name":"mcp__context7__get-library-docs","tool_input":{"prompt":"postgresql://user:pass@host/db"}}' \
     2
 
+# Dash-prefixed patterns were parsed by grep as options, so private keys
+# passed the scanner undetected. Guard against a regression.
+test_basic "Private key detection" \
+    '{"hook_event_name":"PreToolUse","tool_name":"mcp__context7__get-library-docs","tool_input":{"prompt":"-----BEGIN RSA PRIVATE KEY-----"}}' \
+    2
+
 test_basic "Non-MCP tool" \
     '{"hook_event_name":"PreToolUse","tool_name":"Read","tool_input":{"prompt":"sk-1234567890123456789012345678901234567890"}}' \
     0

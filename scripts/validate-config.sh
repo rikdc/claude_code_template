@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 
-# Configuration Validation Script for MCP Security Scanner
-# Validates all configuration files and setup
+# Configuration Validation Script for the security-hooks plugin
+# Validates the plugin manifest, hook scripts, and their behaviour
 
-set -euo pipefail
+# Deliberately no -e: this script's contract is to run every check and exit
+# with the number of failures. Under -e the first failing validate_check
+# aborted the run, skipping every later check and the summary.
+set -uo pipefail
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 readonly PROJECT_ROOT
-readonly CLAUDE_DIR="$PROJECT_ROOT/.claude"
-readonly HOOKS_DIR="$CLAUDE_DIR/hooks"
+readonly PLUGIN_DIR="$PROJECT_ROOT/plugins/security-hooks"
+readonly HOOKS_DIR="$PLUGIN_DIR/hooks"
 readonly SCANNER_SCRIPT="$HOOKS_DIR/mcp-security-scanner.sh"
-readonly SETTINGS_FILE="$CLAUDE_DIR/settings.json"
-readonly PATTERNS_FILE="$CLAUDE_DIR/security-patterns.conf"
-readonly PATTERNS_EXAMPLE="$CLAUDE_DIR/security-patterns.conf.example"
+readonly PROTECT_BRANCH_SCRIPT="$HOOKS_DIR/protect-main-branch.sh"
+readonly MANIFEST_FILE="$PLUGIN_DIR/.claude-plugin/plugin.json"
+readonly PATTERNS_FILE="$PLUGIN_DIR/security-patterns.conf"
 
 # Colors for output
 readonly GREEN='\033[0;32m'
@@ -75,7 +78,7 @@ validate_check() {
 show_banner() {
     cat << 'EOF'
 ╔══════════════════════════════════════════════════════════════╗
-║              MCP Security Scanner Validator                  ║
+║              security-hooks Plugin Validator                 ║
 ║                                                              ║
 ║  Validating configuration and setup                          ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -88,15 +91,15 @@ validate_file_structure() {
     info "Validating file structure..."
     
     # Required files
-    validate_check "Claude directory exists" "[[ -d '$CLAUDE_DIR' ]]"
+    validate_check "Plugin directory exists" "[[ -d '$PLUGIN_DIR' ]]"
     validate_check "Hooks directory exists" "[[ -d '$HOOKS_DIR' ]]"
     validate_check "Security scanner script exists" "[[ -f '$SCANNER_SCRIPT' ]]"
-    validate_check "Hook settings file exists" "[[ -f '$SETTINGS_FILE' ]]"
-    validate_check "Security patterns example exists" "[[ -f '$PATTERNS_EXAMPLE' ]]" "true"
-    
+    validate_check "Protected branch script exists" "[[ -f '$PROTECT_BRANCH_SCRIPT' ]]"
+    validate_check "Plugin manifest exists" "[[ -f '$MANIFEST_FILE' ]]"
+
     # Optional files
     validate_check "Security patterns file exists" "[[ -f '$PATTERNS_FILE' ]]" "true"
-    validate_check "README file exists" "[[ -f '$CLAUDE_DIR/README.md' ]]" "true"
+    validate_check "README file exists" "[[ -f '$PLUGIN_DIR/README.md' ]]" "true"
     
     echo
 }
@@ -107,7 +110,8 @@ validate_permissions() {
     
     validate_check "Security scanner script is executable" "[[ -x '$SCANNER_SCRIPT' ]]"
     validate_check "Security scanner script is readable" "[[ -r '$SCANNER_SCRIPT' ]]"
-    validate_check "Hook settings file is readable" "[[ -r '$SETTINGS_FILE' ]]"
+    validate_check "Protected branch script is executable" "[[ -x '$PROTECT_BRANCH_SCRIPT' ]]"
+    validate_check "Plugin manifest is readable" "[[ -r '$MANIFEST_FILE' ]]"
     
     if [[ -f "$PATTERNS_FILE" ]]; then
         validate_check "Security patterns file is readable" "[[ -r '$PATTERNS_FILE' ]]"
@@ -121,33 +125,56 @@ validate_json_config() {
     info "Validating JSON configuration..."
     
     # Validate JSON syntax
-    if validate_check "Hook settings JSON is valid" "jq empty '$SETTINGS_FILE'"; then
+    if validate_check "Plugin manifest JSON is valid" "jq empty '$MANIFEST_FILE'"; then
         # Validate structure
-        validate_check "Hook configuration has 'hooks' section" "jq -e '.hooks' '$SETTINGS_FILE'"
-        validate_check "Hook configuration has 'PreToolUse' section" "jq -e '.hooks.PreToolUse' '$SETTINGS_FILE'"
-        validate_check "Hook configuration has matcher pattern" "jq -e '.hooks.PreToolUse[0].matcher' '$SETTINGS_FILE'"
-        validate_check "Hook configuration has command path" "jq -e '.hooks.PreToolUse[0].hooks[0].command' '$SETTINGS_FILE'"
-        
-        # Validate matcher pattern
+        validate_check "Manifest declares a plugin name" "jq -e '.name' '$MANIFEST_FILE'"
+        validate_check "Manifest has 'hooks' section" "jq -e '.hooks' '$MANIFEST_FILE'"
+        validate_check "Manifest has 'PreToolUse' section" "jq -e '.hooks.PreToolUse' '$MANIFEST_FILE'"
+        validate_check "Manifest registers both hooks" \
+            "[[ \$(jq '.hooks.PreToolUse | length' '$MANIFEST_FILE') -eq 2 ]]"
+
+        # Validate matcher pattern for the MCP scanner
         local matcher_pattern
-        matcher_pattern=$(jq -r '.hooks.PreToolUse[0].matcher' "$SETTINGS_FILE" 2>/dev/null || echo "")
+        matcher_pattern=$(jq -r '.hooks.PreToolUse[0].matcher' "$MANIFEST_FILE" 2>/dev/null || echo "")
         if [[ "$matcher_pattern" == "mcp__.*" ]]; then
-            success "Hook matcher pattern is correct: $matcher_pattern"
+            success "Scanner matcher pattern is correct: $matcher_pattern"
             ((CHECKS_PASSED++))
         else
-            error "Hook matcher pattern is incorrect: $matcher_pattern (expected: mcp__.*)"
+            error "Scanner matcher pattern is incorrect: $matcher_pattern (expected: mcp__.*)"
             ((CHECKS_FAILED++))
         fi
         ((CHECKS_RUN++))
-        
-        # Validate command path
-        local command_path
-        command_path=$(jq -r '.hooks.PreToolUse[0].hooks[0].command' "$SETTINGS_FILE" 2>/dev/null || echo "")
-        if [[ "$command_path" == ".claude/hooks/mcp-security-scanner.sh" ]]; then
-            success "Hook command path is correct: $command_path"
+
+        # Every hook command must resolve through ${CLAUDE_PLUGIN_ROOT}. Earlier
+        # revisions used ${PLUGIN_DIR} and ${WORKSPACE}, neither of which Claude
+        # Code defines, so they expanded to empty and the paths never resolved.
+        local bad_vars
+        bad_vars=$(jq -r '[.hooks[][] | .hooks[].command
+            | select(contains("${CLAUDE_PLUGIN_ROOT}") | not)] | length' \
+            "$MANIFEST_FILE" 2>/dev/null || echo "1")
+        if [[ "$bad_vars" == "0" ]]; then
+            success "All hook commands resolve through \${CLAUDE_PLUGIN_ROOT}"
             ((CHECKS_PASSED++))
         else
-            error "Hook command path is incorrect: $command_path (expected: .claude/hooks/mcp-security-scanner.sh)"
+            error "$bad_vars hook command(s) do not use \${CLAUDE_PLUGIN_ROOT}"
+            ((CHECKS_FAILED++))
+        fi
+        ((CHECKS_RUN++))
+
+        # Each referenced script must actually exist on disk
+        local missing_scripts=0
+        while IFS= read -r cmd; do
+            [[ -z "$cmd" ]] && continue
+            local resolved="${cmd//\"/}"
+            resolved="${resolved/\$\{CLAUDE_PLUGIN_ROOT\}/$PLUGIN_DIR}"
+            [[ -f "$resolved" ]] || ((missing_scripts++))
+        done < <(jq -r '.hooks[][] | .hooks[].command' "$MANIFEST_FILE" 2>/dev/null)
+
+        if [[ $missing_scripts -eq 0 ]]; then
+            success "All hook commands point at existing scripts"
+            ((CHECKS_PASSED++))
+        else
+            error "$missing_scripts hook command(s) reference missing scripts"
             ((CHECKS_FAILED++))
         fi
         ((CHECKS_RUN++))
@@ -179,8 +206,9 @@ validate_security_patterns() {
             [[ "$pattern_name" =~ ^#.*$ ]] || [[ -z "$pattern_name" ]] && continue
             [[ -z "$pattern_regex" ]] && continue
             
-            # Test if pattern is a valid regex (basic test)
-            if ! echo "test" | grep -q "$pattern_regex" 2>/dev/null && ! echo "test" | grep -qv "$pattern_regex" 2>/dev/null; then
+            # Test if pattern is a valid regex (basic test). -e keeps grep from
+            # parsing dash-prefixed patterns as options.
+            if ! echo "test" | grep -q -e "$pattern_regex" 2>/dev/null && ! echo "test" | grep -qv -e "$pattern_regex" 2>/dev/null; then
                 ((invalid_patterns++))
             fi
         done < "$PATTERNS_FILE"
@@ -204,29 +232,30 @@ validate_security_patterns() {
 validate_script_syntax() {
     info "Validating script syntax..."
     
-    # Check bash syntax
-    validate_check "Security scanner script has valid bash syntax" "bash -n '$SCANNER_SCRIPT'"
-    
-    # Check shebang
-    local shebang
-    shebang=$(head -n1 "$SCANNER_SCRIPT" 2>/dev/null || echo "")
-    if [[ "$shebang" =~ ^\#\!/usr/bin/env\ bash$ ]]; then
-        success "Security scanner script has correct shebang: $shebang"
-        ((CHECKS_PASSED++))
-    else
-        error "Security scanner script has incorrect shebang: $shebang (expected: #!/usr/bin/env bash)"
-        ((CHECKS_FAILED++))
-    fi
-    ((CHECKS_RUN++))
-    
-    # Check for common issues
-    if grep -q "set -euo pipefail" "$SCANNER_SCRIPT"; then
-        success "Security scanner script uses strict error handling"
-        ((CHECKS_PASSED++))
-    else
-        warning "Security scanner script should use 'set -euo pipefail' for strict error handling"
-    fi
-    ((CHECKS_RUN++))
+    local script name shebang
+    for script in "$SCANNER_SCRIPT" "$PROTECT_BRANCH_SCRIPT"; do
+        name=$(basename "$script")
+
+        validate_check "$name has valid bash syntax" "bash -n '$script'"
+
+        shebang=$(head -n1 "$script" 2>/dev/null || echo "")
+        if [[ "$shebang" =~ ^\#\!/usr/bin/env\ bash$ ]]; then
+            success "$name has correct shebang: $shebang"
+            ((CHECKS_PASSED++))
+        else
+            error "$name has incorrect shebang: $shebang (expected: #!/usr/bin/env bash)"
+            ((CHECKS_FAILED++))
+        fi
+        ((CHECKS_RUN++))
+
+        if grep -q "set -euo pipefail" "$script"; then
+            success "$name uses strict error handling"
+            ((CHECKS_PASSED++))
+        else
+            warning "$name should use 'set -euo pipefail' for strict error handling"
+        fi
+        ((CHECKS_RUN++))
+    done
     
     echo
 }
@@ -300,7 +329,34 @@ validate_functionality() {
         ((CHECKS_FAILED++))
     fi
     ((CHECKS_RUN++))
-    
+
+    # Protected branch hook. A PreToolUse hook signals a block through
+    # hookSpecificOutput.permissionDecision, not an exit code, so parse stdout.
+    local branch_input='{"hook_event_name": "PreToolUse", "tool_name": "Edit", "tool_input": {"file_path": "/test"}}'
+    local decision
+
+    decision=$(echo "$branch_input" | TEST_BRANCH_NAME="main" "$PROTECT_BRANCH_SCRIPT" 2>/dev/null |
+        jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null || echo "")
+    if [[ "$decision" == "deny" ]]; then
+        success "Protected branch test passed (Edit on main denied)"
+        ((CHECKS_PASSED++))
+    else
+        error "Protected branch test failed - expected deny, got '${decision:-no decision}'"
+        ((CHECKS_FAILED++))
+    fi
+    ((CHECKS_RUN++))
+
+    decision=$(echo "$branch_input" | TEST_BRANCH_NAME="feature/test" "$PROTECT_BRANCH_SCRIPT" 2>/dev/null |
+        jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null || echo "")
+    if [[ -z "$decision" ]]; then
+        success "Feature branch test passed (Edit on feature branch allowed)"
+        ((CHECKS_PASSED++))
+    else
+        error "Feature branch test failed - expected allow, got '$decision'"
+        ((CHECKS_FAILED++))
+    fi
+    ((CHECKS_RUN++))
+
     echo
 }
 
@@ -319,8 +375,10 @@ show_results() {
         echo "Failed: $CHECKS_FAILED"
     fi
     
+    # Report the tally directly rather than through warning(), which would
+    # increment the counter it is reporting.
     if [[ $WARNINGS -gt 0 ]]; then
-        warning "Warnings: $WARNINGS"
+        echo -e "${YELLOW}⚠️  Warnings: $WARNINGS${NC}"
     else
         echo "Warnings: $WARNINGS"
     fi
@@ -330,17 +388,17 @@ show_results() {
     if [[ $CHECKS_FAILED -eq 0 ]]; then
         success "🎉 All critical validation checks passed!"
         echo
-        echo "The MCP Security Scanner is properly configured and ready to use."
+        echo "The security-hooks plugin is properly configured and ready to use."
         
         if [[ $WARNINGS -gt 0 ]]; then
             echo
-            warning "Note: There are $WARNINGS warnings that should be addressed for optimal functionality."
+            echo -e "${YELLOW}⚠️  Note: There are $WARNINGS warnings that should be addressed for optimal functionality.${NC}"
         fi
     else
         error "💥 $CHECKS_FAILED validation checks failed!"
         echo
         echo "Please address the failed checks before using the security scanner."
-        echo "Run 'make install' to fix common issues automatically."
+        echo "Run 'make install' to restore executable permissions on the hook scripts."
     fi
     
     echo "════════════════════════════════════════════════════════════════"
@@ -369,9 +427,9 @@ main() {
 # Handle help
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     cat << EOF
-MCP Security Scanner Configuration Validator
+security-hooks Plugin Configuration Validator
 
-This script validates the configuration and setup of the MCP Security Scanner.
+This script validates the configuration and setup of the security-hooks plugin.
 
 Usage: $0 [options]
 
@@ -381,7 +439,7 @@ Options:
 The validator checks:
 1. File structure and existence
 2. File permissions
-3. JSON configuration syntax and structure
+3. Plugin manifest syntax, structure, and command paths
 4. Security patterns file
 5. Script syntax and bash compatibility
 6. Required and optional dependencies
@@ -391,7 +449,7 @@ Exit codes:
   0 - All critical checks passed
   N - N critical checks failed (warnings don't affect exit code)
 
-Use 'make validate' to run this script, or 'make install' to fix common issues.
+Use 'make validate' to run this script.
 
 EOF
     exit 0
