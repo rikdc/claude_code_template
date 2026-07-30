@@ -32,24 +32,25 @@ Use this skill for:
 Defer to `nix-builder` when the task is to create or change `.nix` files for a
 specific host in an existing flake repository.
 
-## Workflow Routing
+## Routing
 
-Route to the matching workflow file rather than answering from this file when
-the request is specific:
+Read the matching reference file rather than answering from this file when the
+request is specific. Each one is a task-oriented procedure, not passive
+background:
 
-| Workflow | Trigger | File |
-|----------|---------|------|
-| **Build** | "build nix package", "nixos-rebuild build", "compile nix" | `workflows/Build.md` |
-| **Debug** | "debug nix", "nix error", "evaluation error", "infinite recursion" | `workflows/Debug.md` |
-| **Develop** | "development shell", "nix develop", "devShell", "direnv" | `workflows/Develop.md` |
-| **Deploy** | "deploy nixos", "nixos-rebuild switch", "remote deployment" | `workflows/Deploy.md` |
-| **Package** | "create package", "derivation", "buildGoModule", "package app" | `workflows/Package.md` |
-| **Flakes** | "create flake", "flake.lock", "update inputs", "flake outputs" | `workflows/Flakes.md` |
-| **Secrets** | "manage secrets", "agenix", "encrypt secrets", "age encryption" | `workflows/Secrets.md` |
-| **Security** | "harden nixos", "apparmor", "firewall", "security hardening" | `workflows/Security.md` |
-| **Troubleshoot** | "hash mismatch", "nix failing", "common errors" | `workflows/Troubleshoot.md` |
+| Topic | Trigger | Reference |
+|-------|---------|-----------|
+| **Build** | "build nix package", "nixos-rebuild build", "compile nix" | [references/Build.md](references/Build.md) |
+| **Debug** | "debug nix", "nix error", "evaluation error", "infinite recursion" | [references/Debug.md](references/Debug.md) |
+| **Develop** | "development shell", "nix develop", "devShell", "direnv" | [references/Develop.md](references/Develop.md) |
+| **Deploy** | "deploy nixos", "nixos-rebuild switch", "remote deployment" | [references/Deploy.md](references/Deploy.md) |
+| **Package** | "create package", "derivation", "buildGoModule", "package app" | [references/Package.md](references/Package.md) |
+| **Flakes** | "create flake", "flake.lock", "update inputs", "flake outputs" | [references/Flakes.md](references/Flakes.md) |
+| **Secrets** | "manage secrets", "agenix", "encrypt secrets", "age encryption" | [references/Secrets.md](references/Secrets.md) |
+| **Security** | "harden nixos", "apparmor", "firewall", "security hardening" | [references/Security.md](references/Security.md) |
+| **Troubleshoot** | "hash mismatch", "nix failing", "common errors" | [references/Troubleshoot.md](references/Troubleshoot.md) |
 
-Read only the workflow you need. For general guidance, continue with this file.
+Read only the one you need. For general guidance, continue with this file.
 
 ## Core Principles
 
@@ -186,46 +187,10 @@ Use `mkForce` sparingly — it defeats the merge system.
 
 ## Package Development
 
-### callPackage pattern
-
-```nix
-# pkgs/default.nix
-{
-  mypackage = pkgs.callPackage ./mypackage { };
-  mytool = pkgs.callPackage ./mytool { };
-}
-```
-
-### Package definition
-
-```nix
-{ lib
-, buildGoModule
-, fetchFromGitHub
-}:
-
-buildGoModule rec {
-  pname = "mypackage";
-  version = "1.0.0";
-
-  src = fetchFromGitHub {
-    owner = "owner";
-    repo = "repo";
-    rev = "v${version}";
-    hash = "sha256-...";
-  };
-
-  vendorHash = "sha256-...";
-
-  meta = with lib; {
-    description = "Package description";
-    homepage = "https://example.com";
-    license = licenses.mit;
-    maintainers = with maintainers; [ ];
-    platforms = platforms.linux;
-  };
-}
-```
+Derivation templates, the `callPackage` pattern, and per-language builders
+(`buildGoModule`, `rustPlatform`, `python3Packages`) live in
+[references/Package.md](references/Package.md). Read that rather than working from
+memory — `meta` attributes and hash arguments are easy to get subtly wrong.
 
 ### Overlays
 
@@ -353,30 +318,55 @@ agenix -e secrets/mySecret.age   # Edit or create
 agenix -r                        # Re-key after adding a host
 ```
 
-See `workflows/Secrets.md` for the full treatment.
+See [references/Secrets.md](references/Secrets.md) for the full treatment.
 
 ## Safety and Testing
 
+`switch` is the only irreversible-in-the-moment step. Climb the ladder in
+order and stop at the first failure — never skip a rung to save time.
+
+| # | Command | Proves | On failure |
+|---|---------|--------|------------|
+| 1 | `nixos-rebuild dry-build --flake .#<host>` | Evaluates and shows what *would* be built | Fix eval errors; re-run 1 |
+| 2 | `nixos-rebuild build --flake .#<host>` | It actually compiles | Read the failing derivation; re-run 2 |
+| 3 | `nixos-rebuild dry-activate --flake .#<host>` | Which units would restart or stop | Reconsider blast radius; back to 1 |
+| 4 | `nixos-rebuild test --flake .#<host>` | Activates now, bootloader untouched | `reboot` recovers the old generation |
+| 5 | `nixos-rebuild switch --flake .#<host>` | Activates and makes it the boot default | `nixos-rebuild switch --rollback` |
+
+Rung 3 is the one people skip, and the one that catches "this restarts
+postgresql and sshd" before it happens.
+
+Confirm each rung actually succeeded before advancing — check the exit status,
+don't assume. If rung 2 fails, rungs 3-5 are meaningless.
+
+### Extra care on remote hosts
+
+Never `switch` a remote host you cannot physically reach without first running
+rungs 1-4. A bad `networking` or `openssh` change locks you out, and rung 5
+makes it survive the reboot that would otherwise have saved you.
+
 ```bash
-nixos-rebuild build --flake .#<hostname>       # Build only
-nixos-rebuild dry-build --flake .#<hostname>   # Show what would change
-nixos-rebuild test --flake .#<hostname>        # Activate, skip bootloader
-nixos-rebuild switch --flake .#<hostname>      # Activate and make default
+# Build locally, push the closure, activate with a safety net
+nixos-rebuild test --flake .#<host> --target-host root@<host> --build-host localhost
 ```
 
-Always `build` before `switch` on a remote host. `test` is the safe middle
-ground — a reboot recovers the previous generation.
+Consider `services.openssh.enable` and firewall changes one-at-a-time, and keep
+a second SSH session open while testing.
 
 ### Rollback
 
 ```bash
-nixos-rebuild list-generations
-nixos-rebuild switch --rollback
-nixos-rebuild switch --switch-generation <number>
+nixos-rebuild list-generations              # See what you can return to
+nixos-rebuild switch --rollback             # Previous generation
+nixos-rebuild switch --switch-generation N  # A specific one
 ```
 
 Keep at least two or three recent generations. `nix-collect-garbage -d` deletes
-all rollback targets — never run it as a first response to a full disk.
+every rollback target — never run it as a first response to a full disk, and
+never immediately after a `switch` you have not yet verified.
+
+See [references/Deploy.md](references/Deploy.md) for remote deployment, and
+[references/Troubleshoot.md](references/Troubleshoot.md) when a rung fails.
 
 ## Common Patterns
 
@@ -489,7 +479,7 @@ switch to `prev`.
 - [ ] Audit logging on critical services
 - [ ] Minimal package set on exposed hosts
 
-See `workflows/Security.md` for the hardened profile and per-service
+See [references/Security.md](references/Security.md) for the hardened profile and per-service
 sandboxing.
 
 ## Resources

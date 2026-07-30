@@ -243,10 +243,10 @@ Read on demand. Do not load these upfront.
 
 | File | When to read |
 |---|---|
-| `references/services.md` | Before implementing any service — native module patterns and option shapes |
-| `references/zfs.md` | When declaring ZFS pools, datasets, or dataset-backed state dirs |
-| `references/secrets.md` | When declaring agenix secrets or internal PKI integration |
-| `references/caddy.md` | When generating Caddy vhosts, including internal-PKI TLS |
+| [references/services.md](references/services.md) | Before implementing any service — native module patterns and option shapes |
+| [references/zfs.md](references/zfs.md) | When declaring ZFS pools, datasets, or dataset-backed state dirs |
+| [references/secrets.md](references/secrets.md) | When declaring agenix secrets or internal PKI integration |
+| [references/caddy.md](references/caddy.md) | When generating Caddy vhosts, including internal-PKI TLS |
 
 Examples in these files use role-based placeholder hostnames
 (`media-host`, `gpu-host`, `service-host`). They illustrate patterns — replace

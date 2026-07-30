@@ -38,19 +38,24 @@ management, home-manager, secrets, and NixOS hardening.
 **Use when**: writing or reviewing Nix expressions, authoring packages,
 managing flake inputs, or debugging evaluation and build failures.
 
-Routes to nine focused workflows:
+Routes to nine focused reference files, each a task-oriented procedure rather
+than passive background:
 
-| Workflow | Covers |
+| Reference | Covers |
 |---|---|
-| `Build` | `nix build`, `nixos-rebuild build`, build failures |
-| `Debug` | Evaluation errors, infinite recursion, `--show-trace` |
-| `Develop` | `devShell`, `nix develop`, direnv integration |
-| `Deploy` | `nixos-rebuild switch`, remote deployment, rollback |
-| `Package` | Derivations, `buildGoModule`, overlays |
-| `Flakes` | Inputs, `flake.lock`, outputs schema |
-| `Secrets` | agenix, sops-nix, age encryption |
-| `Security` | Hardening, AppArmor, firewall, systemd sandboxing |
-| `Troubleshoot` | Hash mismatches, common errors |
+| [Build](skills/nix-expert/references/Build.md) | `nix build`, `nixos-rebuild build`, build failures |
+| [Debug](skills/nix-expert/references/Debug.md) | Evaluation errors, infinite recursion, `--show-trace` |
+| [Develop](skills/nix-expert/references/Develop.md) | `devShell`, `nix develop`, direnv integration |
+| [Deploy](skills/nix-expert/references/Deploy.md) | `nixos-rebuild switch`, remote deployment, rollback |
+| [Package](skills/nix-expert/references/Package.md) | Derivations, `buildGoModule`, overlays |
+| [Flakes](skills/nix-expert/references/Flakes.md) | Inputs, `flake.lock`, outputs schema |
+| [Secrets](skills/nix-expert/references/Secrets.md) | agenix, sops-nix, age encryption |
+| [Security](skills/nix-expert/references/Security.md) | Hardening, AppArmor, firewall, systemd sandboxing |
+| [Troubleshoot](skills/nix-expert/references/Troubleshoot.md) | Hash mismatches, common errors |
+
+`/nix-expert`'s `SKILL.md` also carries a five-rung safety ladder for
+`nixos-rebuild` (`dry-build → build → dry-activate → test → switch`), with the
+failure recovery for each rung.
 
 ## Choosing Between Them
 
