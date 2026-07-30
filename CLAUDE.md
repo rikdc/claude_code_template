@@ -75,7 +75,7 @@ Legacy slash commands (still functional):
 
 - `/check` - Comprehensive code quality analysis and auto-fix with parallel sub-task strategy
 - `/clean` - Remove redundant and obvious comments from codebase
-- `/changelog` - Create and maintain project changelog following Keep a Changelog format
+- `/git-workflow:changelog` - Create and maintain project changelog following Keep a Changelog format (migrated to a skill in the `git-workflow` plugin)
 
 ## Architecture
 
@@ -113,7 +113,7 @@ The scanner detects multiple categories of sensitive data:
 4. **Hook Testing**: Test security patterns with sample MCP requests as shown in the documentation
 5. **Quality Checks**: Use `/check` command for comprehensive code quality analysis and auto-fixing
 6. **Code Cleanup**: Use `/clean` command to remove redundant comments before commits
-7. **Changelog**: Use `/changelog` command to maintain project changelog with proper versioning
+7. **Changelog**: Use `/git-workflow:changelog` to maintain project changelog with proper versioning
 
 ## Hook System Architecture
 

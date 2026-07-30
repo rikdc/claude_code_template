@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Migrated the `git-workflow` plugin from commands to the skill format
+  (`skills/<name>/SKILL.md`)
+- Tightened `git-workflow` commit and PR message rules: no emoji, shorter bodies
 - Improved project linting and code quality standards
 - Enhanced security scanning capabilities
 

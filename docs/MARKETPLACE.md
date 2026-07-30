@@ -89,9 +89,9 @@ claude code plugins install dev-skills
 
 **Components**:
 
-- `/commit` - Conventional commits with emoji
-- `/pr` - GitHub pull request creation
-- `/changelog` - Changelog maintenance
+- `/git-workflow:commit` - Brief conventional commits
+- `/git-workflow:pr` - GitHub pull request creation
+- `/git-workflow:changelog` - Changelog maintenance
 
 **Features**:
 
