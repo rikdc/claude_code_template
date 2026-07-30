@@ -222,28 +222,54 @@ sudo aa-enforce /path/to/program
 ```
 
 ### Sudo Configuration
+
+Prefer `sudo-rs`, the memory-safe Rust reimplementation, on hosts where you have
+the freedom to switch. It covers the common configuration surface with the same
+option names, and the historical CVE record for C `sudo` is dominated by memory
+handling in exactly the parsing code `sudo-rs` replaces.
+
 ```nix
 {
-  # Require password for sudo
-  security.sudo = {
+  security.sudo-rs = {
     enable = true;
+    wheelNeedsPassword = true;
 
-    # Timeout for password (in minutes)
     extraConfig = ''
+      # Re-prompt after 5 minutes
       Defaults timestamp_timeout=5
 
-      # Require password for every command
-      Defaults !authenticate
-
-      # Log all sudo commands
+      # Log every invocation
       Defaults logfile=/var/log/sudo.log
     '';
   };
-
-  # Limit sudo to wheel group
-  security.sudo.wheelNeedsPassword = true;
 }
 ```
+
+The two implementations are mutually exclusive: `security.sudo-rs` asserts
+`!config.security.sudo.enable` and sets `security.sudo.enable = mkDefault false`
+for you. Enabling both explicitly is an eval error.
+
+`sudo-rs` does not implement everything C `sudo` does — if you rely on plugins,
+exotic `Defaults`, or `sudoedit` corner cases, stay on `security.sudo` and use
+the identical option names:
+
+```nix
+{
+  security.sudo = {
+    enable = true;
+    wheelNeedsPassword = true;
+
+    extraConfig = ''
+      Defaults timestamp_timeout=5
+      Defaults logfile=/var/log/sudo.log
+    '';
+  };
+}
+```
+
+Never write `Defaults !authenticate` — it disables password checks entirely and
+turns every `wheel` member into passwordless root. To require a password for
+every command instead of caching it, set `Defaults timestamp_timeout=0`.
 
 ### SSH Hardening
 ```nix
