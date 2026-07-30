@@ -139,8 +139,15 @@ This project includes work from the following sources:
 The PM command suite (`/pm:create-prd`, `/pm:generate-tasks`, `/pm:process-tasks`) is based on patterns and workflows from:
 
 - **Source**: [AI Dev Tasks](https://github.com/snarktank/ai-dev-tasks/tree/main)
-- **License**: MIT License
+- **License**: Apache License 2.0 — full text at [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt)
 - **Usage**: Adapted and extended for Claude Code project management workflows
+
+**Statement of changes** (Apache-2.0 §4(b)): the upstream `create-prd.md` and
+`generate-tasks.md` have been modified. Changes include restructuring them as
+Claude Code slash commands under the `/pm:` namespace, adding frontmatter,
+adjusting the task-list format, and extending the workflow with
+`/pm:process-tasks`. The files in `plugins/pm-tools/commands/` are not
+byte-identical to their upstream originals.
 
 Special thanks to the AI Dev Tasks project for providing the foundational patterns for structured AI-assisted development workflows.
 
@@ -158,6 +165,7 @@ MPL-2.0 is a per-file weak copyleft licence. In practice:
 - **Modifications to these files must stay open** under MPL-2.0, with source made available
 - **Larger works may be proprietary** — you can combine this with closed code
 
-The PM command suite retains its upstream MIT licence, as noted under
-[Attribution](#attribution). MIT-licensed material is compatible with MPL-2.0
-provided the upstream notice is preserved.
+The PM command suite retains its upstream Apache-2.0 licence, as noted under
+[Attribution](#attribution). Apache-2.0 material may be included in an MPL-2.0
+project provided its licence copy, attribution, and statement of changes are
+preserved — see [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt).

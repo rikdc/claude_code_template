@@ -358,6 +358,19 @@ available. You are free to combine it with proprietary code in a larger work.
 The PM command suite (`/pm:create-prd`, `/pm:generate-tasks`,
 `/pm:process-tasks`) is derived from
 [AI Dev Tasks](https://github.com/snarktank/ai-dev-tasks/tree/main), which is
-MIT licensed. MIT-licensed material may be included in an MPL-2.0 project, but
-the upstream copyright and licence notice must be retained — see the
-attribution in the root [README](../README.md).
+licensed under Apache-2.0.
+
+Apache-2.0 material may be included in an MPL-2.0 project, but Apache-2.0 §4
+imposes obligations that must be honoured on redistribution:
+
+- **§4(a)** — a copy of the Apache-2.0 licence must be included. It lives at
+  [LICENSES/Apache-2.0.txt](../LICENSES/Apache-2.0.txt).
+- **§4(b)** — modified files must carry prominent notices stating they were
+  changed. See the statement of changes in the root
+  [README](../README.md#attribution).
+- **§4(c)** — upstream `NOTICE` file contents must be reproduced. AI Dev Tasks
+  ships no `NOTICE` file, so this does not apply.
+
+If you add further Apache-2.0 material, place its licence copy under
+`LICENSES/` and record the attribution and statement of changes in the root
+README.
