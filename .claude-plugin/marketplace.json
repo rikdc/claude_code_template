@@ -36,7 +36,7 @@
     {
       "name": "nix-skills",
       "source": "./plugins/nix-skills",
-      "description": "Expert skills for Nix, NixOS, and home-manager — config authoring and advisory guidance",
+      "description": "Expert guidance on Nix, NixOS, and home-manager — expressions, flakes, packaging, secrets, and hardening",
       "version": "1.0.0",
       "keywords": ["skills", "nix", "nixos", "home-manager", "flakes", "homelab"],
       "category": "skills"

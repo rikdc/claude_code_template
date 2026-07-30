@@ -7,15 +7,15 @@ description: >
   or sops-nix, or hardening a NixOS host. Triggers on Nix, NixOS, nixpkgs,
   home-manager, flake.nix, nixos-rebuild, nix build, nix develop, devShell,
   derivation, overlay, agenix, and on Nix errors such as hash mismatches,
-  infinite recursion, or evaluation failures. For creating or modifying host
-  configurations in an existing flake repository, use nix-builder instead.
+  infinite recursion, or evaluation failures. Advisory rather than generative:
+  it explains, reviews, and debugs. If the repository provides its own skill for
+  authoring host configurations, prefer that for writing config.
 ---
 
 # Nix Expert
 
-Advisory guidance on Nix, NixOS, and home-manager. This skill answers questions
-and reviews Nix code. It does not author host configurations — see
-`nix-builder` for that.
+Advisory guidance on Nix, NixOS, and home-manager. This skill answers questions,
+explains patterns, and reviews Nix code.
 
 ## Scope
 
@@ -29,8 +29,11 @@ Use this skill for:
 - Secrets management patterns
 - NixOS security hardening
 
-Defer to `nix-builder` when the task is to create or change `.nix` files for a
-specific host in an existing flake repository.
+When the task is to author or change `.nix` files for a specific host, check
+whether the target repository ships its own config-generation skill and prefer
+it — it will know that flake's layout, secrets backend, and conventions, which
+this skill deliberately does not assume. Failing that, read the existing tree
+before writing anything, and conform to what is already there.
 
 ## Routing
 
