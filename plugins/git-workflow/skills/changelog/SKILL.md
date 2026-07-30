@@ -3,112 +3,82 @@ name: changelog
 description: Creates and maintains CHANGELOG.md in Keep a Changelog format, including adding entries and cutting releases. Use when the user asks to update the changelog, add a changelog entry, or record a release.
 user-invocable: true
 argument-hint: "[--create] [--add-entry \"description\" --type TYPE] [--release X.Y.Z]"
-allowed-tools: Read, Write(CHANGELOG.md), Edit(CHANGELOG.md), Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git log:*)
+allowed-tools: Read, Write(CHANGELOG.md), Edit(CHANGELOG.md), Bash(date:*), Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git log:*)
 ---
 
 # Changelog - Keep a Changelog Maintenance
 
-Create, update, or maintain a comprehensive changelog following industry standards.
+Maintains CHANGELOG.md in [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+format with [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Usage
 
-- `/git-workflow:changelog --create` - Create new CHANGELOG.md
-- `/git-workflow:changelog --add-entry "description" --type TYPE` - Add new entry
-  - Types: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`
-- `/git-workflow:changelog --release X.Y.Z` - Move unreleased items to new version
+- `/git-workflow:changelog --create` - Create CHANGELOG.md
+- `/git-workflow:changelog --add-entry "description" --type TYPE` - Add an entry
+- `/git-workflow:changelog --release X.Y.Z` - Cut a release
 
-## Instructions
+With no flags, infer the operation from the request. Categories: `added`,
+`changed`, `deprecated`, `removed`, `fixed`, `security`.
 
-Based on the provided arguments ($ARGUMENTS), perform the appropriate changelog operation:
+## Skeleton
 
-1. **First, analyze the project context:**
-    - Check if CHANGELOG.md already exists
-    - Read package.json for current version info
-    - Review recent commits for unreleased changes
+```markdown
+# Changelog
 
-2. **Changelog Format (Keep a Changelog)**
+All notable changes to this project will be documented in this file.
 
-   ```markdown
-   # Changelog
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-   All notable changes to this project will be documented in this file.
+## [Unreleased]
 
-   The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-   and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.2.3] - 2024-01-15
 
-   ## [Unreleased]
-   ### Added
+### Added
 
-   - New features
+- User authentication
+```
 
-   ### Changed
+Category headings exist only where they have entries. Never write a heading
+with a placeholder bullet under it.
 
-   - Changes in existing functionality
+## Operation: --create
 
-   ### Deprecated
+1. Read CHANGELOG.md. If it exists, stop and report it — do not overwrite.
+2. Write the skeleton above with an empty `## [Unreleased]` and no version
+   sections.
+3. Offer to seed it from `git log`, but do not do so unasked.
 
-   - Soon-to-be removed features
+## Operation: --add-entry
 
-   ### Removed
+1. Read CHANGELOG.md; run `--create` first if it is missing.
+2. Reject a `--type` outside the six categories.
+3. Append the entry as a bullet under `## [Unreleased]` and its `### <Type>`
+   heading, adding that heading if absent.
+4. Preserve the existing order of categories and the file's surrounding
+   formatting.
 
-   - Removed features
+## Operation: --release X.Y.Z
 
-   ### Fixed
+Check before writing, and stop with the reason if any fails:
 
-   - Bug fixes
+- `## [Unreleased]` has at least one entry — nothing to release otherwise.
+- `X.Y.Z` does not already appear in the file.
+- `X.Y.Z` is higher than the most recent version present.
 
-   ### Security
+Then:
 
-   - Security improvements
+1. Get today's date with `date +%F`. Do not guess it.
+2. Rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD`, keeping its entries.
+3. Insert a fresh empty `## [Unreleased]` above it.
+4. If the file uses link references at the bottom, add one for `X.Y.Z` and
+   repoint `[Unreleased]` to compare against the new tag.
 
-   ```
+Do not tag, commit, or push unless asked.
 
-3. **Version Entries**
+## Entry Style
 
-   ```markdown
-   ## [1.2.3] - 2024-01-15
-   ### Added
-
-   - User authentication system
-   - Dark mode toggle
-   - Export functionality for reports
-
-   ### Fixed
-
-   - Memory leak in background tasks
-   - Timezone handling issues
-
-   ```
-
-4. **Automation Tools**
-
-   ```bash
-   # Generate changelog from git commits
-   npm install -D conventional-changelog-cli
-   npx conventional-changelog -p angular -i CHANGELOG.md -s
-
-   # Auto-changelog
-   npm install -D auto-changelog
-   npx auto-changelog
-   ```
-
-5. **Commit Convention**
-
-   ```bash
-   # Conventional commits for auto-generation
-   feat: add user authentication
-   fix: resolve memory leak in tasks
-   docs: update API documentation
-   style: format code with prettier
-   refactor: reorganize user service
-   test: add unit tests for auth
-   chore: update dependencies
-   ```
-
-6. **Integration with Releases**
-   - Update changelog before each release
-   - Include in release notes
-   - Link to GitHub releases
-   - Tag versions consistently
-
-Remember to keep entries clear, categorized, and focused on user-facing changes.
+- One line per entry, describing a user-facing change.
+- Lead with a verb: "Add session refresh endpoint", not "Added a new endpoint
+  that lets users refresh sessions".
+- No commit hashes, file paths, or internal refactors that users cannot observe.
