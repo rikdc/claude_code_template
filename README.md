@@ -8,7 +8,7 @@ Production-ready Claude Code project template with security hooks, workflow auto
 - **Slash Commands**: Workflow automation for code quality, documentation, and project management
 - **Specialized Agents**: Expert agents for Go development, code review, and documentation
 - **Testing Infrastructure**: Comprehensive test suite with ~2000 lines of test coverage
-- **Marketplace Plugins**: Modular plugin architecture with 6 installable plugins
+- **Marketplace Plugins**: Modular plugin architecture with 7 installable plugins
 
 ## Installation
 
@@ -24,6 +24,7 @@ claude code plugins install git-workflow
 claude code plugins install pm-tools
 claude code plugins install code-quality
 claude code plugins install prompt-tools
+claude code plugins install pr-review-triage
 
 # Or install from GitHub
 claude code plugins install github:rikdc/claude_code_template/security-hooks
@@ -50,6 +51,7 @@ make test
 | [pm-tools](plugins/pm-tools/) | Productivity | Project management commands for PRDs and tasks |
 | [code-quality](plugins/code-quality/) | Development | Code quality analysis, review, and cleanup |
 | [prompt-tools](plugins/prompt-tools/) | AI | AI prompt generation and review tools |
+| [pr-review-triage](plugins/pr-review-triage/) | Workflow | Triage of PR review comments and follow-up tracking |
 
 ## Security Hooks
 
@@ -112,7 +114,8 @@ plugins/                          # Marketplace plugin distribution
 ├── git-workflow/                # Git automation skills
 ├── pm-tools/                    # Project management commands
 ├── code-quality/                # Code review and cleanup
-└── prompt-tools/                # AI prompt generation
+├── prompt-tools/                # AI prompt generation
+└── pr-review-triage/            # PR review comment triage
 
 .claude/                         # Local development structure
 ├── skills/                      # Specialized skills

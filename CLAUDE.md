@@ -10,7 +10,7 @@ This is a Claude Code Template project that provides security hooks and testing 
 
 ## Marketplace Structure
 
-The repository is organized as a **marketplace with 6 installable plugins**:
+The repository is organized as a **marketplace with 7 installable plugins**:
 
 - **security-hooks**: MCP security scanner and protected branch hooks
 - **dev-skills**: Expert skills for Go, documentation, and architecture
@@ -18,6 +18,7 @@ The repository is organized as a **marketplace with 6 installable plugins**:
 - **pm-tools**: Project management commands for PRDs and tasks
 - **code-quality**: Code quality analysis, review, and cleanup
 - **prompt-tools**: AI prompt generation and review tools
+- **pr-review-triage**: Triage of PR review comments and follow-up tracking
 
 ### Directory Structure
 
