@@ -86,8 +86,11 @@ imports = [
 
 ### 4. Version control everything
 
-Track all Nix configuration in git, commit `flake.lock` changes deliberately,
-and record why an input was pinned or overridden.
+Track all Nix configuration in git. Always put the `nix flake update` output in
+the commit message body — a `flake.lock` diff is bare hashes and epochs, so the
+generated summary is the only readable record of which inputs moved and where.
+`nix flake update --commit-lock-file` does this for you. Add the *why* above it
+when an input is pinned or overridden.
 
 ### 5. Prefer flakes
 
@@ -162,14 +165,17 @@ If the repository has such a helper, use it rather than calling
 }
 ```
 
-### Common types
+### Choosing a type
 
-`types.bool`, `types.int`, `types.str`, `types.path`, `types.port`,
-`types.listOf types.str`, `types.attrsOf`, `types.submodule`, `types.package`,
-`types.nullOr`, `types.enum [ ... ]`.
+The full set is documented in the NixOS manual under [Options
+Types](https://nixos.org/manual/nixos/stable/#sec-option-types) and defined in
+`lib/types.nix` in nixpkgs. Read one of those rather than working from memory —
+the set grows, and composed types (`either`, `oneOf`, `coercedTo`, `attrTag`)
+are easy to misremember.
 
-Prefer `types.port` over `types.int` and `types.enum` over `types.str` when the
-value set is closed — the module system then catches bad values at eval time.
+Pick the narrowest type that fits: `types.port` rather than `types.int`,
+`types.enum` rather than `types.str` when the value set is closed. The module
+system then rejects bad values at eval time instead of at activation.
 
 ### mkIf, mkMerge, mkDefault
 
