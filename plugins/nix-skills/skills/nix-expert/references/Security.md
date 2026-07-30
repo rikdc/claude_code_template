@@ -11,14 +11,6 @@ Harden NixOS systems with security best practices and configurations.
 
 ## Quick Commands
 
-### Enable Hardened Profile
-```nix
-# Import hardened profile
-imports = [
-  <nixpkgs/nixos/modules/profiles/hardened.nix>
-];
-```
-
 ### Basic Security Configuration
 ```nix
 # Firewall
@@ -31,66 +23,51 @@ security.apparmor.enable = true;
 systemd.coredump.enable = false;
 ```
 
-## Hardened Profile
+## The Hardened Profile Is Gone
 
-### What It Enables
-The NixOS hardened profile provides:
-- Hardened Linux kernel with security patches
-- Scudo memory allocator for heap protection
-- Kernel module loading prevention after boot
-- Kernel image protection
-- AppArmor mandatory access control
-- Restricted filesystem module loading
-- Disabled simultaneous multithreading (SMT)
-- Forced page table isolation
+`nixos/modules/profiles/hardened.nix` was **removed in NixOS 26.05**. The file
+still exists in nixpkgs, but only as a `mkRemovedOptionModule` stub that throws
+on evaluation:
 
-### Enable Hardened Profile
-```nix
-{ config, pkgs, ... }:
-
-{
-  imports = [
-    <nixpkgs/nixos/modules/profiles/hardened.nix>
-  ];
-
-  # The hardened profile is opinionated
-  # You may need to override some defaults
-}
+```
+The hardened profile has been removed, see the backward incompatibilities
+section of the 26.05 release notes for more information.
 ```
 
-### In Flakes
+`pkgs.linuxPackages_hardened` went with it — `linux_hardened` now throws
+`"linux_hardened has been removed due to lack of maintenance"`. Any
+configuration importing the profile or setting that kernel fails at eval.
+
+There is no drop-in replacement. Pick the individual options you want and
+justify each one, which is what the profile was doing on your behalf anyway.
+
+### Applying the pieces individually
 ```nix
 {
-  nixosConfigurations.hostname = nixpkgs.lib.nixosSystem {
-    modules = [
-      "${nixpkgs}/nixos/modules/profiles/hardened.nix"
-      ./configuration.nix
-    ];
-  };
-}
-```
+  # Kernel
+  security.lockKernelModules = true;         # No module loading after boot
+  security.protectKernelImage = true;        # No kexec, no hibernation
+  security.forcePageTableIsolation = true;   # Meltdown mitigation, costs perf
 
-### Selective Hardening
-```nix
-# If full hardened profile is too restrictive
-# Enable specific hardening features
-{
-  # Hardened kernel
-  boot.kernelPackages = pkgs.linuxPackages_hardened;
+  # Only on hosts running untrusted code — halves throughput on most workloads
+  security.allowSimultaneousMultithreading = false;
 
-  # Memory allocator
-  environment.memoryAllocator.provider = "scudo";
+  # Hardened heap allocator
+  environment.memoryAllocator.provider = "scudo";  # or "graphene-hardened"
 
-  # Lock kernel modules
-  security.lockKernelModules = true;
-
-  # Protect kernel image
-  security.protectKernelImage = true;
-
-  # AppArmor
+  # Mandatory access control
   security.apparmor.enable = true;
+
+  # No coredumps
+  systemd.coredump.enable = false;
 }
 ```
+
+Each of these breaks something for someone. `lockKernelModules` breaks
+out-of-tree drivers loaded late and some container runtimes;
+`protectKernelImage` disables hibernation; `graphene-hardened` breaks programs
+that assume glibc malloc behaviour. Enable them one at a time and climb the
+rebuild ladder between each — `dry-activate` will show you what restarts.
 
 ## Firewall Configuration
 
@@ -616,7 +593,8 @@ systemd-analyze security --no-pager myservice.service
 
 ## Security Best Practices
 
-1. **Use the hardened profile**: Start with security-focused defaults
+1. **Harden deliberately, option by option**: the hardened profile was removed
+   in 26.05 and there is no replacement — choose and justify each setting
 2. **Default deny firewall**: Only allow required ports
 3. **Enable AppArmor**: Mandatory access control for services
 4. **Harden SSH**: Disable password auth, use keys only
@@ -663,7 +641,7 @@ sudo -u service-user cat /etc/shadow  # Should fail
    - Use `systemd-analyze security` to check impact
 
 2. **Performance overhead**: Security features have cost
-   - Hardened kernel is slower
+   - `forcePageTableIsolation` and disabling SMT are both measurable
    - Profile before/after
 
 3. **Update challenges**: Hardening can complicate updates
@@ -678,6 +656,6 @@ sudo -u service-user cat /etc/shadow  # Should fail
 
 - [NixOS Security Wiki](https://nixos.wiki/wiki/Security)
 - [Solene's NixOS Hardening Guide](https://dataswamp.org/~solene/2022-01-13-nixos-hardened.html)
-- [NixOS Hardened Profile](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/profiles/hardened.nix)
+- [NixOS 26.05 release notes](https://nixos.org/manual/nixos/stable/release-notes) — backward incompatibilities, including the hardened profile removal
 - [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/Documentation)
 - [systemd Security Features](https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Security)
