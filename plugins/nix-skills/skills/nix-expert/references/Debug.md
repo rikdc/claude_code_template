@@ -571,8 +571,8 @@ nix-env --list-generations --profile /nix/var/nix/profiles/system
 
 ### Out of Disk Space
 ```bash
-# Clean old generations
-nix-collect-garbage -d
+# Clean old generations, keeping the last 30 days of rollback targets
+nix-collect-garbage --delete-older-than 30d
 
 # Delete specific generation
 nix-env --delete-generations 10 11 12

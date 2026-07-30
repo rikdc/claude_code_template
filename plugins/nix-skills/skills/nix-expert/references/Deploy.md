@@ -406,8 +406,8 @@ ssh user@remote-host systemctl status
 
 ### Disk Space Issues
 ```bash
-# Clean old generations before deploying
-sudo nix-collect-garbage -d
+# Clean old generations before deploying, keeping recent rollback targets
+sudo nix-collect-garbage --delete-older-than 30d
 
 # Optimize store
 sudo nix-store --optimize

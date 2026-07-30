@@ -501,8 +501,8 @@ nix-prefetch-github owner repo --rev commit-hash
 
 ### Disk Space Issues
 ```bash
-# Clean old build artifacts
-nix-collect-garbage -d
+# Clean old build artifacts, keeping the last 30 days of rollback targets
+nix-collect-garbage --delete-older-than 30d
 
 # Check store size
 du -sh /nix/store

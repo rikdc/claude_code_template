@@ -365,10 +365,7 @@ nix path-info --closure-size .#package | sort -h
 
 **Clean Up:**
 ```bash
-# Delete old generations
-nix-collect-garbage -d
-
-# Delete generations older than 30 days
+# Delete generations older than 30 days, keeping recent rollback targets
 nix-collect-garbage --delete-older-than 30d
 
 # Optimize store (deduplicate)
@@ -666,10 +663,12 @@ systemctl start nix-daemon
 
 **Emergency Clean:**
 ```bash
-# Delete old generations
+# Keep the 5 most recent generations, drop the rest
 sudo nix-env --delete-generations +5
 
-# Garbage collect
+# Garbage collect. `-d` destroys EVERY rollback target except the running
+# generation — only reach for it once --delete-older-than has not freed enough,
+# and never immediately after a `switch` you have not yet verified.
 sudo nix-collect-garbage -d
 
 # Optimize
