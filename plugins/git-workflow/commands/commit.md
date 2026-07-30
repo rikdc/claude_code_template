@@ -1,89 +1,99 @@
 ---
 allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git log:*)
-description: Creates well-formatted commits with conventional commit messages
+description: Creates brief conventional-commit messages
 ---
 
 # Claude Command: Commit
 
-Creates well-formatted commits with conventional commit messages.
-Runs pre-commit checks and suggests commit splitting when appropriate.
+Creates commits with short conventional commit messages. Runs pre-commit checks
+and suggests splitting when the staged changes cover more than one concern.
 
 ## Usage
 
-To create a commit, just type:
-
 ```bash
 /commit [--no-verify] [--help]
-
 ```
 
 ## Workflow
 
-This command spawns parallel sub-tasks for efficiency:
+1. **Pre-commit checks** (unless `--no-verify`): run `make checks` if available.
+2. **Git analysis**: inspect staged files and `git diff` to identify the change.
+3. **Commit**: write the message, then commit.
 
-1. **Pre-commit checks** (unless `--no-verify`): Runs `make checks` if available.
-2. **Git analysis**: Checks staged files, runs `git diff`, analyzes change patterns
-3. **Commit preparation**: Generates conventional commit messages. Omit emoji from commit messages.
+If nothing is staged, stage all modified files. If the diff covers distinct
+concerns, propose atomic commits before committing.
 
-If no files are staged, automatically stages all modified files.
-If multiple distinct changes are detected, suggests splitting into atomic commits.
-
-## Core Commit Types
-
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation
-- `style`: Formatting/style
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Tests
-- `chore`: Tooling, configuration
-- `ci`: CI/CD improvements
-- `fix`: Fix compiler/linter warnings
-- `fix`: Security fixes
-- `fix`: Simple non-critical fixes
-
-## Commit Message Format
-
-```markdown
-<type>: <description>
-[optional body]
+## Message Rules
 
 ```
+<type>(<scope>): <subject>
 
-- Use present tense, imperative mood ("add feature" not "added feature")
-- Keep first line under 72 characters
-- Each commit should contain related changes serving a single purpose
+[body — only when required]
+```
+
+- **No emoji.** Not in the subject, not in the body.
+- Subject: imperative mood, lower case, no trailing period, under 60 characters.
+- `scope` is optional; include it only when it disambiguates.
+- **Default to a subject line alone.** Most commits need nothing more.
+- Add a body only for information the diff cannot show: why the change was
+  made, a breaking change, or an issue reference. Cap it at two short sentences
+  or three bullets.
+- Never restate the diff, list touched files, summarise your process, or add
+  closing commentary.
+
+## Types
+
+- `feat`: new feature
+- `fix`: bug fix, security fix, warning fix
+- `docs`: documentation
+- `style`: formatting
+- `refactor`: restructuring without behaviour change
+- `perf`: performance
+- `test`: tests
+- `chore`: tooling, dependencies, configuration
+- `ci`: CI/CD
 
 ## Splitting Criteria
 
-Suggests multiple commits when changes involve:
-
-- Different concerns or file types
-- Mixed change types (feature + fix + docs)
-- Large changes that would be clearer when separated
+Propose separate commits when the staged changes mix concerns, mix types
+(feature + fix + docs), or are large enough that one message cannot describe
+them accurately.
 
 ## Examples
 
-Good commit messages:
+Good:
 
-- feat: add user authentication system
-- fix: resolve memory leak in rendering process
-- docs: update API documentation with new endpoints
-- refactor: simplify error handling logic
+- `feat(auth): add session refresh endpoint`
+- `fix(render): release texture handles on unmount`
+- `docs: document the scanner exit codes`
+- `refactor: collapse duplicate error wrapping`
 
-Example split:
+With a body, where the reason is not visible in the diff:
 
-- feat: add new API endpoints
-- docs: update API documentation
-- test: add unit tests for new endpoints
+```
+fix(scanner): match patterns case-insensitively
+
+Uppercase AWS keys were slipping through, reported in #212.
+```
+
+Too verbose — do not do this:
+
+```
+✨ feat(auth): add a new session refresh endpoint to the auth package
+
+This commit adds a new endpoint. It modifies auth/handler.go to add the
+handler, auth/routes.go to register the route, and auth/handler_test.go to
+cover it. This improves the developer experience and makes the codebase
+more maintainable going forward.
+```
 
 ## Options
 
-- `--no-verify`: Skip pre-commit checks
+- `--no-verify`: skip pre-commit checks
+- `--help`: show this reference
 
 ## Notes
 
-- **Pre-commit failures**: Prompts to fix issues or proceed anyway
-- **No staged files**: Auto-stages all modified/new files
-- **Large changes**: Suggests atomic commits with guided staging
+- **Pre-commit failures**: ask whether to fix or proceed.
+- **No staged files**: auto-stage modified and new files.
+- **Large changes**: suggest atomic commits with guided staging.

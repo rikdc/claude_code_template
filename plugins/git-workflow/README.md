@@ -6,14 +6,14 @@ Git workflow automation commands for commits, PRs, and changelog management.
 
 ### `/commit`
 
-Creates well-formatted commits with conventional commit messages and emoji.
+Creates commits with brief conventional commit messages.
 
 **Features**:
 
-- Conventional commit format (feat, fix, docs, etc.)
-- Optional emoji prefixes
+- Conventional commit format (feat, fix, docs, etc.), no emoji
+- Subject-only messages by default; body only when the diff cannot explain the change
 - Automatic commit message generation from staged changes
-- Follows repository commit message style
+- Suggests splitting when staged changes mix concerns
 
 ### `/pr`
 
@@ -22,8 +22,8 @@ Creates a PR on GitHub with proper title and description.
 **Features**:
 
 - Analyzes full commit history for the branch
-- Generates concise PR title (under 70 characters)
-- Creates detailed PR description with summary and test plan
+- Generates a concise PR title (under 70 characters, no emoji)
+- Writes a succinct description covering only what the branch changes
 - Automatically pushes branch if needed
 
 ### `/changelog`

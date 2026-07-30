@@ -5,107 +5,94 @@ description: Creates a PR on GitHub
 
 # GitHub PR Creation Assistant
 
-Creates a new GitHub pull request using our project template and conventions.
+Creates a draft pull request with a conventional-commit title and a short
+description of what the branch actually changes.
 
-## Usage
+## Workflow
 
-This command will:
+1. **Validate**: `gh auth status`, current branch, uncommitted changes.
+2. **Read the branch**: `git log <base>..HEAD` and `git diff <base>...HEAD` —
+   the description covers exactly this, nothing more.
+3. **Write the body**: use `.github/pull_request_template.md` if present,
+   otherwise the sections below.
+4. **Create**: `gh pr create --draft --title "<type>(<scope>): <subject>" --body-file <file> --base main`
 
-1. Check git status and GitHub CLI authentication
-2. Retrieve and populate the PR template
-3. Format title using conventional commits
-4. Create draft PR with proper structure
+## Title Rules
 
-## Command Structure
+- Conventional commit format: `<type>(<scope>): <subject>`.
+- **No emoji.** The title is plain text.
+- Under 70 characters, imperative mood, no trailing period.
+- For a single-commit PR, reuse that commit's subject.
 
-```bash
-gh pr create --draft --title "✨(scope): Your descriptive title" --body-file .github/pull_request_template.md --base main
+Examples:
 
-```
+- `feat(auth): add session refresh endpoint`
+- `fix(scanner): match patterns case-insensitively`
+- `docs: document the scanner exit codes`
 
-### Title Format
+## Body Rules
 
-Use conventional commit format with emojis:
+Keep it succinct. The PR body describes the commits on the branch and nothing
+else.
 
-✨(feature): Add new functionality
-🐛(bugfix): Fix critical issue
-📝(docs): Update documentation
-🔧(config): Modify configuration
+- **Summary**: one to three sentences. What changed and why. No restating the
+  title, no background essay.
+- **Changes**: one bullet per meaningful change, one line each. Group trivial
+  edits rather than listing every file. Under six bullets for a normal PR — if
+  it needs more, the PR is probably too large.
+- **Testing**: one line stating what was run (`make test`, `go test ./...`) and
+  the result. Say so plainly if nothing was run.
+- Drop any template section that has nothing real to say.
+- No emoji, no headings beyond the template's, no "Notes for reviewers",
+  "Future work", "Impact", or risk-assessment sections unless asked.
+- Do not claim behaviour you have not verified.
 
-### Workflow Steps
-
-Sub-task 1: Validation
-
-- Verify GitHub CLI installation and authentication
-- Check current branch status
-- Validate uncommitted changes
-
-### Sub-task 2: Template Processing
-
-- Read .github/pull_request_template.md
-- Pre-populate known sections
-- Validate template structure
-
-### Sub-task 3: PR Creation
-
-- Format title with appropriate emoji
-- Create draft PR with populated template
-- Set proper base branch and reviewers
-
-### Template Sections
-
-Ensure all sections are included:
+Default body when there is no template:
 
 ```markdown
+## Summary
 
-# Summary
-
-## pr_agent:summary
+<1-3 sentences>
 
 ## Changes
 
-## pr_agent:walkthrough
+- <change>
+- <change>
 
 ## Testing
 
-## Checklist
-
+<command and result>
 ```
 
-Common Actions
+Example body:
+
+```markdown
+## Summary
+
+Pattern matching in the MCP scanner was case-sensitive, so uppercase AWS keys
+passed the scan. Matching is now case-insensitive.
+
+## Changes
+
+- Add `-i` to the pattern grep in `mcp-security-scanner.sh`
+- Cover uppercase keys in `tests/test-scanner.sh`
+
+## Testing
+
+`make test` — all suites pass.
+```
+
+## Common Actions
 
 ```bash
-
-# Convert draft to ready
-
-gh pr ready <PR-NUMBER>
-
-# Add reviewers
-
-gh pr edit <PR-NUMBER> --add-reviewer username1,username2
-
-# Check PR status
-
-gh pr status
-
+gh pr ready <PR-NUMBER>                                    # draft to ready
+gh pr edit <PR-NUMBER> --add-reviewer user1,user2          # add reviewers
+gh pr status                                               # check status
 ```
 
-### Error Handling
+## Error Handling
 
-The command will automatically:
-
-- Install GitHub CLI if missing (with permission)
-- Prompt for authentication if needed
-- Create template if .github/pull_request_template.md doesn't exist
-- Validate title format and suggest corrections
-
-**Prerequisites Check:***
-
-Before execution, validates:
-
-- GitHub CLI installation
-- Repository authentication
-- Clean working directory
-- Valid branch for PR creation
-
-Use `gh auth status` to verify authentication if issues occur.
+- Missing `gh`: prompt to install.
+- Not authenticated: run `gh auth status` and prompt to log in.
+- Missing PR template: use the default body above; do not create the template
+  file unless asked.

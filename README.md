@@ -68,7 +68,7 @@ make test
 
 ### GitHub Workflow
 
-- `/gh:commit` - Creates conventional commits with emoji
+- `/gh:commit` - Creates brief conventional commits
 - `/gh:pr` - Creates GitHub pull requests with templates
 
 ### Project Management
