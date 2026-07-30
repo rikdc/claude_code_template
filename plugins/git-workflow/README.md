@@ -69,4 +69,4 @@ claude code plugins install github:rikdc/claude_code_template/git-workflow
 
 ## License
 
-MIT
+Mozilla Public License 2.0 — see [LICENSE](../../LICENSE).

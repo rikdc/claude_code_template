@@ -99,4 +99,4 @@ claude code plugins install github:rikdc/claude_code_template/dev-skills
 
 ## License
 
-MIT
+Mozilla Public License 2.0 — see [LICENSE](../../LICENSE).

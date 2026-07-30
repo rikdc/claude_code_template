@@ -223,7 +223,7 @@ Each plugin has a `.claude-plugin/plugin.json` manifest:
   "author": {
     "name": "Richard Claydon"
   },
-  "license": "MIT",
+  "license": "MPL-2.0",
   "category": "security|development|productivity|ai",
   "keywords": ["keyword1", "keyword2"],
   "skills": ["./skills/"],        // For skill plugins
@@ -346,4 +346,31 @@ Tests validate the core functionality that plugins are built from.
 
 ## License
 
-All plugins are licensed under MIT License.
+All plugins are licensed under the Mozilla Public License 2.0. See
+[LICENSE](../LICENSE) for the full text.
+
+MPL-2.0 is a per-file weak copyleft licence: if you modify a file from this
+repository, that file must remain under MPL-2.0 and its source must be made
+available. You are free to combine it with proprietary code in a larger work.
+
+### Third-party content
+
+The PM command suite (`/pm:create-prd`, `/pm:generate-tasks`,
+`/pm:process-tasks`) is derived from
+[AI Dev Tasks](https://github.com/snarktank/ai-dev-tasks/tree/main), which is
+licensed under Apache-2.0.
+
+Apache-2.0 material may be included in an MPL-2.0 project, but Apache-2.0 §4
+imposes obligations that must be honoured on redistribution:
+
+- **§4(a)** — a copy of the Apache-2.0 licence must be included. It lives at
+  [LICENSES/Apache-2.0.txt](../LICENSES/Apache-2.0.txt).
+- **§4(b)** — modified files must carry prominent notices stating they were
+  changed. See the statement of changes in the root
+  [README](../README.md#attribution).
+- **§4(c)** — upstream `NOTICE` file contents must be reproduced. AI Dev Tasks
+  ships no `NOTICE` file, so this does not apply.
+
+If you add further Apache-2.0 material, place its licence copy under
+`LICENSES/` and record the attribution and statement of changes in the root
+README.
