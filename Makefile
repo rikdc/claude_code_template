@@ -20,6 +20,7 @@ PROTECT_BRANCH_SCRIPT := $(HOOKS_DIR)/protect-main-branch.sh
 MANIFEST_FILE := $(PLUGIN_DIR)/.claude-plugin/plugin.json
 TEST_SCRIPT := $(TESTS_DIR)/test-scanner.sh
 TEST_PROTECT_BRANCH_SCRIPT := $(TESTS_DIR)/test-protect-main-branch.sh
+TEST_MARKETPLACE_SCRIPT := $(TESTS_DIR)/test-marketplace.sh
 VALIDATE_SCRIPT := $(SCRIPTS_DIR)/validate-config.sh
 
 # Colors for output
@@ -41,6 +42,9 @@ test: ## Run complete test suite
 	@echo
 	@echo -e "$(BLUE)🧪 Running protected branch hook tests...$(NC)"
 	@$(TEST_PROTECT_BRANCH_SCRIPT)
+	@echo
+	@echo -e "$(BLUE)🧪 Running marketplace consistency tests...$(NC)"
+	@$(TEST_MARKETPLACE_SCRIPT)
 
 .PHONY: validate
 validate: ## Validate plugin manifest, hook scripts, and dependencies

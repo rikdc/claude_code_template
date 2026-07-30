@@ -4,7 +4,7 @@ This document explains the marketplace structure and plugin distribution system 
 
 ## Overview
 
-The repository is organized as a **Claude Code marketplace** with 6 independent, installable plugins. This allows users to install only the components they need rather than getting everything at once.
+The repository is organized as a **Claude Code marketplace** with 7 independent, installable plugins. This allows users to install only the components they need rather than getting everything at once.
 
 ## Architecture
 
@@ -189,6 +189,31 @@ claude code plugins install prompt-tools
 ```
 
 **Documentation**: [plugins/prompt-tools/README.md](../plugins/prompt-tools/README.md)
+
+---
+
+### 7. pr-review-triage
+
+**Category**: Workflow
+**Source**: `./plugins/pr-review-triage`
+
+**Components**:
+
+- `/triage-reviews` - PR review comment triage skill
+- `/triage` - Legacy triage command
+
+**Features**:
+
+- Classifies review comments and accepts or rejects each with a reason
+- Creates tracked follow-up tasks for deferred feedback
+- Resolves handled threads on the pull request
+- Supports `--dry-run` and per-category auto-approval
+
+**Installation**:
+
+```bash
+claude code plugins install pr-review-triage
+```
 
 ---
 
