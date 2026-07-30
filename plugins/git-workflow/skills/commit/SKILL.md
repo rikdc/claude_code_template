@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Writes brief conventional-commit messages and commits the staged changes. Use when the user asks to commit, stage and commit, or write a commit message.
+description: Writes brief conventional-commit messages, runs pre-commit checks, stages changes, commits them, and proposes splitting when the diff mixes concerns. Use when the user asks to commit, stage and commit, write a commit message, or split a change into atomic commits.
 user-invocable: true
 argument-hint: "[--no-verify] [--help]"
 allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git log:*)
