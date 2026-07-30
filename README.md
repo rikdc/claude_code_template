@@ -68,8 +68,8 @@ make test
 
 ### GitHub Workflow
 
-- `/gh:commit` - Creates brief conventional commits
-- `/gh:pr` - Creates GitHub pull requests with templates
+- `/git-workflow:commit` - Creates brief conventional commits
+- `/git-workflow:pr` - Creates draft GitHub pull requests from the branch
 
 ### Project Management
 
@@ -79,7 +79,7 @@ make test
 
 ### Documentation
 
-- `/changelog` - Maintains CHANGELOG.md following Keep a Changelog format
+- `/git-workflow:changelog` - Maintains CHANGELOG.md following Keep a Changelog format
 - `/promptify` - Generates high-quality AI prompts with best practices
 - `/prompt-reviewer` - Reviews and improves AI prompts
 
@@ -109,7 +109,7 @@ make status         # Show configuration and tool status
 plugins/                          # Marketplace plugin distribution
 ├── security-hooks/              # MCP security and branch protection
 ├── dev-skills/                  # Development skills (Go, docs, etc.)
-├── git-workflow/                # Git automation commands
+├── git-workflow/                # Git automation skills
 ├── pm-tools/                    # Project management commands
 ├── code-quality/                # Code review and cleanup
 └── prompt-tools/                # AI prompt generation

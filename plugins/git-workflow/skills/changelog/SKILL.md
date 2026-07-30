@@ -1,19 +1,21 @@
 ---
-allowed-tools: Read(*), Write(CHANGELOG.md), Edit(CHANGELOG.md), Bash(git add:*), Bash(git status:*), Bash(git commit:*)
-description: Maintains a CHANGELOG.md document in this repository
+name: changelog
+description: Creates and maintains CHANGELOG.md in Keep a Changelog format, including adding entries and cutting releases. Use when the user asks to update the changelog, add a changelog entry, or record a release.
+user-invocable: true
+argument-hint: "[--create] [--add-entry \"description\" --type TYPE] [--release X.Y.Z]"
+allowed-tools: Read, Write(CHANGELOG.md), Edit(CHANGELOG.md), Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git log:*)
 ---
 
-# Add Changelog Command
+# Changelog - Keep a Changelog Maintenance
 
-  Create, update, or maintain a comprehensive changelog following industry standards.
+Create, update, or maintain a comprehensive changelog following industry standards.
 
 ## Usage
 
-- `changelog --create` - Create new CHANGELOG.md
-- `changelog --add-entry "description" --type TYPE` - Add new entry
+- `/git-workflow:changelog --create` - Create new CHANGELOG.md
+- `/git-workflow:changelog --add-entry "description" --type TYPE` - Add new entry
   - Types: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`
-
-- `changelog --release X.Y.Z` - Move unreleased items to new version
+- `/git-workflow:changelog --release X.Y.Z` - Move unreleased items to new version
 
 ## Instructions
 

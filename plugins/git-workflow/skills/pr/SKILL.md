@@ -1,9 +1,12 @@
 ---
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(gh *)
-description: Creates a PR on GitHub
+name: pr
+description: Creates a draft GitHub pull request with a plain-text conventional-commit title and a succinct description of the branch. Use when the user asks to open, raise, or create a pull request or PR.
+user-invocable: true
+argument-hint: "[--base <branch>]"
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git log:*), Bash(git diff:*), Bash(git push:*), Bash(gh *), Read, Write
 ---
 
-# GitHub PR Creation Assistant
+# PR - GitHub Pull Request Creation
 
 Creates a draft pull request with a conventional-commit title and a short
 description of what the branch actually changes.

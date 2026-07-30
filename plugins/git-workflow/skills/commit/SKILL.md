@@ -1,9 +1,12 @@
 ---
+name: commit
+description: Writes brief conventional-commit messages and commits the staged changes. Use when the user asks to commit, stage and commit, or write a commit message.
+user-invocable: true
+argument-hint: "[--no-verify] [--help]"
 allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git log:*)
-description: Creates brief conventional-commit messages
 ---
 
-# Claude Command: Commit
+# Commit - Conventional Commit Messages
 
 Creates commits with short conventional commit messages. Runs pre-commit checks
 and suggests splitting when the staged changes cover more than one concern.
@@ -11,7 +14,7 @@ and suggests splitting when the staged changes cover more than one concern.
 ## Usage
 
 ```bash
-/commit [--no-verify] [--help]
+/git-workflow:commit [--no-verify] [--help]
 ```
 
 ## Workflow

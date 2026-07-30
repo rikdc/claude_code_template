@@ -1,10 +1,10 @@
 # Git Workflow Plugin
 
-Git workflow automation commands for commits, PRs, and changelog management.
+Git workflow automation skills for commits, PRs, and changelog management.
 
-## Commands Included
+## Skills Included
 
-### `/commit`
+### `/git-workflow:commit`
 
 Creates commits with brief conventional commit messages.
 
@@ -15,7 +15,7 @@ Creates commits with brief conventional commit messages.
 - Automatic commit message generation from staged changes
 - Suggests splitting when staged changes mix concerns
 
-### `/pr`
+### `/git-workflow:pr`
 
 Creates a PR on GitHub with proper title and description.
 
@@ -26,7 +26,7 @@ Creates a PR on GitHub with proper title and description.
 - Writes a succinct description covering only what the branch changes
 - Automatically pushes branch if needed
 
-### `/changelog`
+### `/git-workflow:changelog`
 
 Maintains a CHANGELOG.md document following Keep a Changelog format.
 
@@ -55,17 +55,20 @@ claude code plugins install github:rikdc/claude_code_template/git-workflow
 
 ```bash
 # Create a commit
-/commit
+/git-workflow:commit
 
-# Create a commit with specific message
-/commit -m "feat: add user authentication"
+# Create a commit, skipping pre-commit checks
+/git-workflow:commit --no-verify
 
-# Create a pull request
-/pr
+# Create a draft pull request
+/git-workflow:pr
 
-# Update changelog
-/changelog Add new authentication feature to version 1.2.0
+# Add a changelog entry
+/git-workflow:changelog --add-entry "Add user authentication" --type added
 ```
+
+Each skill also triggers on plain requests such as "commit this" or "open a
+PR" — the slash form is just the explicit way to invoke it.
 
 ## License
 
