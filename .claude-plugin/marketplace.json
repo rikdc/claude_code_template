@@ -32,6 +32,14 @@
       "version": "1.0.0",
       "keywords": ["skills", "go", "documentation", "architecture", "mentorship"],
       "category": "skills"
+    },
+    {
+      "name": "nix-skills",
+      "source": "./plugins/nix-skills",
+      "description": "Expert skills for Nix, NixOS, and home-manager — config authoring and advisory guidance",
+      "version": "1.0.0",
+      "keywords": ["skills", "nix", "nixos", "home-manager", "flakes", "homelab"],
+      "category": "skills"
     }
   ]
 }
