@@ -106,4 +106,4 @@ grep "PROTECTED BRANCH VIOLATION" .claude/protect-main-branch.log
 
 ## License
 
-MIT
+Mozilla Public License 2.0 — see [LICENSE](../../LICENSE).

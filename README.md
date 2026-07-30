@@ -143,3 +143,21 @@ The PM command suite (`/pm:create-prd`, `/pm:generate-tasks`, `/pm:process-tasks
 - **Usage**: Adapted and extended for Claude Code project management workflows
 
 Special thanks to the AI Dev Tasks project for providing the foundational patterns for structured AI-assisted development workflows.
+
+## License
+
+Copyright (c) Richard Claydon.
+
+Licensed under the Mozilla Public License, v. 2.0. See [LICENSE](LICENSE) for
+the full text, or obtain a copy at <https://mozilla.org/MPL/2.0/>.
+
+MPL-2.0 is a per-file weak copyleft licence. In practice:
+
+- **Use it freely**, including commercially, with no obligation to open your own code
+- **Credit is required** — retain the copyright and licence notices
+- **Modifications to these files must stay open** under MPL-2.0, with source made available
+- **Larger works may be proprietary** — you can combine this with closed code
+
+The PM command suite retains its upstream MIT licence, as noted under
+[Attribution](#attribution). MIT-licensed material is compatible with MPL-2.0
+provided the upstream notice is preserved.

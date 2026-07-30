@@ -74,4 +74,4 @@ claude code plugins install github:rikdc/claude_code_template/code-quality
 
 ## License
 
-MIT
+Mozilla Public License 2.0 — see [LICENSE](../../LICENSE).
