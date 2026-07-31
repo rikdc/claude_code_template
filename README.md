@@ -1,4 +1,4 @@
-# Claude Code Template
+# AI Skills
 
 A Claude Code marketplace of seven plugins. Two are security hooks: one scans
 MCP traffic for secrets, the other stops you editing protected branches
@@ -14,13 +14,13 @@ Add the marketplace, then install plugins from it:
 ```bash
 claude plugin marketplace add rikdc/ai-skills
 
-claude plugin install security-hooks@claude-code-template
-claude plugin install dev-skills@claude-code-template
-claude plugin install git-workflow@claude-code-template
-claude plugin install pm-tools@claude-code-template
-claude plugin install code-quality@claude-code-template
-claude plugin install prompt-tools@claude-code-template
-claude plugin install pr-review-triage@claude-code-template
+claude plugin install security-hooks@ai-skills
+claude plugin install dev-skills@ai-skills
+claude plugin install git-workflow@ai-skills
+claude plugin install pm-tools@ai-skills
+claude plugin install code-quality@ai-skills
+claude plugin install prompt-tools@ai-skills
+claude plugin install pr-review-triage@ai-skills
 ```
 
 The `/plugin` command does the same thing from inside a session.
