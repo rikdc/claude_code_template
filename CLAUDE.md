@@ -44,7 +44,7 @@ make help           # Display all available commands
 
 This project uses the modern Claude Code skills structure alongside legacy commands.
 
-### Skills (`.claude/skills/`)
+### Skills (`plugins/*/skills/`)
 
 Skills are the recommended approach for reusable Claude Code behaviors:
 
@@ -58,7 +58,7 @@ Skills are the recommended approach for reusable Claude Code behaviors:
 
 ### Migration from Agents
 
-Previous `.claude/agents/` files have been migrated to skills:
+Previous agent definitions have been migrated to skills:
 
 | Old Agent | New Skill |
 |-----------|-----------|
@@ -70,7 +70,7 @@ Previous `.claude/agents/` files have been migrated to skills:
 | `staff-eyes-agent.md` | `/mentor` (renamed for clarity) |
 | `taskify-agent.md` | `/taskify` |
 
-### Commands (`.claude/commands/`)
+### Commands (`plugins/*/commands/`)
 
 Legacy slash commands (still functional):
 
@@ -82,11 +82,11 @@ Legacy slash commands (still functional):
 
 ### Core Components
 
-- **Security Scanner Hook** (`.claude/hooks/mcp-security-scanner.sh`): Main security scanner that intercepts MCP requests and scans for sensitive data using regex patterns and optional external tools
-- **Protected Branch Hook** (`.claude/hooks/protect-main-branch.sh`): Prevents direct edits to protected branches (main, master, production, release) by blocking Edit, Write, Bash, and Task tools, enforcing PR-based workflows
-- **Hook Configuration** (`.claude/settings.json`): Claude Code hook configuration that automatically runs hooks for MCP tools and code-modifying operations
+- **Security Scanner Hook** (`plugins/security-hooks/hooks/mcp-security-scanner.sh`): Main security scanner that intercepts MCP requests and scans for sensitive data using regex patterns and optional external tools
+- **Protected Branch Hook** (`plugins/security-hooks/hooks/protect-main-branch.sh`): Prevents direct edits to protected branches (main, master, production, release) by blocking Edit, Write, Bash, and Task tools, enforcing PR-based workflows
+- **Hook Configuration** (`plugins/security-hooks/.claude-plugin/plugin.json`): Claude Code hook configuration that automatically runs hooks for MCP tools and code-modifying operations
 - **Security Patterns** (`.claude/security-patterns.conf`): Configurable regex patterns for detecting sensitive data (API keys, tokens, database URLs, etc.)
-- **Custom Commands** (`.claude/commands/`): Slash commands that provide specialized workflows for code quality, cleanup, and changelog maintenance
+- **Custom Commands** (`plugins/*/commands/`): Slash commands that provide specialized workflows for code quality, cleanup, and changelog maintenance
 
 ### Testing Infrastructure
 
@@ -127,7 +127,7 @@ The project uses Claude Code's PreToolUse hook mechanism with two complementary 
 - **Response**: Provides monitoring/auditing with violation logging
 
 ### Protected Branch Hook
-- **Trigger**: Edit, Write, Bash, and Task tool calls matching pattern `(Edit|Write|Bash|Task).*`
+- **Trigger**: Edit, Write, Bash, and Task tool calls matching pattern `^(Edit|Write|Bash|Task)$`
 - **Flow**: Tool Call → Branch Detection → Protection Check → Allow/Block
 - **Protected Branches**: main, master, production, release
 - **Response**: Blocks operations with guidance to create feature branches
@@ -146,12 +146,12 @@ The project uses Claude Code's PreToolUse hook mechanism with two complementary 
 
 ## Key Files
 
-- `.claude/settings.json`: Hook configuration for all hooks (MCP scanner and branch protection)
-- `.claude/security-patterns.conf`: Security detection patterns
-- `.claude/security-scan.log`: Audit log of all security scan activity
-- `.claude/protect-main-branch.log`: Audit log of branch protection activity
-- `.claude/skills/`: Modern skills with SKILL.md format (recommended)
-- `.claude/commands/`: Legacy slash commands (check, clean, changelog)
+- `plugins/security-hooks/.claude-plugin/plugin.json`: Hook configuration for all hooks (MCP scanner and branch protection)
+- `.claude/security-patterns.conf`: Security detection patterns (generated at runtime from `security-patterns.conf.example`)
+- security-scan.log (in `.claude/`): Audit log of all security scan activity, generated at runtime and gitignored
+- protect-main-branch.log (in `.claude/`): Audit log of branch protection activity, generated at runtime and gitignored
+- `plugins/*/skills/`: Modern skills with SKILL.md format (recommended)
+- `plugins/*/commands/`: Legacy slash commands (check, clean, changelog)
 - `tests/test-scanner.sh`: Security scanner test suite
 - `tests/test-protect-main-branch.sh`: Protected branch hook test suite
 - `Makefile`: Primary interface for all project operations
@@ -160,16 +160,16 @@ The project uses Claude Code's PreToolUse hook mechanism with two complementary 
 
 ## Monitoring and Debugging
 
-**Security Scanning**: Check `.claude/security-scan.log` for:
+**Security Scanning**: Check the runtime-generated security-scan.log in `.claude/` for:
 - Hook execution: `grep "DEBUG: Hook script started"`
 - Clean requests: `grep "Security scan passed"`
 - Violations: `grep "SECURITY VIOLATION"`
 
-**Branch Protection**: Check `.claude/protect-main-branch.log` for:
+**Branch Protection**: Check the runtime-generated protect-main-branch.log in `.claude/` for:
 - Hook execution: `grep "DEBUG: Hook script started"`
 - Allowed operations: `grep "INFO: Branch.*is not protected"`
 - Violations: `grep "ERROR: PROTECTED BRANCH VIOLATION"`
-- Blocked tools: `grep "blocked" .claude/protect-main-branch.log`
+- Blocked tools: `grep "blocked"` against that log
 
 **MCP Coverage**: The scanner monitors all MCP servers and extracts content from various parameter fields (`thought`, `prompt`, `topic`, `libraryName`, etc.) for comprehensive security coverage.
 
