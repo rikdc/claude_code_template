@@ -5,8 +5,7 @@
   },
   "metadata": {
     "description": "Security hooks, branch protection, and development skills for Claude Code projects",
-    "version": "1.0.0",
-    "pluginRoot": "./plugins"
+    "version": "1.0.0"
   },
   "plugins": [
     {
