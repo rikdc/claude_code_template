@@ -1,4 +1,4 @@
-# Makefile for Claude Code Template
+# Makefile for AI Skills
 # Provides a simple interface for common operations
 
 # Configuration
@@ -128,7 +128,7 @@ check-tools: ## Check for required and optional tools
 
 .PHONY: status
 status: ## Show current status and configuration
-	@echo -e "$(BLUE)📊 Claude Code Template Status$(NC)"
+	@echo -e "$(BLUE)📊 AI Skills Status$(NC)"
 	@echo
 	@echo "Configuration:"
 	@echo "  Project root: $(PROJECT_ROOT)"
@@ -143,7 +143,7 @@ status: ## Show current status and configuration
 
 .PHONY: help
 help: ## Display this help
-	@echo -e "$(BLUE)Claude Code Template - Make Targets$(NC)"
+	@echo -e "$(BLUE)AI Skills - Make Targets$(NC)"
 	@echo
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) }' $(MAKEFILE_LIST)
 	@echo

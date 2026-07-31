@@ -1,6 +1,6 @@
-# Claude Code Template Marketplace
+# AI Skills Marketplace
 
-This document explains the marketplace structure and plugin distribution system for the Claude Code Template repository.
+This document explains the marketplace structure and plugin distribution system for the AI Skills repository.
 
 ## Overview
 
@@ -263,7 +263,7 @@ The top-level `.claude-plugin/marketplace.json` registers all plugins:
 
 ```json
 {
-  "name": "claude-code-template",
+  "name": "ai-skills",
   "owner": {
     "name": "Richard Claydon"
   },
@@ -305,8 +305,8 @@ claude code plugins install dev-skills
 #### Option 2: Clone entire repository
 
 ```bash
-git clone https://github.com/rikdc/claude_code_template.git
-cd claude_code_template
+git clone https://github.com/rikdc/ai-skills.git
+cd ai-skills
 make install
 ```
 
@@ -321,7 +321,7 @@ claude code plugins install <plugin-name>
 ### From GitHub Repository
 
 ```bash
-claude code plugins install github:rikdc/claude_code_template/<plugin-name>
+claude code plugins install github:rikdc/ai-skills/<plugin-name>
 ```
 
 ### From Local Directory
