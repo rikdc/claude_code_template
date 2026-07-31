@@ -23,6 +23,9 @@ TEST_PROTECT_BRANCH_SCRIPT := $(TESTS_DIR)/test-protect-main-branch.sh
 TEST_MARKETPLACE_SCRIPT := $(TESTS_DIR)/test-marketplace.sh
 VALIDATE_SCRIPT := $(SCRIPTS_DIR)/validate-config.sh
 
+# Pinned tool versions
+CLAUDELINT_VERSION := 0.7.1
+
 # Colors for output
 BLUE := \033[0;34m
 GREEN := \033[0;32m
@@ -70,6 +73,18 @@ lint: ## Run ShellCheck on shell scripts and markdownlint on Markdown files
 		echo -e "  $(GREEN)✅ markdownlint passed$(NC)"; \
 	else \
 		echo -e "  $(YELLOW)⚠️  markdownlint not installed - skipping Markdown linting$(NC)"; \
+	fi
+	@echo
+	@$(MAKE) --no-print-directory lint-claude
+
+.PHONY: lint-claude
+lint-claude: ## Run claudelint on Claude Code configuration
+	@echo "Claude configuration:"
+	@if command -v npx >/dev/null 2>&1; then \
+		npx --yes claude-code-lint@$(CLAUDELINT_VERSION) check-all && \
+		echo -e "  $(GREEN)✅ claudelint passed$(NC)"; \
+	else \
+		echo -e "  $(YELLOW)⚠️  npx not installed - skipping Claude configuration linting$(NC)"; \
 	fi
 
 ##@ Installation and Setup
