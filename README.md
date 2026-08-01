@@ -135,7 +135,7 @@ plugins/                        # Everything the marketplace ships
 └── pr-review-triage/           # PR comment triage
 
 .claude-plugin/marketplace.json # Marketplace manifest
-.claude/                        # Local config: security patterns, logs, activity monitor
+.claude/                        # Local config: security patterns, logs
 docs/                           # Hook and marketplace documentation
 scripts/                        # Validation tooling
 tests/                          # Test suite
