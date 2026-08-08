@@ -17,15 +17,19 @@ directories.
 - Edit the source skill, not its `.codex/skills/` symlink.
 - Keep skills provider-neutral unless a platform-specific instruction is
   essential.
+- After adding, renaming, or removing a plugin skill, run
+  `make sync-codex-skills` to update `.codex/skills/` and commit the result.
+  `make test` fails if the symlinks drift from `plugins/*/skills/`.
 
 ## Commands and verification
 
 Run relevant checks before handing off changes:
 
 ```bash
-make test       # Hook tests
-make validate   # Plugin manifest, scripts, and dependencies
-make lint       # ShellCheck/Markdown lint when installed
+make test              # Hook tests, marketplace and Codex symlink consistency
+make validate           # Plugin manifest, scripts, and dependencies
+make lint               # ShellCheck/Markdown lint when installed
+make sync-codex-skills  # Regenerate .codex/skills/ after plugin skill changes
 ```
 
 `jq`, `grep`, `awk`, and `mktemp` are required for the security-hook tooling.
