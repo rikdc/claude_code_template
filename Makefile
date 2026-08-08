@@ -21,7 +21,9 @@ MANIFEST_FILE := $(PLUGIN_DIR)/.claude-plugin/plugin.json
 TEST_SCRIPT := $(TESTS_DIR)/test-scanner.sh
 TEST_PROTECT_BRANCH_SCRIPT := $(TESTS_DIR)/test-protect-main-branch.sh
 TEST_MARKETPLACE_SCRIPT := $(TESTS_DIR)/test-marketplace.sh
+TEST_CODEX_SKILLS_SCRIPT := $(TESTS_DIR)/test-codex-skills.sh
 VALIDATE_SCRIPT := $(SCRIPTS_DIR)/validate-config.sh
+SYNC_CODEX_SKILLS_SCRIPT := $(SCRIPTS_DIR)/sync-codex-skills.sh
 
 # Pinned tool versions
 CLAUDELINT_VERSION := 0.7.1
@@ -48,6 +50,9 @@ test: ## Run complete test suite
 	@echo
 	@echo -e "$(BLUE)🧪 Running marketplace consistency tests...$(NC)"
 	@$(TEST_MARKETPLACE_SCRIPT)
+	@echo
+	@echo -e "$(BLUE)🧪 Running Codex skill symlink tests...$(NC)"
+	@$(TEST_CODEX_SKILLS_SCRIPT)
 
 .PHONY: validate
 validate: ## Validate plugin manifest, hook scripts, and dependencies
@@ -105,6 +110,10 @@ clean: ## Remove test artifacts and logs
 	@find "$(PLUGIN_DIR)" -name "*.log" -type f -delete 2>/dev/null || true
 	@find "$(TESTS_DIR)" -name "*.log" -type f -delete 2>/dev/null || true
 	@echo -e "$(GREEN)✅ Cleanup complete$(NC)"
+
+.PHONY: sync-codex-skills
+sync-codex-skills: ## Sync .codex/skills symlinks with plugins/*/skills
+	@$(SYNC_CODEX_SKILLS_SCRIPT)
 
 ##@ Development
 
@@ -167,6 +176,7 @@ help: ## Display this help
 	@echo "  make validate          # Validate plugin configuration"
 	@echo "  make lint              # Run code quality checks"
 	@echo "  make install           # Make hook scripts executable"
+	@echo "  make sync-codex-skills # Sync .codex/skills symlinks with plugins/*/skills"
 	@echo "  make clean             # Clean up artifacts"
 	@echo
 

@@ -31,13 +31,14 @@ The repository is organized as a **marketplace with 7 installable plugins**:
 All project operations are managed through the Makefile:
 
 ```bash
-make test           # Run complete test suite
-make lint           # Run ShellCheck on all shell scripts
-make install        # Install hooks (make scanner script executable)
-make clean          # Remove test artifacts and logs
-make status         # Show current status and configuration
-make check-tools    # Check for required and optional security tools
-make help           # Display all available commands
+make test               # Run complete test suite
+make lint               # Run ShellCheck on all shell scripts
+make install            # Install hooks (make scanner script executable)
+make sync-codex-skills  # Sync .codex/skills symlinks with plugins/*/skills
+make clean              # Remove test artifacts and logs
+make status             # Show current status and configuration
+make check-tools        # Check for required and optional security tools
+make help               # Display all available commands
 ```
 
 ## Claude Code Skills and Commands
@@ -154,6 +155,8 @@ The project uses Claude Code's PreToolUse hook mechanism with two complementary 
 - `plugins/*/commands/`: Legacy slash commands (check, clean, changelog)
 - `tests/test-scanner.sh`: Security scanner test suite
 - `tests/test-protect-main-branch.sh`: Protected branch hook test suite
+- `tests/test-codex-skills.sh`: Verifies `.codex/skills/` symlinks match `plugins/*/skills/`
+- `scripts/sync-codex-skills.sh`: Creates, fixes, and prunes `.codex/skills/` symlinks (`--check` for CI/verification)
 - `Makefile`: Primary interface for all project operations
 - `docs/mcp-security-scanner.md`: Comprehensive security scanner documentation
 - `docs/protect-main-branch-hook.md`: Comprehensive branch protection documentation
